@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1.5 &ndash; State &amp; Events | React Kurs</title>
+  <script>(function(){var t=localStorage.getItem('kurs-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
+  <link rel="stylesheet" href="assets/kurs.css">
+  <link rel="stylesheet" id="hljs-theme" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+<body>
+
+<button class="hamburger" id="hamburger" aria-label="Navigation &ouml;ffnen">&#9776;</button>
+<div class="sidebar-overlay" id="overlay"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html">
+      <span class="brand-icon">&#9992;</span>
+      <div>
+        <div class="brand-name">React Kurs</div>
+        <div class="brand-sub">Web &amp; Mobile</div>
+      </div>
+    </a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Dark/Light Mode" title="Theme wechseln">&#9728;</button>
+  </div>
+        <nav class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-label react-label">Teil 1 &mdash; React Einführung</div>
+      <a class="nav-link" href="1.1-einfuehrung-spa.html"><span class="ln">1.1</span>Motivation &amp; SPA</a>
+      <a class="nav-link" href="1.2-einfuehrung.html"><span class="ln">1.2</span>Einführung &amp; Umgebung</a>
+      <a class="nav-link" href="1.3-komponenten-props-einfach.html"><span class="ln">1.3</span>Komponenten &amp; Props (einfach)</a>
+      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten &amp; Props (Vertiefung)</a>
+      <a class="nav-link" href="1.5-state-events.html"><span class="ln">1.5</span>State &amp; Events</a>
+      <a class="nav-link" href="1.6-listen-conditional.html"><span class="ln">1.6</span>Listen &amp; Conditional Rendering</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label react-label">Teil 2 &mdash; React Praxis</div>
+      <a class="nav-link" href="2.1-formulare.html"><span class="ln">2.1</span>Formulare &amp; Inputs</a>
+      <a class="nav-link" href="2.2-useeffect-api.html"><span class="ln">2.2</span>useEffect &amp; API</a>
+      <a class="nav-link" href="2.3-kommunikation.html"><span class="ln">2.3</span>Komponentenkommunikation</a>
+      <a class="nav-link" href="2.4-context.html"><span class="ln">2.4</span>Context API</a>
+      <a class="nav-link" href="2.5-custom-hooks.html"><span class="ln">2.5</span>Custom Hooks</a>
+      <a class="nav-link" href="2.6-testen-vitest-rtl.html"><span class="ln">2.6</span>Testen mit Vitest + RTL</a>
+      <a class="nav-link" href="2.7-react-router.html"><span class="ln">2.7</span>React Router</a>
+      <a class="nav-link" href="2.8-datenbank-drizzle-sqlite.html"><span class="ln">2.8</span>Datenbankzugriff mit Drizzle + SQLite</a>
+      <a class="nav-link" href="2.9-redux-state-management.html"><span class="ln">2.9</span>State Management mit Redux (Überblick)</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label next-label">Teil 3 &mdash; Next.js</div>
+      <a class="nav-link" href="3.1-nextjs-einfuehrung.html"><span class="ln">3.1</span>Einführung Next.js</a>
+      <a class="nav-link" href="3.2-nextjs-routing.html"><span class="ln">3.2</span>Routing &amp; Layouts</a>
+      <a class="nav-link" href="3.3-server-client.html"><span class="ln">3.3</span>Server &amp; Client Components</a>
+      <a class="nav-link" href="3.4-api-routes.html"><span class="ln">3.4</span>API Routes &amp; Datenabruf</a>
+      <a class="nav-link" href="3.5-playwright-e2e.html"><span class="ln">3.5</span>Playwright E2E</a>
+      <a class="nav-link" href="3.6-deployment.html"><span class="ln">3.6</span>Deployment</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label rn-label">Teil 4 &mdash; React Native</div>
+      <a class="nav-link" href="4.1-rn-einfuehrung.html"><span class="ln">4.1</span>Einführung React Native</a>
+      <a class="nav-link" href="4.2-rn-komponenten.html"><span class="ln">4.2</span>Native Komponenten &amp; Styling</a>
+      <a class="nav-link" href="4.3-rn-navigation.html"><span class="ln">4.3</span>Navigation &amp; State</a>
+    </div>
+  </nav>
+</aside>
+
+<main class="main-content">
+  <header class="lesson-header">
+    <p class="lesson-eyebrow">Lektion 1.5 &mdash; Teil 1: React Einführung</p>
+    <h1>State &amp; Events</h1>
+    <div class="lesson-tags">
+      <span class="tag tag-react">React</span>
+      <span class="tag tag-time">ca. 90 min</span>
+    </div>
+  </header>
+
+  <div class="content-area">
+
+    <section class="section section-lernziele">
+      <h2>Lernziele</h2>
+      <ul class="lernziele-list">
+        <li>Den <code>useState</code>-Hook verstehen und anwenden</li>
+        <li>Event-Handler in TypeScript korrekt typisieren</li>
+        <li>Den Unterschied zwischen State und Props verstehen</li>
+        <li>Immutability: State niemals direkt mutieren</li>
+        <li>Re-rendering: wann rendert React neu?</li>
+        <li>State f&uuml;r Arrays und Objekte aktualisieren</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>Was ist State?</h2>
+      <p>
+        State ist der <strong>interne, ver&auml;nderliche Speicher</strong> einer Komponente. W&auml;hrend Props
+        von au&szlig;en hereinkommen und in der Komponente unver&auml;ndert bleiben, kann State durch
+        Benutzerinteraktionen oder andere Ereignisse ge&auml;ndert werden. Immer wenn sich State &auml;ndert,
+        rendert React die Komponente neu &ndash; die Ansicht spiegelt stets den aktuellen State wider.
+      </p>
+      <p>
+        Der wichtigste Unterschied: Props kommen <em>von den Eltern</em>, State kommt <em>von innen</em>.
+        Eine Komponente kann ihren eigenen State &auml;ndern, aber niemals direkt die Props eines Kindes.
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">useState-Grundlagen</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import { useState } from 'react';
+
+// Syntax: const [wert, setWert] = useState&lt;Typ&gt;(initialWert);
+// useState gibt ein Tupel zur&uuml;ck: [aktueller Wert, Setter-Funktion]
+
+const [count, setCount]     = useState&lt;number&gt;(0);
+const [name, setName]       = useState&lt;string&gt;('');
+const [isOpen, setIsOpen]   = useState&lt;boolean&gt;(false);
+
+// TypeScript kann den Typ oft aus dem Initialwert ableiten:
+const [count, setCount]   = useState(0);       // Typ: number
+const [name, setName]     = useState('');       // Typ: string
+
+// Bei komplexen Typen oder wenn der Initialwert null sein kann:
+const [flight, setFlight] = useState&lt;Flight | null&gt;(null);
+const [flights, setFlights] = useState&lt;Flight[]&gt;([]);</code></pre>
+      </div>
+      <div class="callout callout-info">
+        <div class="callout-icon">&#8505;</div>
+        <div class="callout-body">
+          <div class="callout-title">Was ist ein Hook?</div>
+          <p>
+            Hooks sind spezielle React-Funktionen, die mit <code>use</code> beginnen (z.B.
+            <code>useState</code>, <code>useEffect</code>). Sie d&uuml;rfen <strong>nur</strong> in
+            Funktionskomponenten und in Custom Hooks aufgerufen werden &ndash; nicht in Schleifen,
+            Bedingungen oder normalen Funktionen. Diese Regel nennt sich die <em>Rules of Hooks</em>.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Event-Handler und TypeScript-Typen</h2>
+      <p>
+        React-Events sind synthetische Events (Wrapper um native Browser-Events). In TypeScript m&uuml;ssen
+        Event-Handler-Funktionen den richtigen Typ f&uuml;r den Event-Parameter haben. Die wichtigsten Typen
+        sind <code>React.MouseEvent</code>, <code>React.ChangeEvent</code> und <code>React.FormEvent</code>.
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Event-Handler Typen</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import { useState } from 'react';
+
+const BeispielKomponente = () => {
+  const [count, setCount]   = useState(0);
+  const [text, setText]     = useState('');
+
+  // Einfacher Click-Handler ohne Parameter
+  const handleClick = () => {
+    setCount(count + 1);
+  };
+
+  // Click-Handler mit Event-Parameter (f&uuml;r position, target etc.)
+  const handleButtonClick = (e: React.MouseEvent&lt;HTMLButtonElement&gt;) => {
+    console.log('Geklickt bei:', e.clientX, e.clientY);
+    setCount(prev => prev + 1);
+  };
+
+  // Input-&Auml;nderung &ndash; HTMLInputElement f&uuml;r &lt;input&gt;
+  const handleChange = (e: React.ChangeEvent&lt;HTMLInputElement&gt;) => {
+    setText(e.target.value);
+  };
+
+  return (
+    &lt;div&gt;
+      &lt;p&gt;Z&auml;hler: {count}&lt;/p&gt;
+
+      {/* Direkte Inline-Funktion (gut f&uuml;r einfache F&auml;lle) */}
+      &lt;button onClick={() => setCount(0)}&gt;Zur&uuml;cksetzen&lt;/button&gt;
+
+      {/* Referenz auf Handler-Funktion (besser bei Wiederverwendung) */}
+      &lt;button onClick={handleClick}&gt;Erh&ouml;hen&lt;/button&gt;
+
+      {/* ACHTUNG: Nicht so! setCount(1) wird sofort ausgef&uuml;hrt, nicht beim Klick */}
+      {/* &lt;button onClick={setCount(1)}&gt;Falsch!&lt;/button&gt; */}
+
+      &lt;input value={text} onChange={handleChange} /&gt;
+    &lt;/div&gt;
+  );
+};</code></pre>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Immutability &ndash; State niemals direkt mutieren</h2>
+      <p>
+        Das ist eine der wichtigsten Regeln in React: <strong>State darf niemals direkt ver&auml;ndert
+        werden!</strong> React erkennt State-&Auml;nderungen nur dann, wenn die Referenz des State-Werts
+        sich &auml;ndert. Eine direkte Mutation ver&auml;ndert das Objekt im Speicher, aber nicht die
+        Referenz &ndash; React bemerkt die &Auml;nderung nicht und rendert nicht neu.
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Immutability &ndash; Richtig vs. Falsch</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import { useState } from 'react';
+import { sampleFlights } from '../data/flights';
+import { Flight, FlightStatus } from '../types/flight';
+
+const App = () => {
+  const [flights, setFlights] = useState&lt;Flight[]&gt;(sampleFlights);
+
+  // --- FALSCH: Direkte Mutation ---
+  const updateStatusFalsch = (id: number, status: FlightStatus) => {
+    flights[0].status = status;  // Direkte Mutation! React bemerkt es nicht!
+    setFlights(flights);         // Gleiche Referenz &rarr; kein Re-render!
+  };
+
+  // --- RICHTIG: Neues Array mit neuem Objekt erstellen ---
+  const updateStatus = (id: number, status: FlightStatus) => {
+    setFlights(
+      flights.map(f =>
+        f.id === id
+          ? { ...f, status }   // Spread: kopiert alle Felder, &uuml;berschreibt status
+          : f                  // Andere Fl&uuml;ge unver&auml;ndert
+      )
+    );
+  };
+
+  // Flug hinzuf&uuml;gen &ndash; neues Array mit Spread
+  const addFlight = (flight: Flight) => {
+    setFlights(prev => [...prev, flight]);
+  };
+
+  // Flug entfernen &ndash; filter erstellt immer ein neues Array
+  const removeFlight = (id: number) => {
+    setFlights(prev => prev.filter(f => f.id !== id));
+  };
+
+  return &lt;div&gt;{/* ... */}&lt;/div&gt;;
+};</code></pre>
+      </div>
+      <div class="callout callout-warning">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">Funktionaler State-Update bei Abh&auml;ngigkeiten</div>
+          <p>
+            Wenn der neue State-Wert vom vorherigen abh&auml;ngt, verwende die Callback-Form des Setters:
+            <code>setCount(prev =&gt; prev + 1)</code> statt <code>setCount(count + 1)</code>. Die
+            Callback-Form garantiert, dass immer der aktuellste Wert verwendet wird &ndash; besonders
+            wichtig in asynchronen Kontexten.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Flug ausw&auml;hlen &ndash; selectedFlight State</h2>
+      <p>
+        Wir f&uuml;gen unserem FlugBoard eine Auswahlfunktion hinzu: Wenn der Nutzer auf eine Zeile klickt,
+        wird der ausgew&auml;hlte Flug in einem Detail-Panel angezeigt. Daf&uuml;r ben&ouml;tigen wir einen
+        <code>selectedFlight</code>-State in <code>App.tsx</code>, der entweder <code>null</code> (kein
+        Flug ausgew&auml;hlt) oder ein <code>Flight</code>-Objekt enth&auml;lt.
+      </p>
+      <p>
+        Die Callback-Funktion <code>onFlightSelect</code> wird von <code>App</code> nach unten an
+        <code>FlightBoard</code> und weiter an <code>FlightCard</code> &uuml;bergeben. Das nennt sich
+        <em>Lifting State Up</em> &ndash; der State lebt in der gemeinsamen Elternkomponente. Styling
+        bleibt wie bisher &uuml;ber <code>className</code> und separate CSS-Dateien (z.B.
+        <code>FlightCard.css</code>, <code>FlightDetail.css</code>).
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">src/App.tsx &ndash; mit selectedFlight State</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import { useState } from 'react';
+import FlightBoard from './components/FlightBoard';
+import FlightDetail from './components/FlightDetail';
+import { sampleFlights } from './data/flights';
+import { Flight } from './types/flight';
+
+function App() {
+  // State f&uuml;r den ausgew&auml;hlten Flug (null = keiner ausgew&auml;hlt)
+  const [selectedFlight, setSelectedFlight] = useState&lt;Flight | null&gt;(null);
+
+  const departures = sampleFlights.filter(f => f.type === 'departure');
+  const arrivals   = sampleFlights.filter(f => f.type === 'arrival');
+
+  return (
+    &lt;div className="app-page"&gt;
+      &lt;header className="app-header"&gt;
+        &lt;h1 className="app-title"&gt;&#9992; FlugBoard &ndash; Wien International&lt;/h1&gt;
+      &lt;/header&gt;
+
+      {/* Detail-Panel nur anzeigen wenn ein Flug ausgew&auml;hlt ist */}
+      {selectedFlight &amp;&amp; (
+        &lt;FlightDetail
+          flight={selectedFlight}
+          onClose={() => setSelectedFlight(null)}
+        /&gt;
+      )}
+
+      {/* Callback wird nach unten weitergegeben */}
+      &lt;FlightBoard
+        flights={departures}
+        title="Abfl&uuml;ge"
+        onFlightSelect={setSelectedFlight}
+      /&gt;
+      &lt;FlightBoard
+        flights={arrivals}
+        title="Ank&uuml;nfte"
+        onFlightSelect={setSelectedFlight}
+      /&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default App;</code></pre>
+      </div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">src/components/FlightDetail.tsx</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import { Flight } from '../types/flight';
+import './FlightDetail.css';
+
+interface FlightDetailProps {
+  flight: Flight;
+  onClose: () => void;   // Callback: teilt dem Elternteil mit, dass geschlossen werden soll
+}
+
+/**
+ * Zeigt alle Details eines ausgew&auml;hlten Fluges an.
+ */
+const FlightDetail = ({ flight, onClose }: FlightDetailProps) => {
+  return (
+    &lt;div className="detail-panel"&gt;
+      {/* Schlie&szlig;en-Button in der oberen rechten Ecke */}
+      &lt;button
+        onClick={onClose}
+        className="detail-close-btn"
+      &gt;
+        &times; Schlie&szlig;en
+      &lt;/button&gt;
+
+      &lt;h3 className="detail-title"&gt;
+        {flight.flightNumber} &ndash; {flight.airline}
+      &lt;/h3&gt;
+      &lt;p&gt;&lt;strong&gt;Typ:&lt;/strong&gt; {flight.type === 'departure' ? 'Abflug' : 'Ankunft'}&lt;/p&gt;
+      &lt;p&gt;&lt;strong&gt;{flight.type === 'departure' ? 'Ziel' : 'Herkunft'}:&lt;/strong&gt; {flight.airport}&lt;/p&gt;
+      &lt;p&gt;&lt;strong&gt;Geplante Zeit:&lt;/strong&gt; {flight.scheduledTime}&lt;/p&gt;
+      {flight.expectedTime &amp;&amp; (
+        &lt;p&gt;&lt;strong&gt;Erwartete Zeit:&lt;/strong&gt; {flight.expectedTime}&lt;/p&gt;
+      )}
+      &lt;p&gt;&lt;strong&gt;Terminal:&lt;/strong&gt; {flight.terminal}&lt;/p&gt;
+      &lt;p&gt;&lt;strong&gt;Gate:&lt;/strong&gt; {flight.gate ?? '&mdash;'}&lt;/p&gt;
+    &lt;/div&gt;
+  );
+};
+
+export default FlightDetail;</code></pre>
+      </div>
+      <p>
+        <code>FlightBoard</code> erh&auml;lt den Callback als Prop und gibt ihn weiter an <code>FlightCard</code>.
+        In <code>FlightCard</code> wird der <code>onClick</code>-Handler auf die <code>&lt;tr&gt;</code>-Zeile gesetzt:
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">FlightCard &ndash; Klick auf Zeile</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import { Flight } from '../types/flight';
+import FlightStatusBadge from './FlightStatusBadge';
+import './FlightCard.css';
+
+interface FlightCardProps {
+  flight: Flight;
+  isSelected: boolean;
+  onSelect: (flight: Flight) => void;   // Callback-Prop
+}
+
+const FlightCard = ({ flight, isSelected, onSelect }: FlightCardProps) => {
+  const rowClassName = [
+    'flight-row',
+    isSelected ? 'is-selected' : '',
+  ].filter(Boolean).join(' ');
+
+  return (
+    &lt;tr className={rowClassName} onClick={() => onSelect(flight)}&gt;
+      {/* ... Tabellenzellen wie bisher ... */}
+    &lt;/tr&gt;
+  );
+};</code></pre>
+      </div>
+    </section>
+
+    <section class="section section-projekt">
+      <h2>Projektschritt</h2>
+      <div class="projekt-box">
+        <div class="projekt-box-header">
+          <span class="projekt-step">Projektschritt 1.5</span>
+          <h3>Flug ausw&auml;hlen &amp; Detail-Panel</h3>
+        </div>
+        <p>
+          Wir machen das FlugBoard interaktiv: Ein Klick auf eine Tabellenzeile &ouml;ffnet ein Detail-Panel
+          mit allen Informationen zum Flug. Ein weiterer Klick auf &bdquo;Schlie&szlig;en&ldquo; blendet es wieder aus.
+        </p>
+        <p><strong>&Auml;nderungen in dieser Lektion:</strong></p>
+        <ul>
+          <li><code>App.tsx</code> erh&auml;lt <code>selectedFlight: Flight | null</code> als State</li>
+          <li>Neue Komponente <code>FlightDetail</code> zeigt den ausgew&auml;hlten Flug an</li>
+          <li><code>FlightBoard</code> erh&auml;lt <code>onFlightSelect</code> als Prop und gibt es an <code>FlightCard</code> weiter</li>
+          <li><code>FlightCard</code> erh&auml;lt <code>isSelected</code> und <code>onSelect</code> als Props</li>
+        </ul>
+        <div class="callout callout-tip">
+          <div class="callout-icon">&#10003;</div>
+          <div class="callout-body">
+            <div class="callout-title">Lifting State Up</div>
+            <p>
+              Wenn zwei Komponenten denselben State ben&ouml;tigen, muss der State in deren gemeinsamen
+              Elternteil leben. <code>FlightDetail</code> und <code>FlightBoard</code> ben&ouml;tigen
+              beide den <code>selectedFlight</code> &ndash; deshalb lebt er in <code>App</code>. Der
+              ausgew&auml;hlte Flug wird als Prop nach unten gegeben, &Auml;nderungen durch Callbacks nach
+              oben gemeldet.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-fehler">
+      <h2>H&auml;ufige Fehler</h2>
+
+      <div class="fehler-item">
+        <div class="fehler-title">Fehler: State direkt mutieren</div>
+        <p>
+          <code>flights[0].status = 'boarding';</code> &ndash; React erkennt diese &Auml;nderung nicht, weil
+          die Array-Referenz gleich bleibt. Die UI aktualisiert sich nicht, obwohl der Wert im Speicher
+          ge&auml;ndert wurde. Das f&uuml;hrt zu schwer nachvollziehbaren Bugs.
+        </p>
+        <p class="fehler-fix">Immer ein neues Objekt/Array erstellen: <code>setFlights(prev =&gt; prev.map(f =&gt; f.id === id ? &#123; ...f, status &#125; : f))</code></p>
+      </div>
+
+      <div class="fehler-item">
+        <div class="fehler-title">Fehler: State-Setter direkt im JSX aufrufen</div>
+        <p>
+          <code>&lt;button onClick={setCount(1)}&gt;</code> &ndash; Hier wird <code>setCount(1)</code>
+          sofort beim Rendern ausgef&uuml;hrt, nicht erst beim Klick. Das f&uuml;hrt zu einer Endlosschleife:
+          Render &rarr; State &auml;ndern &rarr; Re-render &rarr; State &auml;ndern &rarr; ...
+        </p>
+        <p class="fehler-fix">Immer eine Funktion &uuml;bergeben: <code>onClick={() =&gt; setCount(1)}</code></p>
+      </div>
+
+      <div class="fehler-item">
+        <div class="fehler-title">Fehler: <code>useState</code> au&szlig;erhalb der Komponente</div>
+        <p>
+          Hooks m&uuml;ssen im <em>Top-Level</em> einer Funktionskomponente aufgerufen werden &ndash; nicht
+          in Schleifen, nicht in Bedingungen, nicht in verschachtelten Funktionen. Sonst verliert React
+          die Zuordnung zwischen Hook und Komponente.
+        </p>
+        <p class="fehler-fix">Alle <code>useState</code>-Aufrufe direkt an den Anfang der Komponente schreiben.</p>
+      </div>
+
+      <div class="fehler-item">
+        <div class="fehler-title">Fehler: Veralteter State in Closures (<em>Stale Closure</em>)</div>
+        <p>
+          <code>setCount(count + 1)</code> kann in asynchronen Kontexten den <em>alten</em> Wert von
+          <code>count</code> verwenden, wenn sich dieser zwischenzeitlich ge&auml;ndert hat.
+        </p>
+        <p class="fehler-fix">Verwende die Callback-Form: <code>setCount(prev =&gt; prev + 1)</code> &ndash; garantiert immer den aktuellsten Wert.</p>
+      </div>
+    </section>
+
+    <section class="section section-aufgaben">
+      <h2>Aufgaben</h2>
+      <div class="aufgaben-list">
+
+        <div class="aufgabe">
+          <div class="aufgabe-header">
+            <span class="aufgabe-num">Aufgabe 1</span>
+            <span class="aufgabe-title">Zeile hervorheben</span>
+          </div>
+          <p>
+            F&uuml;ge in <code>FlightCard</code> einen Click-Handler hinzu. Die ausgew&auml;hlte Zeile soll
+            sich visuell abheben.
+          </p>
+          <ul>
+            <li>Erh&auml;lt <code>FlightCard</code> ein <code>isSelected: boolean</code>-Prop</li>
+            <li>Wenn <code>isSelected</code> wahr ist: anderer Hintergrund (z.B. <code>rgba(97,218,251,0.08)</code>)</li>
+            <li>Linker Rand als visuelle Markierung: <code>borderLeft: '3px solid #61dafb'</code></li>
+            <li>Vergleich in App.tsx: <code>selectedFlight?.id === flight.id</code></li>
+          </ul>
+        </div>
+
+        <div class="aufgabe">
+          <div class="aufgabe-header">
+            <span class="aufgabe-num">Aufgabe 2</span>
+            <span class="aufgabe-title">FlightDetail Komponente</span>
+          </div>
+          <p>
+            Erstelle die <code>FlightDetail</code>-Komponente und zeige sie in <code>App.tsx</code> an,
+            wenn ein Flug ausgew&auml;hlt ist.
+          </p>
+          <ul>
+            <li>Zeige alle Felder des <code>Flight</code>-Objekts &uuml;bersichtlich an</li>
+            <li><code>expectedTime</code> nur anzeigen wenn vorhanden (conditional rendering)</li>
+            <li>Ein &bdquo;Schlie&szlig;en&ldquo;-Button setzt <code>selectedFlight</code> auf <code>null</code></li>
+            <li>Bei <code>type === 'departure'</code>: &bdquo;Ziel&ldquo;; bei <code>arrival</code>: &bdquo;Herkunft&ldquo;</li>
+          </ul>
+        </div>
+
+        <div class="aufgabe">
+          <div class="aufgabe-header">
+            <span class="aufgabe-num">Aufgabe 3</span>
+            <span class="aufgabe-title">Ansichts-Toggle</span>
+          </div>
+          <p>
+            F&uuml;ge in <code>App.tsx</code> einen Toggle-Button hinzu, der zwischen drei Ansichten wechselt.
+          </p>
+          <ul>
+            <li>State: <code>filterType: 'all' | 'departure' | 'arrival'</code>, Initialwert <code>'all'</code></li>
+            <li>Drei Buttons: &bdquo;Alle&ldquo;, &bdquo;Abfl&uuml;ge&ldquo;, &bdquo;Ank&uuml;nfte&ldquo;</li>
+            <li>Der aktive Button soll visuell hervorgehoben sein</li>
+            <li>Die Tabellen filtern entsprechend: bei <code>'all'</code> beide Boards zeigen, bei <code>'departure'</code> nur Abfl&uuml;ge usw.</li>
+          </ul>
+        </div>
+
+        <div class="aufgabe aufgabe-bonus">
+          <div class="aufgabe-header">
+            <span class="aufgabe-num">Bonus</span>
+            <span class="aufgabe-title">Favoriten-Funktion</span>
+          </div>
+          <p>
+            Implementiere eine Favoriten-Funktion: Ein Stern-Symbol in jeder <code>FlightCard</code> markiert
+            einen Flug als Favorit.
+          </p>
+          <ul>
+            <li>State in <code>App.tsx</code>: <code>favoriteIds: Set&lt;number&gt;</code>, Initialwert <code>new Set()</code></li>
+            <li>Beim Klick auf den Stern: Falls ID bereits im Set &rarr; entfernen (<code>new Set([...prev].filter(...))</code>), sonst hinzuf&uuml;gen (<code>new Set([...prev, id])</code>)</li>
+            <li>Stern-Symbol: gef&uuml;llt (&#9733;) wenn Favorit, leer (&#9734;) wenn nicht</li>
+            <li>Zeige die Anzahl der Favoriten im Header: &bdquo;3 Favoriten&ldquo;</li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+  </div><!-- /content-area -->
+
+        <nav class="lesson-nav">
+    <a class="nav-btn" href="1.4-komponenten-props-vertiefung.html">&larr; Lektion 1.4: Komponenten &amp; Props (Vertiefung)</a>
+    <span class="nav-center-info">Lektion 1.5</span>
+    <a class="nav-btn primary" href="1.6-listen-conditional.html">Lektion 1.6: Listen &amp; Conditional Rendering &rarr;</a>
+  </nav>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+<script>
+  // Hamburger menu
+  const ham = document.getElementById('hamburger');
+  const sb  = document.getElementById('sidebar');
+  const ov  = document.getElementById('overlay');
+  ham.addEventListener('click', () => { sb.classList.toggle('open'); ov.classList.toggle('visible'); });
+  ov.addEventListener('click',  () => { sb.classList.remove('open'); ov.classList.remove('visible'); });
+  // Active nav link
+  const cur = window.location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.nav-link').forEach(l => {
+    if (l.getAttribute('href') === cur) l.classList.add('active');
+  });
+  // Theme toggle — einfach & robust (kein CSS-Swap nötig)
+  const themeBtn = document.getElementById('theme-toggle');
+  const applyTheme = (t) => {
+    document.documentElement.setAttribute('data-theme', t);
+    if (themeBtn) themeBtn.innerHTML = t === 'dark' ? '&#9728;' : '&#9790;';
+  };
+  // Theme aus localStorage laden (alle Seiten teilen denselben Key)
+  applyTheme(localStorage.getItem('kurs-theme') || 'dark');
+  // Transitions erst nach dem initialen Render aktivieren (verhindert Flash)
+  setTimeout(() => document.documentElement.classList.add('theme-transitions'), 50);
+  if (themeBtn) themeBtn.addEventListener('click', () => {
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('kurs-theme', next);
+    applyTheme(next);
+  });
+  hljs.highlightAll();
+</script>
+</body>
+</html>

@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3.1 &ndash; Einf&uuml;hrung Next.js | React Kurs</title>
+  <script>(function(){var t=localStorage.getItem('kurs-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
+  <link rel="stylesheet" href="assets/kurs.css">
+  <link rel="stylesheet" id="hljs-theme" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+<body>
+
+<button class="hamburger" id="hamburger" aria-label="Navigation &ouml;ffnen">&#9776;</button>
+<div class="sidebar-overlay" id="overlay"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html">
+      <span class="brand-icon">&#9992;</span>
+      <div>
+        <div class="brand-name">React Kurs</div>
+        <div class="brand-sub">Web &amp; Mobile</div>
+      </div>
+    </a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Dark/Light Mode" title="Theme wechseln">&#9728;</button>
+  </div>
+        <nav class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-label react-label">Teil 1 &mdash; React Einführung</div>
+      <a class="nav-link" href="1.1-einfuehrung-spa.html"><span class="ln">1.1</span>Motivation &amp; SPA</a>
+      <a class="nav-link" href="1.2-einfuehrung.html"><span class="ln">1.2</span>Einführung &amp; Umgebung</a>
+      <a class="nav-link" href="1.3-komponenten-props-einfach.html"><span class="ln">1.3</span>Komponenten &amp; Props (einfach)</a>
+      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten &amp; Props (Vertiefung)</a>
+      <a class="nav-link" href="1.5-state-events.html"><span class="ln">1.5</span>State &amp; Events</a>
+      <a class="nav-link" href="1.6-listen-conditional.html"><span class="ln">1.6</span>Listen &amp; Conditional Rendering</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label react-label">Teil 2 &mdash; React Praxis</div>
+      <a class="nav-link" href="2.1-formulare.html"><span class="ln">2.1</span>Formulare &amp; Inputs</a>
+      <a class="nav-link" href="2.2-useeffect-api.html"><span class="ln">2.2</span>useEffect &amp; API</a>
+      <a class="nav-link" href="2.3-kommunikation.html"><span class="ln">2.3</span>Komponentenkommunikation</a>
+      <a class="nav-link" href="2.4-context.html"><span class="ln">2.4</span>Context API</a>
+      <a class="nav-link" href="2.5-custom-hooks.html"><span class="ln">2.5</span>Custom Hooks</a>
+      <a class="nav-link" href="2.6-testen-vitest-rtl.html"><span class="ln">2.6</span>Testen mit Vitest + RTL</a>
+      <a class="nav-link" href="2.7-react-router.html"><span class="ln">2.7</span>React Router</a>
+      <a class="nav-link" href="2.8-datenbank-drizzle-sqlite.html"><span class="ln">2.8</span>Datenbankzugriff mit Drizzle + SQLite</a>
+      <a class="nav-link" href="2.9-redux-state-management.html"><span class="ln">2.9</span>State Management mit Redux (Überblick)</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label next-label">Teil 3 &mdash; Next.js</div>
+      <a class="nav-link" href="3.1-nextjs-einfuehrung.html"><span class="ln">3.1</span>Einführung Next.js</a>
+      <a class="nav-link" href="3.2-nextjs-routing.html"><span class="ln">3.2</span>Routing &amp; Layouts</a>
+      <a class="nav-link" href="3.3-server-client.html"><span class="ln">3.3</span>Server &amp; Client Components</a>
+      <a class="nav-link" href="3.4-api-routes.html"><span class="ln">3.4</span>API Routes &amp; Datenabruf</a>
+      <a class="nav-link" href="3.5-playwright-e2e.html"><span class="ln">3.5</span>Playwright E2E</a>
+      <a class="nav-link" href="3.6-deployment.html"><span class="ln">3.6</span>Deployment</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label rn-label">Teil 4 &mdash; React Native</div>
+      <a class="nav-link" href="4.1-rn-einfuehrung.html"><span class="ln">4.1</span>Einführung React Native</a>
+      <a class="nav-link" href="4.2-rn-komponenten.html"><span class="ln">4.2</span>Native Komponenten &amp; Styling</a>
+      <a class="nav-link" href="4.3-rn-navigation.html"><span class="ln">4.3</span>Navigation &amp; State</a>
+    </div>
+  </nav>
+</aside>
+
+<main class="main-content">
+
+  <header class="lesson-header">
+    <p class="lesson-eyebrow">Lektion 3.1 &mdash; Teil 3: Next.js</p>
+    <h1>Einf&uuml;hrung Next.js</h1>
+    <div class="lesson-tags">
+      <span class="tag tag-next">Next.js</span>
+      <span class="tag tag-time">ca. 90 min</span>
+    </div>
+  </header>
+
+  <div class="content-area">
+
+  <!-- LERNZIELE -->
+  <section class="section section-lernziele">
+    <h2>Lernziele</h2>
+    <p>Nach dieser Lektion kannst du folgendes:</p>
+    <ul>
+      <li>Den Unterschied zwischen React und Next.js erkl&auml;ren</li>
+      <li>CSR, SSR und SSG voneinander unterscheiden und den richtigen Ansatz f&uuml;r FlugBoard w&auml;hlen</li>
+      <li>Ein neues Next.js-Projekt mit <code>create-next-app</code> erstellen</li>
+      <li>Die Projektstruktur des App Routers verstehen</li>
+      <li><code>app/page.tsx</code> als Einstiegspunkt und <code>layout.tsx</code> als globales Layout einsetzen</li>
+      <li>TypeScript-Typen aus dem React-Projekt wiederverwenden</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 1 -->
+  <section class="section">
+    <h2>1 &mdash; React vs. Next.js</h2>
+    <p>
+      React ist eine <strong>UI-Bibliothek</strong>. Sie k&uuml;mmert sich ausschlie&szlig;lich darum, wie Daten in DOM-Elemente
+      umgewandelt werden. Alles andere &mdash; Routing, Datenabruf, Build-Setup, Server-Logik &mdash; musst du selbst
+      zusammenbauen oder separate Bibliotheken einbinden.
+    </p>
+    <p>
+      <strong>Next.js</strong> ist ein <em>Full-Stack-Framework</em>, das auf React aufbaut. Es bringt all diese
+      Zutaten direkt mit und trifft bereits viele Architekturentscheidungen f&uuml;r dich. Das bedeutet:
+      weniger Konfiguration, mehr Konvention.
+    </p>
+
+    <div class="callout callout-info">
+      <div class="callout-icon">&#8505;</div>
+      <div class="callout-body">
+        <div class="callout-title">Next.js ist kein Ersatz f&uuml;r React</div>
+        <p>
+          Next.js <em>verwendet</em> React intern. Du schreibst weiterhin React-Komponenten mit JSX,
+          Props und Hooks &mdash; Next.js f&uuml;gt nur Schichten hinzu, die React allein nicht bietet.
+          Alles, was du in Teil&nbsp;1 gelernt hast, gilt hier weiterhin.
+        </p>
+      </div>
+    </div>
+
+    <h3>Vergleichstabelle: React SPA vs. Next.js</h3>
+    <div style="overflow-x:auto;">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Merkmal</th>
+            <th>React SPA (Vite)</th>
+            <th>Next.js (App Router)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Routing</strong></td>
+            <td>Manuell via React Router</td>
+            <td>Dateibasiert &mdash; jede <code>page.tsx</code> = URL</td>
+          </tr>
+          <tr>
+            <td><strong>Rendering</strong></td>
+            <td>Nur Client-Side Rendering (CSR)</td>
+            <td>CSR, SSR, SSG, ISR &mdash; pro Seite w&auml;hlbar</td>
+          </tr>
+          <tr>
+            <td><strong>Backend</strong></td>
+            <td>Externes Backend n&ouml;tig (z.&nbsp;B. Deno)</td>
+            <td>API Routes direkt im Projekt (<code>route.ts</code>)</td>
+          </tr>
+          <tr>
+            <td><strong>SEO</strong></td>
+            <td>Eingeschr&auml;nkt &mdash; leeres HTML f&uuml;r Crawler</td>
+            <td>Vollst&auml;ndiges HTML vom Server, optimale SEO</td>
+          </tr>
+          <tr>
+            <td><strong>Bilder / Fonts</strong></td>
+            <td>Keine automatische Optimierung</td>
+            <td><code>next/image</code> &amp; <code>next/font</code> eingebaut</td>
+          </tr>
+          <tr>
+            <td><strong>Deployment</strong></td>
+            <td>Statische Dateien, beliebiger Hoster</td>
+            <td>Vercel (optimal), Node-Server oder statisch</td>
+          </tr>
+          <tr>
+            <td><strong>TypeScript</strong></td>
+            <td>M&ouml;glich, aber manuell einrichten</td>
+            <td>Out-of-the-box, vollst&auml;ndige Unterst&uuml;tzung</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SECTION 2 -->
+  <section class="section">
+    <h2>2 &mdash; CSR, SSR und SSG verstehen</h2>
+    <p>
+      Die gr&ouml;&szlig;te St&auml;rke von Next.js ist die Flexibilit&auml;t beim Rendering. Du kannst f&uuml;r jede Seite
+      individuell entscheiden, wie HTML erzeugt wird.
+    </p>
+
+    <h3>Client-Side Rendering (CSR)</h3>
+    <p>
+      Der Server liefert eine <em>leere</em> HTML-Datei. Der Browser l&auml;dt das JavaScript-Bundle herunter,
+      f&uuml;hrt es aus und rendert die Seite erst dann. Das war unser Ansatz in Teil&nbsp;1 mit Vite.
+      Nachteil: Suchmaschinen und langsame Verbindungen sehen zun&auml;chst nichts.
+    </p>
+
+    <h3>Server-Side Rendering (SSR)</h3>
+    <p>
+      Der Server rendert das vollst&auml;ndige HTML <em>bei jedem Request</em>. Der Browser erh&auml;lt sofort
+      lesbaren Inhalt. Ideal f&uuml;r Daten, die sich h&auml;ufig &auml;ndern &mdash; zum Beispiel Abflugzeiten eines
+      Flughafens.
+    </p>
+
+    <h3>Static Site Generation (SSG)</h3>
+    <p>
+      Das HTML wird <em>einmalig beim Build</em> erzeugt und dann als statische Datei ausgeliefert.
+      Blitzschnell, da kein Server-Rendering n&ouml;tig. Ideal f&uuml;r Inhalte, die sich selten &auml;ndern,
+      wie eine &Uuml;ber-uns-Seite.
+    </p>
+
+    <h3>Incremental Static Regeneration (ISR)</h3>
+    <p>
+      Eine Kombination: die Seite wird statisch ausgeliefert, aber nach einer definierten Zeit
+      (<code>revalidate</code>) im Hintergrund neu generiert. Der Besucher erh&auml;lt immer eine
+      gecachte Version &mdash; aber nie &auml;lter als X Sekunden.
+    </p>
+
+    <div class="callout callout-info">
+      <div class="callout-icon">&#8505;</div>
+      <div class="callout-body">
+        <div class="callout-title">FlugBoard &amp; SSR</div>
+        <p>
+          Unser FlugBoard zeigt Live-Flugdaten: Abfl&uuml;ge und Ank&uuml;nfte &auml;ndern sich st&auml;ndig.
+          SSR mit <code>revalidate: 30</code> ist deshalb der perfekte Ansatz &mdash; aktuelle Daten,
+          ohne unn&ouml;tige Server-Last bei jedem Request.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3 -->
+  <section class="section">
+    <h2>3 &mdash; Projekt erstellen</h2>
+    <p>
+      Next.js bringt ein offizielles CLI-Tool mit, das alle n&ouml;tigen Dateien und Konfigurationen
+      automatisch einrichtet. F&uuml;hre folgende Befehle in deinem Terminal aus:
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">Terminal</span>
+        <span class="code-lang">Bash</span>
+      </div>
+      <pre><code class="language-bash">npx create-next-app@latest flugboard-next</code></pre>
+    </div>
+
+    <p>Der Setup-Wizard stellt folgende Fragen &mdash; w&auml;hle genau diese Antworten:</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">create-next-app Wizard</span>
+        <span class="code-lang">Bash</span>
+      </div>
+      <pre><code class="language-bash">✔ Would you like to use TypeScript?          › Yes
+✔ Would you like to use ESLint?              › Yes
+✔ Would you like to use Tailwind CSS?        › No
+✔ Would you like your code inside a `src/` directory?  › Yes
+✔ Would you like to use App Router?          › Yes
+✔ Would you like to use Turbopack?           › No
+✔ Would you like to customize the import alias?        › No</code></pre>
+    </div>
+
+    <p>Anschlie&szlig;end das Projekt starten:</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">Terminal</span>
+        <span class="code-lang">Bash</span>
+      </div>
+      <pre><code class="language-bash">cd flugboard-next
+npm run dev
+# → Lokaler Entwicklungsserver: http://localhost:3000</code></pre>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-icon">&#10003;</div>
+      <div class="callout-body">
+        <div class="callout-title">Turbopack vs. Webpack</div>
+        <p>
+          Turbopack ist der neue, schnellere Bundler von Vercel. F&uuml;r diesen Kurs deaktivieren wir
+          ihn, da er noch experimentell ist und gelegentlich inkompatibel mit &auml;lteren Plugins sein kann.
+          Im Alltag kannst du ihn bedenkenlos aktivieren.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4 -->
+  <section class="section">
+    <h2>4 &mdash; Projektstruktur verstehen</h2>
+    <p>
+      Nach dem Setup hat <code>create-next-app</code> folgende Struktur erzeugt. Die wichtigsten
+      Ordner und Dateien auf einen Blick:
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">Projektstruktur</span>
+        <span class="code-lang">Bash</span>
+      </div>
+      <pre><code class="language-bash">flugboard-next/
+├── src/
+│   └── app/
+│       ├── layout.tsx          ← Globales Layout (HTML-Rahmen)
+│       ├── page.tsx            ← Startseite → http://localhost:3000/
+│       ├── globals.css         ← Globale CSS-Stile
+│       ├── departures/
+│       │   └── page.tsx        ← Abflüge → /departures
+│       ├── arrivals/
+│       │   └── page.tsx        ← Ankünfte → /arrivals
+│       └── flight/
+│           └── [id]/
+│               └── page.tsx    ← Detailseite → /flight/LH123
+├── public/
+│   └── favicon.ico
+├── next.config.ts
+├── tsconfig.json
+└── package.json</code></pre>
+    </div>
+
+    <p>
+      Der entscheidende Unterschied zu React Router: <strong>jede Datei namens <code>page.tsx</code></strong>
+      wird automatisch zu einer &ouml;ffentlichen URL. Du musst kein <code>&lt;Routes&gt;</code>-Setup
+      schreiben &mdash; die Ordnerstruktur <em>ist</em> das Routing.
+    </p>
+
+    <h3>Wichtige Regeln f&uuml;r den App Router</h3>
+    <ul>
+      <li>Nur <code>page.tsx</code>, <code>layout.tsx</code>, <code>loading.tsx</code> usw. sind &bdquo;reservierte&ldquo; Dateinamen mit besonderer Bedeutung.</li>
+      <li>Eigene Komponenten (z.&nbsp;B. <code>FlightCard.tsx</code>) kannst du im selben Ordner ablegen &mdash; sie werden <em>nicht</em> zu URLs.</li>
+      <li>Ordner in eckigen Klammern (<code>[id]</code>) sind dynamische Segmente.</li>
+      <li>Ordner in runden Klammern (<code>(board)</code>) sind Route Groups &mdash; sie gruppieren Seiten, tauchen aber nicht in der URL auf.</li>
+    </ul>
+
+    <div class="callout callout-info">
+      <div class="callout-icon">&#8505;</div>
+      <div class="callout-body">
+        <div class="callout-title">Pages Router vs. App Router</div>
+        <p>
+          Next.js hatte fr&uuml;her den <strong>Pages Router</strong> (<code>pages/</code>-Ordner).
+          Seit Next.js&nbsp;13 gibt es den moderneren <strong>App Router</strong> (<code>app/</code>-Ordner).
+          In diesem Kurs verwenden wir ausschlie&szlig;lich den App Router. &Auml;ltere Tutorials nutzen
+          oft noch den Pages Router &mdash; achte auf diesen Unterschied beim Recherchieren.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 5 -->
+  <section class="section">
+    <h2>5 &mdash; <code>app/page.tsx</code> und <code>layout.tsx</code></h2>
+    <p>
+      Die zwei wichtigsten Dateien beim Start sind <code>page.tsx</code> (die Startseite) und
+      <code>layout.tsx</code> (der HTML-Rahmen, der alle Seiten umschlie&szlig;t).
+    </p>
+
+    <h3>layout.tsx &mdash; Globaler HTML-Rahmen</h3>
+    <p>
+      <code>layout.tsx</code> definiert das <code>&lt;html&gt;</code>- und <code>&lt;body&gt;</code>-Tag
+      f&uuml;r die gesamte Anwendung. Zus&auml;tzlich kannst du hier das <code>metadata</code>-Objekt
+      exportieren, das automatisch in <code>&lt;meta&gt;</code>-Tags umgewandelt wird &mdash; ideal f&uuml;r SEO.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">src/app/layout.tsx</span>
+        <span class="code-lang">TypeScript</span>
+      </div>
+      <pre><code class="language-typescript">import type { Metadata } from 'next';
+import './globals.css';
+
+export const metadata: Metadata = {
+  title: {
+    template: '%s | FlugBoard',
+    default: 'FlugBoard – Flughafen München',
+  },
+  description:
+    'Echtzeit-Abflug- und Ankunftstafel für den Flughafen München.',
+  keywords: ['Flug', 'Abflug', 'Ankunft', 'München', 'Airport'],
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    &lt;html lang="de"&gt;
+      &lt;body&gt;
+        {children}
+      &lt;/body&gt;
+    &lt;/html&gt;
+  );
+}</code></pre>
+    </div>
+
+    <p>
+      Das <code>template</code>-Feld im <code>title</code> sorgt daf&uuml;r, dass jede Unterseite
+      automatisch <em>&bdquo;Abfl&uuml;ge | FlugBoard&ldquo;</em> als Titel bekommt, wenn sie
+      <code>title: 'Abfl&uuml;ge'</code> in ihrer eigenen Metadata definiert.
+    </p>
+
+    <h3>page.tsx &mdash; Die Startseite</h3>
+    <p>
+      Im Gegensatz zum React-Projekt mit Vite ist <code>page.tsx</code> standardm&auml;&szlig;ig
+      eine <strong>Server Component</strong>. Das bedeutet: kein <code>'use client'</code>,
+      kein <code>useState</code>, kein <code>useEffect</code> &mdash; der Code l&auml;uft auf dem
+      Server und liefert fertiges HTML.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">src/app/page.tsx</span>
+        <span class="code-lang">TypeScript</span>
+      </div>
+      <pre><code class="language-typescript">import Link from 'next/link';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Startseite',
+};
+
+export default function HomePage() {
+  return (
+    &lt;main className="home-container"&gt;
+      &lt;h1&gt;&#9992; FlugBoard M&uuml;nchen&lt;/h1&gt;
+      &lt;p className="home-subtitle"&gt;
+        Ihre Echtzeit-Flugtafel f&uuml;r alle Abfl&uuml;ge und Ank&uuml;nfte.
+      &lt;/p&gt;
+      &lt;nav className="home-nav"&gt;
+        &lt;Link href="/departures" className="home-btn"&gt;
+          &#10132; Abfl&uuml;ge
+        &lt;/Link&gt;
+        &lt;Link href="/arrivals" className="home-btn home-btn--secondary"&gt;
+          &#10132; Ank&uuml;nfte
+        &lt;/Link&gt;
+      &lt;/nav&gt;
+    &lt;/main&gt;
+  );
+}</code></pre>
+    </div>
+
+    <div class="callout callout-warning">
+      <div class="callout-icon">&#9888;</div>
+      <div class="callout-body">
+        <div class="callout-title"><code>&lt;Link&gt;</code> statt <code>&lt;a&gt;</code></div>
+        <p>
+          In Next.js verwendest du immer <code>import Link from 'next/link'</code> f&uuml;r interne
+          Navigation. Ein normales <code>&lt;a href="/departures"&gt;</code> funktioniert zwar,
+          l&auml;dt aber die gesamte Seite neu. <code>&lt;Link&gt;</code> nutzt client-seitiges
+          Navigation und pr&auml;l&auml;dt Seiten im Hintergrund.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 6 -->
+  <section class="section">
+    <h2>6 &mdash; TypeScript-Typen wiederverwenden</h2>
+    <p>
+      Einer der gr&ouml;&szlig;ten Vorteile beim Wechsel zu Next.js: du kannst deine bestehenden
+      TypeScript-Typen aus dem React-Projekt eins zu eins &uuml;bernehmen. Kopiere einfach die
+      Datei <code>src/types/flight.ts</code> in das neue Next.js-Projekt.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">src/types/flight.ts</span>
+        <span class="code-lang">TypeScript</span>
+      </div>
+      <pre><code class="language-typescript">export type FlightStatus =
+  | 'on-time'
+  | 'delayed'
+  | 'boarding'
+  | 'departed'
+  | 'landed'
+  | 'cancelled';
+
+export type FlightType = 'departure' | 'arrival';
+
+export interface Flight {
+  id: number;
+  flightNumber: string;
+  airline: string;
+  airport: string;
+  scheduledTime: string;
+  expectedTime?: string;
+  gate?: string;
+  terminal: string;
+  status: FlightStatus;
+  type: FlightType;
+}</code></pre>
+    </div>
+
+    <p>
+      Statt lokaler Testdaten greifen wir direkt auf den Datenbankzugriff aus Lektion 2.8 auf.
+      In Next.js kannst du daf&uuml;r entweder die bestehenden API-Endpunkte nutzen oder
+      sp&auml;ter in Server Components direkt auf die Datenbank zugreifen.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">Terminal &mdash; Dateien kopieren</span>
+        <span class="code-lang">Bash</span>
+      </div>
+      <pre><code class="language-bash"># Aus dem bestehenden Projekt Typen und Komponenten übernehmen
+cp ../flugboard/src/types/flight.ts   src/types/flight.ts
+
+# Ordner anlegen falls noch nicht vorhanden
+mkdir -p src/types src/lib src/components</code></pre>
+    </div>
+  </section>
+
+  <!-- PROJEKTSCHRITT -->
+  <section class="section section-projekt">
+    <h2>Projektschritt</h2>
+    <div class="projekt-box">
+      <div class="projekt-box-header">
+        <span class="projekt-step">Projektschritt 3.1</span>
+        <h3>FlugBoard-Next-Projekt aufsetzen</h3>
+      </div>
+      <p>
+        In diesem Projektschritt erstellen wir das Next.js-Fundament f&uuml;r FlugBoard.
+        Am Ende hast du ein laufendes Next.js-Projekt mit korrekten Metadaten und einer
+        funktionierenden Startseite.
+      </p>
+      <ol>
+        <li>
+          <strong>Projekt erstellen:</strong> F&uuml;hre <code>npx create-next-app@latest flugboard-next</code>
+          aus und w&auml;hle die oben gezeigten Optionen.
+        </li>
+        <li>
+          <strong>Typen &amp; DB-Utility vorbereiten:</strong> &Uuml;bertrage
+          <code>src/types/flight.ts</code> und richte eine zentrale Datenzugriffsdatei
+          unter <code>src/lib/</code> ein.
+        </li>
+        <li>
+          <strong>layout.tsx aktualisieren:</strong> Setze Title-Template, Description und
+          Keywords wie im Beispiel oben.
+        </li>
+        <li>
+          <strong>page.tsx ersetzen:</strong> Schreibe die Startseite mit &Uuml;berschrift,
+          Untertitel und Links zu <code>/departures</code> und <code>/arrivals</code>.
+        </li>
+        <li>
+          <strong>Platzhalter-Seiten:</strong> Lege <code>src/app/departures/page.tsx</code>
+          und <code>src/app/arrivals/page.tsx</code> mit einfachen &ldquo;Kommt bald&rdquo;-Texten an.
+        </li>
+        <li>
+          <strong>Testen:</strong> Starte den Dev-Server und navigiere zwischen den Seiten.
+          Pr&uuml;fe in den Browser-DevTools den <code>&lt;title&gt;</code>-Tag.
+        </li>
+      </ol>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">src/app/departures/page.tsx</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import type { Metadata } from 'next';
+import { listFlights } from '@/lib/flights-db';
+
+export const metadata: Metadata = {
+  title: 'Abfl&uuml;ge',
+};
+
+export default function DeparturePage() {
+  const departures = listFlights('departure');
+
+  return (
+    &lt;main&gt;
+      &lt;h1&gt;Abfl&uuml;ge &mdash; {departures.length} Fl&uuml;ge&lt;/h1&gt;
+      &lt;ul&gt;
+        {departures.map(flight =&gt; (
+          &lt;li key={flight.id}&gt;
+            {flight.flightNumber} &ndash; {flight.airport} &ndash; {flight.status}
+          &lt;/li&gt;
+        ))}
+      &lt;/ul&gt;
+    &lt;/main&gt;
+  );
+}</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEHLER -->
+  <section class="section section-fehler">
+    <h2>H&auml;ufige Fehler</h2>
+
+    <div class="fehler-item">
+      <div class="fehler-title">Fehler: Pages Router-Syntax im App Router verwendet</div>
+      <p>
+        Du schreibst <code>export default function Page({ params }) {}</code> im <code>pages/</code>-Ordner,
+        obwohl du den App Router (<code>app/</code>) verwendest. Oder du verwendest
+        <code>getServerSideProps</code>, das im App Router nicht existiert.
+      </p>
+      <p class="fehler-fix">
+        <strong>Fix:</strong> Stelle sicher, dass alle Seiten im <code>src/app/</code>-Ordner liegen.
+        Im App Router gibt es kein <code>getServerSideProps</code> &mdash; stattdessen sind
+        async Server Components der neue Ansatz (Lektion 3.1).
+      </p>
+    </div>
+
+    <div class="fehler-item">
+      <div class="fehler-title">Fehler: <code>&lt;a href&gt;</code> statt <code>&lt;Link href&gt;</code></div>
+      <p>
+        Interne Links werden mit <code>&lt;a href="/departures"&gt;</code> geschrieben. Die Navigation
+        funktioniert, aber die Seite wird vollst&auml;ndig neu geladen &mdash; kein SPA-Verhalten,
+        kein Prefetching.
+      </p>
+      <p class="fehler-fix">
+        <strong>Fix:</strong> Immer <code>import Link from 'next/link'</code> f&uuml;r interne Navigation
+        verwenden. <code>&lt;a&gt;</code> nur f&uuml;r externe URLs (z.&nbsp;B. <code>https://...</code>).
+      </p>
+    </div>
+
+    <div class="fehler-item">
+      <div class="fehler-title">Fehler: Port-Konflikt 5173 vs. 3000</div>
+      <p>
+        Du versuchst den Dev-Server zu starten, aber Port&nbsp;3000 ist bereits belegt &mdash;
+        oft weil der alte Vite-Dev-Server noch l&auml;uft (Port&nbsp;5173) oder ein anderer
+        Next.js-Prozess aktiv ist.
+      </p>
+      <p class="fehler-fix">
+        <strong>Fix:</strong> Beende alle laufenden Dev-Server (<kbd>Ctrl+C</kbd>) oder starte
+        Next.js auf einem anderen Port: <code>npm run dev -- -p 3001</code>.
+      </p>
+    </div>
+
+    <div class="fehler-item">
+      <div class="fehler-title">Fehler: <code>&lt;img&gt;</code> statt <code>next/image</code></div>
+      <p>
+        Du verwendest ein normales <code>&lt;img src="..."&gt;</code>. Next.js zeigt eine
+        ESLint-Warnung und das Bild wird nicht optimiert.
+      </p>
+      <p class="fehler-fix">
+        <strong>Fix:</strong> <code>import Image from 'next/image'</code> und
+        <code>&lt;Image src="..." alt="..." width={200} height={100} /&gt;</code>.
+        Next.js konvertiert das Bild automatisch in WebP und lazy-loadt es.
+      </p>
+    </div>
+  </section>
+
+  <!-- AUFGABEN -->
+  <section class="section section-aufgaben">
+    <h2>Aufgaben</h2>
+    <div class="aufgaben-list">
+
+      <div class="aufgabe">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">Aufgabe 1</span>
+          <span class="aufgabe-title">Projekt erstellen und <code>layout.tsx</code> anpassen</span>
+        </div>
+        <p>
+          Erstelle das <code>flugboard-next</code>-Projekt mit den empfohlenen Einstellungen
+          und passe anschlie&szlig;end <code>layout.tsx</code> an.
+        </p>
+        <ul>
+          <li>F&uuml;hre <code>npx create-next-app@latest flugboard-next</code> aus</li>
+          <li>Ersetze den Standard-Inhalt in <code>layout.tsx</code> durch das FlugBoard-Metadata-Objekt</li>
+          <li>Setze <code>lang="de"</code> im <code>&lt;html&gt;</code>-Tag</li>
+          <li>Starte den Dev-Server und &uuml;berpr&uuml;fe <code>http://localhost:3000</code></li>
+        </ul>
+      </div>
+
+      <div class="aufgabe">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">Aufgabe 2</span>
+          <span class="aufgabe-title">Startseite mit Links und DB-Vorschau</span>
+        </div>
+        <p>
+          Erstelle eine ansprechende Startseite in <code>src/app/page.tsx</code>.
+        </p>
+        <ul>
+          <li>Kopiere <code>src/types/flight.ts</code> und richte <code>src/lib/flights-db.ts</code> ein</li>
+          <li>Zeige auf der Startseite 3 Fl&uuml;ge aus der Datenbank als Vorschau-Liste an</li>
+          <li>F&uuml;ge zwei <code>&lt;Link&gt;</code>-Buttons f&uuml;r <code>/departures</code> und <code>/arrivals</code> ein</li>
+          <li>Exportiere ein passendes <code>metadata</code>-Objekt f&uuml;r die Seite</li>
+        </ul>
+      </div>
+
+      <div class="aufgabe">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">Aufgabe 3</span>
+          <span class="aufgabe-title">Platzhalterseiten f&uuml;r alle Routen anlegen</span>
+        </div>
+        <p>
+          Lege die Grundstruktur f&uuml;r alle Seiten des FlugBoards an.
+        </p>
+        <ul>
+          <li>Erstelle <code>src/app/departures/page.tsx</code> mit Liste der Abfl&uuml;ge aus <code>listFlights('departure')</code></li>
+          <li>Erstelle <code>src/app/arrivals/page.tsx</code> mit Liste der Ank&uuml;nfte</li>
+          <li>Erstelle <code>src/app/flight/[id]/page.tsx</code> als Platzhalter (Flug-ID anzeigen)</li>
+          <li>Navigiere zwischen allen Seiten und pr&uuml;fe, ob die URLs korrekt sind</li>
+        </ul>
+      </div>
+
+      <div class="aufgabe aufgabe-bonus">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">Aufgabe 4 &mdash; Bonus</span>
+          <span class="aufgabe-title">404-Seite mit <code>not-found.tsx</code></span>
+        </div>
+        <p>
+          Next.js erlaubt eine benutzerdefinierte 404-Seite &uuml;ber die Datei <code>not-found.tsx</code>.
+        </p>
+        <ul>
+          <li>Erstelle <code>src/app/not-found.tsx</code> mit einer freundlichen Fehlermeldung</li>
+          <li>F&uuml;ge einen <code>&lt;Link href="/"&gt;</code>-Button zum Zur&uuml;cknavigieren ein</li>
+          <li>Teste die Seite, indem du eine nicht existierende URL aufrufst (z.&nbsp;B. <code>/foo</code>)</li>
+          <li>Exportiere ein <code>metadata</code>-Objekt mit <code>title: '404 – Seite nicht gefunden'</code></li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- LESSON NAV -->
+
+  </div><!-- /content-area -->
+
+        <nav class="lesson-nav">
+    <a class="nav-btn" href="2.9-redux-state-management.html">&larr; Lektion 2.9: State Management mit Redux (Überblick)</a>
+    <span class="nav-center-info">Lektion 3.1</span>
+    <a class="nav-btn primary" href="3.2-nextjs-routing.html">Lektion 3.2: Routing &amp; Layouts &rarr;</a>
+  </nav>
+
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+<script>
+  // Hamburger menu
+  const ham = document.getElementById('hamburger');
+  const sb  = document.getElementById('sidebar');
+  const ov  = document.getElementById('overlay');
+  ham.addEventListener('click', () => { sb.classList.toggle('open'); ov.classList.toggle('visible'); });
+  ov.addEventListener('click',  () => { sb.classList.remove('open'); ov.classList.remove('visible'); });
+  // Active nav link
+  const cur = window.location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.nav-link').forEach(l => {
+    if (l.getAttribute('href') === cur) l.classList.add('active');
+  });
+  // Theme toggle — einfach & robust (kein CSS-Swap nötig)
+  const themeBtn = document.getElementById('theme-toggle');
+  const applyTheme = (t) => {
+    document.documentElement.setAttribute('data-theme', t);
+    if (themeBtn) themeBtn.innerHTML = t === 'dark' ? '&#9728;' : '&#9790;';
+  };
+  // Theme aus localStorage laden (alle Seiten teilen denselben Key)
+  applyTheme(localStorage.getItem('kurs-theme') || 'dark');
+  // Transitions erst nach dem initialen Render aktivieren (verhindert Flash)
+  setTimeout(() => document.documentElement.classList.add('theme-transitions'), 50);
+  if (themeBtn) themeBtn.addEventListener('click', () => {
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('kurs-theme', next);
+    applyTheme(next);
+  });
+  hljs.highlightAll();
+</script>
+</body>
+</html>

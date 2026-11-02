@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1.1 &ndash; Motivation &amp; SPA-Konzepte | React Kurs</title>
+  <script>(function(){var t=localStorage.getItem('kurs-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
+  <link rel="stylesheet" href="assets/kurs.css">
+  <link rel="stylesheet" id="hljs-theme" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+<body>
+
+<button class="hamburger" id="hamburger" aria-label="Navigation &ouml;ffnen">&#9776;</button>
+<div class="sidebar-overlay" id="overlay"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html">
+      <span class="brand-icon">&#9992;</span>
+      <div>
+        <div class="brand-name">React Kurs</div>
+        <div class="brand-sub">Web &amp; Mobile</div>
+      </div>
+    </a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Dark/Light Mode" title="Theme wechseln">&#9728;</button>
+  </div>
+        <nav class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-label react-label">Teil 1 &mdash; React Einführung</div>
+      <a class="nav-link" href="1.1-einfuehrung-spa.html"><span class="ln">1.1</span>Motivation &amp; SPA</a>
+      <a class="nav-link" href="1.2-einfuehrung.html"><span class="ln">1.2</span>Einführung &amp; Umgebung</a>
+      <a class="nav-link" href="1.3-komponenten-props-einfach.html"><span class="ln">1.3</span>Komponenten &amp; Props (einfach)</a>
+      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten &amp; Props (Vertiefung)</a>
+      <a class="nav-link" href="1.5-state-events.html"><span class="ln">1.5</span>State &amp; Events</a>
+      <a class="nav-link" href="1.6-listen-conditional.html"><span class="ln">1.6</span>Listen &amp; Conditional Rendering</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label react-label">Teil 2 &mdash; React Praxis</div>
+      <a class="nav-link" href="2.1-formulare.html"><span class="ln">2.1</span>Formulare &amp; Inputs</a>
+      <a class="nav-link" href="2.2-useeffect-api.html"><span class="ln">2.2</span>useEffect &amp; API</a>
+      <a class="nav-link" href="2.3-kommunikation.html"><span class="ln">2.3</span>Komponentenkommunikation</a>
+      <a class="nav-link" href="2.4-context.html"><span class="ln">2.4</span>Context API</a>
+      <a class="nav-link" href="2.5-custom-hooks.html"><span class="ln">2.5</span>Custom Hooks</a>
+      <a class="nav-link" href="2.6-testen-vitest-rtl.html"><span class="ln">2.6</span>Testen mit Vitest + RTL</a>
+      <a class="nav-link" href="2.7-react-router.html"><span class="ln">2.7</span>React Router</a>
+      <a class="nav-link" href="2.8-datenbank-drizzle-sqlite.html"><span class="ln">2.8</span>Datenbankzugriff mit Drizzle + SQLite</a>
+      <a class="nav-link" href="2.9-redux-state-management.html"><span class="ln">2.9</span>State Management mit Redux (Überblick)</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label next-label">Teil 3 &mdash; Next.js</div>
+      <a class="nav-link" href="3.1-nextjs-einfuehrung.html"><span class="ln">3.1</span>Einführung Next.js</a>
+      <a class="nav-link" href="3.2-nextjs-routing.html"><span class="ln">3.2</span>Routing &amp; Layouts</a>
+      <a class="nav-link" href="3.3-server-client.html"><span class="ln">3.3</span>Server &amp; Client Components</a>
+      <a class="nav-link" href="3.4-api-routes.html"><span class="ln">3.4</span>API Routes &amp; Datenabruf</a>
+      <a class="nav-link" href="3.5-playwright-e2e.html"><span class="ln">3.5</span>Playwright E2E</a>
+      <a class="nav-link" href="3.6-deployment.html"><span class="ln">3.6</span>Deployment</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label rn-label">Teil 4 &mdash; React Native</div>
+      <a class="nav-link" href="4.1-rn-einfuehrung.html"><span class="ln">4.1</span>Einführung React Native</a>
+      <a class="nav-link" href="4.2-rn-komponenten.html"><span class="ln">4.2</span>Native Komponenten &amp; Styling</a>
+      <a class="nav-link" href="4.3-rn-navigation.html"><span class="ln">4.3</span>Navigation &amp; State</a>
+    </div>
+  </nav>
+</aside>
+
+<main class="main-content">
+  <header class="lesson-header">
+    <p class="lesson-eyebrow">Lektion 1.1 &mdash; Teil 1: React Einführung</p>
+    <h1>Motivation &amp; SPA-Konzepte</h1>
+    <div class="lesson-tags">
+      <span class="tag tag-react">React</span>
+      <span class="tag tag-time">ca. 60 min</span>
+    </div>
+  </header>
+
+  <div class="content-area">
+
+    <section class="section section-lernziele">
+      <h2>Lernziele</h2>
+      <ul class="lernziele-list">
+        <li>Verstehen, welche Probleme React l&ouml;st und warum es entstanden ist</li>
+        <li>Den Unterschied zwischen traditionellen Webseiten und Single-Page-Applications kennen</li>
+        <li>Das Konzept von Komponenten und deklarativem Rendering verstehen</li>
+        <li>React im Vergleich zu Vue, Angular und Svelte einordnen k&ouml;nnen</li>
+        <li>Den &Uuml;berblick &uuml;ber das React-&Ouml;kosystem (Next.js, React Native) gewinnen</li>
+      </ul>
+    </section>
+
+    <!-- Section 1: Das Problem -->
+    <section class="section">
+      <h2>Das Problem &mdash; Warum brauchen wir React?</h2>
+
+      <p>
+        Um das Jahr 2013 sah typische Web-Entwicklung so aus: <strong>HTML</strong> f&uuml;r Struktur,
+        <strong>CSS</strong> f&uuml;r Gestaltung, <strong>jQuery</strong> f&uuml;r Interaktivit&auml;t.
+        Der Server renderte bei jedem Request eine vollst&auml;ndige HTML-Seite und schickte sie
+        zum Browser. DOM-Manipulation war direkt und imperativ:
+      </p>
+
+      <pre style="display:none"></pre><!-- prevent FOUC on first hljs pass -->
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">dom-manipulation.js</span>
+          <span class="code-lang">JavaScript</span>
+        </div>
+        <pre><code class="language-javascript">document.getElementById('counter').textContent = count;</code></pre>
+      </div>
+
+      <p>
+        Das funktionierte gut f&uuml;r einfache Seiten. Doch als Web-Apps zunehmend komplexer wurden
+        &mdash; Gmail, Facebook, Google Maps &mdash; offenbarte dieser Ansatz seine Grenzen:
+        Wenn sich Daten an einer Stelle &auml;ndern, m&uuml;ssen manuell alle davon
+        abh&auml;ngigen DOM-Elemente aktualisiert werden. Bei f&uuml;nf abh&auml;ngigen
+        Elementen bedeutet das f&uuml;nf separate DOM-Updates. Das f&uuml;hrt zu Bugs,
+        inkonsistentem State und schwer wartbarem Code.
+      </p>
+
+      <h3>Vorher: Vanilla JS (imperativ)</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">counter-vanilla.js</span>
+          <span class="code-lang">JavaScript</span>
+        </div>
+        <pre><code class="language-javascript">// Zustand und DOM-Manipulation sind manuell verknüpft
+let count = 0;
+const btn = document.getElementById('btn');
+const display = document.getElementById('count');
+const statusText = document.getElementById('status');
+
+btn.addEventListener('click', () => {
+  count++;
+  display.textContent = count;               // DOM Update 1
+  statusText.textContent = count > 5         // DOM Update 2
+    ? 'Viele Klicks!'
+    : 'Noch wenige Klicks';
+  if (count > 10) btn.disabled = true;       // DOM Update 3
+  document.title = `Geklickt: ${count}`;    // DOM Update 4
+  // Je mehr State, desto mehr manuelle DOM-Updates nötig
+});</code></pre>
+      </div>
+
+      <h3>Nachher: React (deklarativ)</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Counter.tsx</span>
+          <span class="code-lang">TSX</span>
+        </div>
+        <pre><code class="language-typescript">// React: Beschreibe WIE es aussehen soll, nicht WAS geändert werden soll
+function Counter() {
+  const [count, setCount] = useState(0);
+
+  return (
+    &lt;div&gt;
+      &lt;p&gt;{count &gt; 5 ? 'Viele Klicks!' : 'Noch wenige Klicks'}&lt;/p&gt;
+      &lt;button
+        onClick={() =&gt; setCount(c =&gt; c + 1)}
+        disabled={count &gt; 10}
+      &gt;
+        Geklickt: {count}
+      &lt;/button&gt;
+    &lt;/div&gt;
+  );
+  // React berechnet automatisch, was im DOM geändert werden muss
+}</code></pre>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">&#8505;</div>
+        <div class="callout-body">
+          <div class="callout-title">Deklarativ vs. Imperativ</div>
+          <p>
+            <strong>Imperativ</strong> bedeutet &ldquo;tue Schritt A, dann B, dann C&rdquo;.
+            <strong>Deklarativ</strong> bedeutet &ldquo;das soll das Ergebnis sein&rdquo;.
+            React ist deklarativ &mdash; du beschreibst den gew&uuml;nschten Zustand der UI,
+            React k&uuml;mmert sich um die n&ouml;tigen &Auml;nderungen am DOM.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: SPA -->
+    <section class="section">
+      <h2>Was ist eine Single-Page-Application?</h2>
+
+      <h3>MPA (Multi-Page Application) &mdash; traditionell</h3>
+      <ul>
+        <li>Browser sendet einen Request an den Server</li>
+        <li>Server rendert eine vollst&auml;ndige HTML-Seite und schickt sie zur&uuml;ck</li>
+        <li>Browser l&auml;dt die neue Seite vollst&auml;ndig neu</li>
+        <li>Jede Navigation = Seitenneuladen (langsam, Flackern, Zustand geht verloren)</li>
+        <li>Gut f&uuml;r: Blogs, Nachrichtenseiten, einfache Formulare</li>
+      </ul>
+
+      <h3>SPA (Single-Page Application)</h3>
+      <ul>
+        <li>Browser l&auml;dt beim ersten Aufruf eine minimale HTML-Seite und JavaScript</li>
+        <li>Navigation passiert clientseitig: JavaScript tauscht den Inhalt aus, ohne die Seite neu zu laden</li>
+        <li>Sehr schnelle Navigation nach dem ersten Laden</li>
+        <li>App-&auml;hnliches Gef&uuml;hl (kein Flackern, Zustand bleibt erhalten)</li>
+        <li>Gut f&uuml;r: Dashboards, Verwaltungsanwendungen, interaktive Tools</li>
+      </ul>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">MPA vs. SPA &mdash; Ablaufdiagramm</span>
+          <span class="code-lang">Diagramm</span>
+        </div>
+        <pre><code class="language-bash">MPA (Multi-Page Application):
+Nutzer klickt Link
+    → Browser: GET /produkte → Server: HTML rendern → Browser: Seite neu laden
+    → Browser: GET /warenkorb → Server: HTML rendern → Browser: Seite neu laden
+
+SPA (Single-Page Application):
+Erster Aufruf:
+    → Browser: GET / → Server: index.html + bundle.js → Browser: React startet
+Weitere Navigation:
+    → Nutzer klickt "Produkte" → React Router: Komponente tauschen → sofort
+    → Nutzer klickt "Warenkorb" → React Router: Komponente tauschen → sofort
+    (Kein Server-Roundtrip, kein Seitenneuladen)</code></pre>
+      </div>
+
+      <div class="callout callout-warning">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">Nachteile von SPAs</div>
+          <p>
+            SPAs haben auch Nachteile: Das erste Laden dauert l&auml;nger (JavaScript muss
+            geladen werden), SEO ist schwieriger (Suchmaschinen sehen zun&auml;chst leeres
+            HTML), und der Browser-Zur&uuml;ck-Button muss explizit behandelt werden.
+            <strong>Next.js</strong> (Teil 2 des Kurses) l&ouml;st viele dieser Probleme.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: Komponenten -->
+    <section class="section">
+      <h2>Komponenten &mdash; Bausteine der UI</h2>
+
+      <p>
+        Ohne Komponenten ist eine komplexe UI ein gro&szlig;es, verschachteltes St&uuml;ck Code &mdash;
+        schwer zu verstehen, schwer zu &auml;ndern, schwer wiederzuverwenden. Komponenten erlauben es,
+        die UI in kleine, eigenst&auml;ndige, unabh&auml;ngig wartbare Teile zu zerlegen.
+      </p>
+
+      <h3>Drei Kernprinzipien</h3>
+      <ol>
+        <li>
+          <strong>Wiederverwendbarkeit:</strong> Eine Komponente einmal definieren, &uuml;berall verwenden
+        </li>
+        <li>
+          <strong>Isolation:</strong> Jede Komponente verwaltet ihren eigenen Zustand
+        </li>
+        <li>
+          <strong>Zusammensetzbarkeit:</strong> Komplexe UIs aus einfachen Bausteinen aufbauen
+        </li>
+      </ol>
+
+      <h3>Beispiel: UI-Zerlegung des FlugBoard-Projekts</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Komponentenhierarchie FlugBoard</span>
+          <span class="code-lang">Struktur</span>
+        </div>
+        <pre><code class="language-bash">Gesamte App
+├── AirportHeader
+│   └── LiveClock
+├── SearchBar
+├── FilterBar
+├── FlightBoard (Abflüge)
+│   └── FlightCard (für jeden Flug)
+│       └── FlightStatusBadge
+└── FlightBoard (Ankünfte)
+    └── FlightCard (für jeden Flug)
+        └── FlightStatusBadge</code></pre>
+      </div>
+
+      <p>
+        Jede Komponente ist wie ein eigenes Mini-Programm: Sie bekommt Daten rein
+        (<strong>Props</strong>), verwaltet optional eigenen Zustand (<strong>State</strong>)
+        und gibt JSX zur&uuml;ck. Eine &Auml;nderung in <code>FlightStatusBadge</code>
+        betrifft alle Orte, wo die Komponente verwendet wird &mdash; das ist der Kern
+        der Wiederverwendbarkeit.
+      </p>
+
+      <h3>Virtual DOM</h3>
+      <p>
+        React h&auml;lt eine Kopie der UI als JavaScript-Objekt im Arbeitsspeicher
+        (<strong>Virtual DOM</strong>). Wenn sich State &auml;ndert, erstellt React eine
+        neue virtuelle Repr&auml;sentation, vergleicht sie mit der alten
+        (<em>Reconciliation / Diffing</em>) und aktualisiert nur die tats&auml;chlich
+        ge&auml;nderten Teile des echten DOM. Das macht komplexe UI-Updates effizient.
+      </p>
+    </section>
+
+    <!-- Section 4: React vs. Alternativen -->
+    <section class="section">
+      <h2>React vs. die Alternativen</h2>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Merkmal</th>
+              <th>React</th>
+              <th>Vue</th>
+              <th>Angular</th>
+              <th>Svelte</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Typ</td><td>Library</td><td>Framework</td><td>Framework</td><td>Compiler</td></tr>
+            <tr><td>Entwickler</td><td>Meta (Facebook)</td><td>Community</td><td>Google</td><td>Community</td></tr>
+            <tr><td>Erstver&ouml;ffentlichung</td><td>2013</td><td>2014</td><td>2016 (v2)</td><td>2016</td></tr>
+            <tr><td>Sprache</td><td>JSX / TSX</td><td>Templates + SFC</td><td>TypeScript</td><td>Svelte-Syntax</td></tr>
+            <tr><td>Lernkurve</td><td>Mittel</td><td>Niedrig</td><td>Hoch</td><td>Niedrig</td></tr>
+            <tr><td>Marktanteil (2024)</td><td>~40&thinsp;%</td><td>~18&thinsp;%</td><td>~20&thinsp;%</td><td>~6&thinsp;%</td></tr>
+            <tr><td>Virtual DOM</td><td>Ja</td><td>Ja</td><td>Ja</td><td>Nein (Compiler)</td></tr>
+            <tr><td>Starkes &Ouml;kosystem</td><td>Sehr gro&szlig;</td><td>Gro&szlig;</td><td>Gro&szlig;</td><td>Wachsend</td></tr>
+            <tr><td>Mobile Apps</td><td>React Native</td><td>NativeScript</td><td>NativeScript</td><td>Limitiert</td></tr>
+            <tr><td>Fullstack-L&ouml;sung</td><td>Next.js</td><td>Nuxt.js</td><td>Analog</td><td>SvelteKit</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Vue.js</h3>
+      <p>
+        Sehr gut f&uuml;r Einsteiger, da die Template-Syntax HTML &auml;hnelt. Gut f&uuml;r kleinere
+        Teams. In der DACH-Region und Asien popul&auml;r. &Auml;hnliche Konzepte wie React
+        (komponenten-basiert, reaktiv).
+      </p>
+
+      <h3>Angular</h3>
+      <p>
+        Das einzige vollst&auml;ndige Framework &mdash; hat alles eingebaut: Router, HTTP-Client,
+        Forms. Von Google entwickelt, stark in Unternehmensumgebungen verbreitet. Sehr
+        TypeScript-orientiert. H&ouml;here Lernkurve als React oder Vue.
+      </p>
+
+      <h3>Svelte</h3>
+      <p>
+        Ein <em>Compiler</em> statt einer Library oder eines Frameworks. Svelte-Code wird zu
+        nativem JavaScript kompiliert &mdash; kein Virtual DOM, sehr kleine Bundle-Gr&ouml;&szlig;e
+        und sehr schnell zur Laufzeit. Innovativer Ansatz, aber kleineres &Ouml;kosystem.
+      </p>
+
+      <h3>Warum React lernen?</h3>
+      <ol>
+        <li>Gr&ouml;&szlig;ter Marktanteil &rarr; mehr Jobm&ouml;glichkeiten</li>
+        <li>Riesiges &Ouml;kosystem: unz&auml;hlige Bibliotheken, Tutorials, Stack&nbsp;Overflow-Antworten</li>
+        <li>Transferierbar: React-Kenntnisse direkt anwendbar f&uuml;r React Native (mobile Apps) und Next.js (Full-Stack)</li>
+        <li>JSX ist &ldquo;just JavaScript&rdquo; &mdash; kein eigenst&auml;ndiges Template-System zu erlernen</li>
+        <li>Von Meta eingesetzt bei Facebook, Instagram, WhatsApp Web &rarr; battle-tested</li>
+      </ol>
+
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#10003;</div>
+        <div class="callout-body">
+          <div class="callout-title">Kein Framework ist f&uuml;r alle Situationen das Beste</div>
+          <p>
+            React eignet sich besonders f&uuml;r gro&szlig;e, komplexe Anwendungen mit einem
+            aktiven &Ouml;kosystem. F&uuml;r einfache Projekte kann Vue.js oder Svelte die
+            bessere Wahl sein. Die Konzepte (Komponenten, reaktiver State) sind aber in allen
+            Frameworks &auml;hnlich &mdash; wer React kennt, findet sich in den anderen
+            schnell zurecht.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: Das React-Ökosystem -->
+    <section class="section">
+      <h2>Das React-&Ouml;kosystem &mdash; Ein &Uuml;berblick</h2>
+
+      <h3>React Core (L01&ndash;L10, dieser Kurs)</h3>
+      <ul>
+        <li>JSX, Komponenten, Props, State</li>
+        <li>Hooks: <code>useState</code>, <code>useEffect</code>, <code>useContext</code>, Custom Hooks</li>
+        <li>React Router f&uuml;r clientseitiges Routing</li>
+      </ul>
+
+      <h3>React-basierte Fullstack-Frameworks</h3>
+      <ul>
+        <li>
+          <strong>Next.js</strong> (L11&ndash;L15): SSR, SSG, API Routes, Deployment auf Vercel.
+          F&uuml;r Webseiten und Web-Apps.
+        </li>
+        <li>
+          <strong>Remix</strong>: Alternative zu Next.js mit starkem Fokus auf Web-Standards
+        </li>
+        <li>
+          <strong>Gatsby</strong>: Statische Seiten (Blogs, Dokumentation)
+        </li>
+      </ul>
+
+      <h3>React Native (L16&ndash;L18)</h3>
+      <ul>
+        <li>Native iOS- und Android-Apps mit React-Kenntnissen</li>
+        <li><strong>Expo</strong>: vereinfachte React-Native-Entwicklung ohne Xcode / Android Studio</li>
+      </ul>
+
+      <h3>State Management</h3>
+      <ul>
+        <li><code>useState</code> / <code>useReducer</code>: f&uuml;r lokalen State (reicht f&uuml;r die meisten Projekte)</li>
+        <li><strong>Context API</strong>: f&uuml;r globalen State ohne externe Bibliothek</li>
+        <li><strong>Zustand</strong>: einfache, moderne Alternative</li>
+        <li><strong>Redux</strong>: f&uuml;r sehr komplexe Anwendungen mit vielen Entwicklern</li>
+      </ul>
+
+      <p><strong>Hinweis f&uuml;r den Kurs:</strong> In unseren React-Beispielen nutzen wir standardm&auml;&szlig;ig <code>className</code> mit separaten CSS-Dateien; Inline-Styles nur f&uuml;r dynamische Laufzeitwerte.</p>
+
+      <h3>UI-Bibliotheken</h3>
+      <ul>
+        <li><strong>shadcn/ui</strong>, <strong>Radix UI</strong>: headless Komponenten-Bibliotheken</li>
+        <li><strong>Tailwind CSS</strong>: Utility-First CSS, sehr beliebt mit React</li>
+        <li><strong>Material UI (MUI)</strong>: Google Material Design f&uuml;r React</li>
+      </ul>
+
+      <h3>Datenabruf</h3>
+      <ul>
+        <li><strong>TanStack Query (React Query)</strong>: Caching, Loading-States, Refetching automatisiert</li>
+        <li><strong>SWR</strong>: &auml;hnlich, von Vercel</li>
+      </ul>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">&#8505;</div>
+        <div class="callout-body">
+          <div class="callout-title">Kurs&uuml;bersicht</div>
+          <p>
+            In diesem Kurs lernen wir React Core (L01&ndash;L10), Next.js (L11&ndash;L15) und
+            React Native (L16&ndash;L18). Alle anderen Bibliotheken sind Erweiterungen &mdash;
+            wer die Grundlagen versteht, kann jede dieser Bibliotheken schnell erlernen.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 6: Wie funktioniert React technisch? -->
+    <section class="section">
+      <h2>Wie funktioniert React technisch? (&Uuml;berblick)</h2>
+
+      <h3>JSX</h3>
+      <p>
+        <strong>JSX</strong> (JavaScript XML) ist eine Syntaxerweiterung, die es erlaubt,
+        HTML-&auml;hnlichen Code in JavaScript zu schreiben. JSX wird von einem Compiler
+        (Babel / TypeScript) zu <code>React.createElement()</code>-Aufrufen transformiert.
+        Im Browser l&auml;uft nur normales JavaScript &mdash; kein Browser versteht JSX direkt.
+      </p>
+
+      <h3>Virtual DOM</h3>
+      <p>
+        React h&auml;lt eine Kopie des UI als JavaScript-Objekt (<strong>Virtual DOM</strong>).
+        Bei State-&Auml;nderungen erstellt React eine neue virtuelle Repr&auml;sentation,
+        vergleicht sie mit der alten (<strong>Reconciliation / Diffing</strong>), und aktualisiert
+        nur die ver&auml;nderten Teile des echten DOM.
+      </p>
+
+      <h3>React Fiber</h3>
+      <p>
+        Reacts internes Rendering-System (seit React 16). Es erlaubt React, das Rendering in
+        Chunks aufzuteilen und zu pausieren &mdash; so bleibt die UI auch bei komplexen Updates
+        reaktionsf&auml;hig und ruckelfrei.
+      </p>
+
+      <h3>Unidirektionaler Datenfluss</h3>
+      <p>
+        Daten flie&szlig;en in React immer <strong>von oben nach unten</strong> &mdash; von
+        Eltern- zu Kind-Komponente via Props. &Auml;nderungen flie&szlig;en durch Event-Handler
+        nach oben. Dieser einseitige Datenfluss macht Apps vorhersehbarer und einfacher zu
+        debuggen.
+      </p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Datenfluss in React</span>
+          <span class="code-lang">Diagramm</span>
+        </div>
+        <pre><code class="language-bash">     Elternkomponente
+      │ Props (Daten fließen ↓)
+      ▼
+  Kindkomponente ──── Event-Handler (Änderungen fließen ↑)
+      │ Props
+      ▼
+  Enkelkomponente</code></pre>
+      </div>
+    </section>
+
+    <!-- Projektschritt -->
+    <section class="section section-projekt">
+      <h2>Projektschritt</h2>
+      <div class="projekt-box">
+        <div class="projekt-box-header">
+          <span class="projekt-step">Projektschritt 1.1</span>
+          <h3>Kein Code &mdash; nur Konzepte</h3>
+        </div>
+        <p>
+          Diese Lektion ist rein konzeptuell. Es gibt noch nichts zu programmieren.
+          Nimm dir die Zeit, die Konzepte zu verinnerlichen &mdash; sie sind die Grundlage
+          f&uuml;r alles, was danach kommt.
+        </p>
+        <p>
+          <strong>Empfehlung:</strong> Schau dir kurz eine laufende React-Anwendung an (z.B.
+          <a href="https://react.dev" target="_blank" rel="noopener">react.dev</a> selbst) und
+          &ouml;ffne die Browser-Entwicklertools. Erkunde, wie das DOM bei Interaktionen aktualisiert
+          wird &mdash; du wirst oft sehen, dass nur kleine Teile der Seite wirklich neu gerendert werden.
+        </p>
+      </div>
+    </section>
+
+    <!-- Häufige Missverständnisse -->
+    <section class="section section-fehler">
+      <h2>H&auml;ufige Missverst&auml;ndnisse</h2>
+
+      <div class="fehler-item">
+        <div class="fehler-title">&bdquo;React ist ein Full-Stack-Framework&ldquo;</div>
+        <p>
+          React ist ausschlie&szlig;lich eine UI-Library &mdash; es rendert Komponenten im Browser.
+          F&uuml;r Full-Stack-Funktionalit&auml;t (Datenbank, API, Authentication) braucht man
+          Next.js oder einen separaten Backend-Server.
+        </p>
+        <p class="fehler-fix">React = UI-Schicht. Next.js oder ein separates Backend = Full-Stack.</p>
+      </div>
+
+      <div class="fehler-item">
+        <div class="fehler-title">&bdquo;SPA ist immer besser als MPA&ldquo;</div>
+        <p>
+          SPAs haben Vorteile bei Interaktivit&auml;t und Navigation, aber Nachteile beim ersten
+          Ladevorgang und bei SEO. F&uuml;r einen Blog oder eine Nachrichtenseite ist eine klassische
+          MPA oft die bessere Wahl.
+        </p>
+        <p class="fehler-fix">Next.js kombiniert beide Ans&auml;tze: SSR f&uuml;r SEO, clientseitige Navigation f&uuml;r Performance.</p>
+      </div>
+
+      <div class="fehler-item">
+        <div class="fehler-title">&bdquo;Virtual DOM ist immer schneller als echter DOM&ldquo;</div>
+        <p>
+          Der Virtual DOM ist nicht prinzipiell schneller. Er macht komplexe Updates effizienter,
+          kann aber bei sehr einfachen Updates overhead erzeugen. Svelte verzichtet deshalb ganz
+          auf den Virtual DOM und kompiliert direkten DOM-Code.
+        </p>
+        <p class="fehler-fix">Virtual DOM = effizienter bei komplexen UIs, nicht universell schneller.</p>
+      </div>
+
+      <div class="fehler-item">
+        <div class="fehler-title">&bdquo;React lernen hei&szlig;t React immer einsetzen&ldquo;</div>
+        <p>
+          F&uuml;r einfache Seiten (Blog, Landing Page, Dokumentation) ist React oft Overkill.
+          Statische HTML/CSS-Seiten oder einfaches Vanilla JS k&ouml;nnen die bessere und
+          schnellere L&ouml;sung sein.
+        </p>
+        <p class="fehler-fix">Das richtige Werkzeug f&uuml;r den richtigen Job &mdash; React gl&auml;nzt bei komplexen, interaktiven UIs.</p>
+      </div>
+    </section>
+
+    <!-- Aufgaben -->
+    <section class="section section-aufgaben">
+      <h2>Aufgaben (Reflexion)</h2>
+      <div class="aufgaben-list">
+
+        <div class="aufgabe">
+          <div class="aufgabe-header">
+            <span class="aufgabe-num">Aufgabe 1</span>
+            <span class="aufgabe-title">Reflexion &mdash; MPA vs. SPA</span>
+          </div>
+          <p>
+            Nenne je zwei Beispiele f&uuml;r Webseiten, die du t&auml;glich nutzt, bei denen
+            (a)&nbsp;eine MPA sinnvoll w&auml;re und (b)&nbsp;eine SPA Vorteile h&auml;tte.
+            Begr&uuml;nde deine Auswahl.
+          </p>
+        </div>
+
+        <div class="aufgabe">
+          <div class="aufgabe-header">
+            <span class="aufgabe-num">Aufgabe 2</span>
+            <span class="aufgabe-title">Komponentenzerlegung</span>
+          </div>
+          <p>
+            &Ouml;ffne eine beliebige komplexe Webseite (z.B. youtube.com, github.com).
+            &Uuml;berlege, wie du die Seite in React-Komponenten zerlegen w&uuml;rdest.
+            Skizziere die Komponentenhierarchie &mdash; auf Papier oder als Textstruktur.
+          </p>
+        </div>
+
+        <div class="aufgabe">
+          <div class="aufgabe-header">
+            <span class="aufgabe-num">Aufgabe 3</span>
+            <span class="aufgabe-title">Framework-Vergleich</span>
+          </div>
+          <p>
+            Schau dir je ein kurzes &ldquo;Hello World&rdquo;-Beispiel in React, Vue und Svelte an
+            (z.B. auf deren jeweiligen Dokumentationsseiten). Notiere die Unterschiede in der Syntax.
+            Welches Beispiel wirkt auf dich am intuitivsten?
+          </p>
+        </div>
+
+        <div class="aufgabe aufgabe-bonus">
+          <div class="aufgabe-header">
+            <span class="aufgabe-num">Bonus</span>
+            <span class="aufgabe-title">React DevTools erkunden</span>
+          </div>
+          <p>
+            Installiere die <strong>React Developer Tools</strong> als Browser-Extension
+            (Chrome / Firefox). &Ouml;ffne eine beliebige React-Anwendung (z.B. react.dev) und
+            erkunde den Komponentenbaum im &ldquo;Components&rdquo;-Tab. Welche Komponenten
+            erkennst du? Kannst du Props und State der einzelnen Komponenten sehen?
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+  </div><!-- /content-area -->
+
+        <nav class="lesson-nav">
+    <span class="nav-btn" style="opacity:0.4;cursor:default;">&#8592; Kursanfang</span>
+    <span class="nav-center-info">Lektion 1.1</span>
+    <a class="nav-btn primary" href="1.2-einfuehrung.html">Lektion 1.2: Einführung &amp; Umgebung &rarr;</a>
+  </nav>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+<script>
+  const ham = document.getElementById('hamburger');
+  const sb  = document.getElementById('sidebar');
+  const ov  = document.getElementById('overlay');
+  ham.addEventListener('click', () => { sb.classList.toggle('open'); ov.classList.toggle('visible'); });
+  ov.addEventListener('click',  () => { sb.classList.remove('open'); ov.classList.remove('visible'); });
+  const cur = window.location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.nav-link').forEach(l => {
+    if (l.getAttribute('href') === cur) l.classList.add('active');
+  });
+  // Theme toggle — einfach & robust (kein CSS-Swap nötig)
+  const themeBtn = document.getElementById('theme-toggle');
+  const applyTheme = (t) => {
+    document.documentElement.setAttribute('data-theme', t);
+    if (themeBtn) themeBtn.innerHTML = t === 'dark' ? '&#9728;' : '&#9790;';
+  };
+  // Theme aus localStorage laden (alle Seiten teilen denselben Key)
+  applyTheme(localStorage.getItem('kurs-theme') || 'dark');
+  // Transitions erst nach dem initialen Render aktivieren (verhindert Flash)
+  setTimeout(() => document.documentElement.classList.add('theme-transitions'), 50);
+  if (themeBtn) themeBtn.addEventListener('click', () => {
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('kurs-theme', next);
+    applyTheme(next);
+  });
+  hljs.highlightAll();
+</script>
+</body>
+</html>

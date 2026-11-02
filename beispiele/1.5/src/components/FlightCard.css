@@ -1,0 +1,16 @@
+.flight-row {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.flight-row.is-selected {
+  background: #1f3a4a;
+  border-left-color: #61dafb;
+}
+
+.flight-cell {
+  border-bottom: 1px solid #30363d;
+  color: #e6edf3;
+  padding: 0.7rem 1rem;
+}

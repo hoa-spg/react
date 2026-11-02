@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2.2 &ndash; useEffect &amp; API-Anbindung | React Kurs</title>
+  <script>(function(){var t=localStorage.getItem('kurs-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
+  <link rel="stylesheet" href="assets/kurs.css">
+  <link rel="stylesheet" id="hljs-theme" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+<body>
+
+<button class="hamburger" id="hamburger" aria-label="Navigation &ouml;ffnen">&#9776;</button>
+<div class="sidebar-overlay" id="overlay"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html">
+      <span class="brand-icon">&#9992;</span>
+      <div>
+        <div class="brand-name">React Kurs</div>
+        <div class="brand-sub">Web &amp; Mobile</div>
+      </div>
+    </a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Dark/Light Mode" title="Theme wechseln">&#9728;</button>
+  </div>
+        <nav class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-label react-label">Teil 1 &mdash; React Einführung</div>
+      <a class="nav-link" href="1.1-einfuehrung-spa.html"><span class="ln">1.1</span>Motivation &amp; SPA</a>
+      <a class="nav-link" href="1.2-einfuehrung.html"><span class="ln">1.2</span>Einführung &amp; Umgebung</a>
+      <a class="nav-link" href="1.3-komponenten-props-einfach.html"><span class="ln">1.3</span>Komponenten &amp; Props (einfach)</a>
+      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten &amp; Props (Vertiefung)</a>
+      <a class="nav-link" href="1.5-state-events.html"><span class="ln">1.5</span>State &amp; Events</a>
+      <a class="nav-link" href="1.6-listen-conditional.html"><span class="ln">1.6</span>Listen &amp; Conditional Rendering</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label react-label">Teil 2 &mdash; React Praxis</div>
+      <a class="nav-link" href="2.1-formulare.html"><span class="ln">2.1</span>Formulare &amp; Inputs</a>
+      <a class="nav-link" href="2.2-useeffect-api.html"><span class="ln">2.2</span>useEffect &amp; API</a>
+      <a class="nav-link" href="2.3-kommunikation.html"><span class="ln">2.3</span>Komponentenkommunikation</a>
+      <a class="nav-link" href="2.4-context.html"><span class="ln">2.4</span>Context API</a>
+      <a class="nav-link" href="2.5-custom-hooks.html"><span class="ln">2.5</span>Custom Hooks</a>
+      <a class="nav-link" href="2.6-testen-vitest-rtl.html"><span class="ln">2.6</span>Testen mit Vitest + RTL</a>
+      <a class="nav-link" href="2.7-react-router.html"><span class="ln">2.7</span>React Router</a>
+      <a class="nav-link" href="2.8-datenbank-drizzle-sqlite.html"><span class="ln">2.8</span>Datenbankzugriff mit Drizzle + SQLite</a>
+      <a class="nav-link" href="2.9-redux-state-management.html"><span class="ln">2.9</span>State Management mit Redux (Überblick)</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label next-label">Teil 3 &mdash; Next.js</div>
+      <a class="nav-link" href="3.1-nextjs-einfuehrung.html"><span class="ln">3.1</span>Einführung Next.js</a>
+      <a class="nav-link" href="3.2-nextjs-routing.html"><span class="ln">3.2</span>Routing &amp; Layouts</a>
+      <a class="nav-link" href="3.3-server-client.html"><span class="ln">3.3</span>Server &amp; Client Components</a>
+      <a class="nav-link" href="3.4-api-routes.html"><span class="ln">3.4</span>API Routes &amp; Datenabruf</a>
+      <a class="nav-link" href="3.5-playwright-e2e.html"><span class="ln">3.5</span>Playwright E2E</a>
+      <a class="nav-link" href="3.6-deployment.html"><span class="ln">3.6</span>Deployment</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label rn-label">Teil 4 &mdash; React Native</div>
+      <a class="nav-link" href="4.1-rn-einfuehrung.html"><span class="ln">4.1</span>Einführung React Native</a>
+      <a class="nav-link" href="4.2-rn-komponenten.html"><span class="ln">4.2</span>Native Komponenten &amp; Styling</a>
+      <a class="nav-link" href="4.3-rn-navigation.html"><span class="ln">4.3</span>Navigation &amp; State</a>
+    </div>
+  </nav>
+</aside>
+
+<main class="main-content">
+  <header class="lesson-header">
+    <p class="lesson-eyebrow">Lektion 2.2 &mdash; Teil 2: React Praxis</p>
+    <h1>useEffect &amp; API-Anbindung</h1>
+    <div class="lesson-tags">
+      <span class="tag tag-react">React</span>
+      <span class="tag tag-time">ca. 105 min</span>
+    </div>
+  </header>
+
+  <div class="content-area">
+
+    <section class="section section-lernziele">
+      <h2>Lernziele</h2>
+      <ul class="lernziele-list">
+        <li>Den <code>useEffect</code>-Hook verstehen und korrekt einsetzen</li>
+        <li>Das Abh&auml;ngigkeiten-Array (<em>dependency array</em>) verstehen</li>
+        <li>Cleanup-Funktionen schreiben</li>
+        <li>Einen Deno+Hono Backend-Server einrichten</li>
+        <li>Daten per <code>fetch</code> laden und in State speichern</li>
+        <li>Loading- und Error-States korrekt handhaben</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>Was ist useEffect?</h2>
+      <p>
+        <code>useEffect</code> ist der Hook f&uuml;r <strong>Seiteneffekte</strong> (engl. <em>Side Effects</em>)
+        in React-Komponenten. Ein Seiteneffekt ist alles, was &uuml;ber das reine Berechnen und Rendern von JSX
+        hinausgeht: Daten vom Server laden, Timer setzen, Event-Listener registrieren, den Dokumenttitel
+        &auml;ndern oder direkt auf das DOM zugreifen.
+      </p>
+      <p>
+        <code>useEffect</code> l&auml;uft <em>nach</em> dem Rendern der Komponente. React rendert zuerst die
+        Komponente, aktualisiert das DOM, und f&uuml;hrt dann die Effect-Funktion aus.
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">useEffect &ndash; Drei Varianten</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import { useState, useEffect } from 'react';
+
+const BeispielKomponente = () => {
+  const [count, setCount] = useState(0);
+
+  // --- Variante 1: Kein Abh&auml;ngigkeiten-Array ---
+  // L&auml;uft nach JEDEM Render (sehr selten gew&uuml;nscht)
+  useEffect(() => {
+    console.log('Komponente wurde gerendert, count =', count);
+  });
+
+  // --- Variante 2: Leeres Abh&auml;ngigkeiten-Array ---
+  // L&auml;uft NUR beim ersten Render (Mount)
+  // Typisch f&uuml;r: initiale Daten laden, globale Event-Listener
+  useEffect(() => {
+    console.log('Komponente wurde gemountet');
+    // Hier: Daten vom Server laden
+  }, []);
+
+  // --- Variante 3: Array mit Abh&auml;ngigkeiten ---
+  // L&auml;uft beim Mount UND immer wenn sich count &auml;ndert
+  useEffect(() => {
+    console.log('count hat sich ge&auml;ndert:', count);
+    document.title = `FlugBoard (${count} Fl&uuml;ge)`;
+  }, [count]); // count ist die Abh&auml;ngigkeit
+
+  return &lt;button onClick={() =&gt; setCount(c =&gt; c + 1)}&gt;{count}&lt;/button&gt;;
+};</code></pre>
+      </div>
+      <div class="callout callout-info">
+        <div class="callout-icon">&#8505;</div>
+        <div class="callout-body">
+          <div class="callout-title">Mount, Update, Unmount</div>
+          <p>
+            Jede Komponente durchl&auml;uft drei Phasen: <strong>Mount</strong> (erste Anzeige im DOM),
+            <strong>Update</strong> (Re-render bei State- oder Prop-&Auml;nderung) und <strong>Unmount</strong>
+            (Entfernen aus dem DOM). <code>useEffect</code> l&auml;uft je nach Abh&auml;ngigkeiten-Array nach
+            Mount und/oder Update. Die Cleanup-Funktion l&auml;uft vor dem n&auml;chsten Effect-Aufruf und beim
+            Unmount.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Das Abh&auml;ngigkeiten-Array</h2>
+      <p>
+        Das zweite Argument von <code>useEffect</code> ist das Abh&auml;ngigkeiten-Array. React vergleicht
+        die Werte bei jedem Render mit den vorherigen Werten. Hat sich mindestens ein Wert ge&auml;ndert,
+        wird der Effect erneut ausgef&uuml;hrt.
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Abh&auml;ngigkeiten korrekt angeben</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">const [searchQuery, setSearchQuery] = useState('');
+const [page, setPage]               = useState(1);
+
+// RICHTIG: Alle im Effect verwendeten Variablen im Array angeben
+useEffect(() => {
+  console.log('Suche nach:', searchQuery, 'auf Seite:', page);
+  // fetch(`/api/flights?q=${searchQuery}&page=${page}`)...
+}, [searchQuery, page]);  // Beide Variablen sind Abh&auml;ngigkeiten
+
+// FALSCH: Abh&auml;ngigkeit vergessen (stale closure!)
+useEffect(() => {
+  // searchQuery wird hier verwendet, aber fehlt im Array!
+  // Der Effect liest immer den Initialwert von searchQuery (leerer String)
+  console.log(searchQuery);
+}, []);  // searchQuery fehlt!
+
+// FALSCH: Objekte/Funktionen direkt im Array
+// Objekte werden bei jedem Render neu erstellt (neue Referenz)
+// &rarr; Effect l&auml;uft nach jedem Render!
+useEffect(() => {
+  // ...
+}, [{ key: 'value' }]);  // Neues Objekt bei jedem Render!
+
+// RICHTIG: Primitive Werte oder stabile Referenzen im Array
+useEffect(() => {
+  // ...
+}, [flight.id, flight.status]);  // Primitive: sicher!</code></pre>
+      </div>
+      <div class="callout callout-warning">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">ESLint-Plugin f&uuml;r Hooks</div>
+          <p>
+            Das NPM-Paket <code>eslint-plugin-react-hooks</code> pr&uuml;ft automatisch, ob alle im Effect
+            verwendeten Variablen im Abh&auml;ngigkeiten-Array stehen. Vite-Projekte mit React enthalten
+            dieses Plugin oft bereits. Die Regel <code>react-hooks/exhaustive-deps</code> ist dabei besonders
+            hilfreich um <em>stale closures</em> zu vermeiden.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Cleanup-Funktionen</h2>
+      <p>
+        Viele Seiteneffekte m&uuml;ssen &bdquo;aufger&auml;umt&ldquo; werden, wenn die Komponente unmountet oder bevor
+        der Effect erneut l&auml;uft. Typische F&auml;lle: Timer stoppen, Event-Listener entfernen,
+        laufende Netzwerkanfragen abbrechen. Die <strong>Cleanup-Funktion</strong> wird durch den
+        R&uuml;ckgabewert von <code>useEffect</code> definiert.
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Cleanup mit setInterval</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import { useState, useEffect } from 'react';
+
+const LiveClock = () => {
+  const [currentTime, setCurrentTime] = useState(
+    new Date().toLocaleTimeString('de-AT')
+  );
+
+  useEffect(() => {
+    // Effect starten: Uhrzeit jede Sekunde aktualisieren
+    const intervalId = setInterval(() => {
+      setCurrentTime(new Date().toLocaleTimeString('de-AT'));
+    }, 1000);
+
+    // Cleanup-Funktion: wird aufgerufen
+    // (a) bevor die Komponente unmountet
+    // (b) bevor der Effect erneut l&auml;uft (falls Abh&auml;ngigkeiten sich &auml;ndern)
+    return () => {
+      clearInterval(intervalId);
+      console.log('Interval wurde gestoppt');
+    };
+  }, []); // Nur beim Mount starten
+
+  return &lt;span&gt;{currentTime}&lt;/span&gt;;
+};</code></pre>
+      </div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Cleanup bei Event-Listener</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">useEffect(() => {
+  // Tastaturk&uuml;rzel global registrieren
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      setSelectedFlight(null);  // Auswahl aufheben
+    }
+    if (e.key === 'r' &amp;&amp; e.ctrlKey) {
+      e.preventDefault();
+      fetchFlights();           // Daten neu laden
+    }
+  };
+
+  document.addEventListener('keydown', handleKeyDown);
+
+  // Cleanup: Listener entfernen
+  return () => {
+    document.removeEventListener('keydown', handleKeyDown);
+  };
+}, []);  // Einmalig registrieren</code></pre>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Das Deno+Hono Backend</h2>
+      <p>
+        F&uuml;r das FlugBoard erstellen wir ein kleines Backend mit <strong>Deno</strong> und
+        <strong>Hono</strong>. Deno ist eine moderne JavaScript/TypeScript-Laufzeit (Alternative zu Node.js)
+        von Ryan Dahl, dem urspr&uuml;nglichen Node.js-Entwickler. Hono ist ein ultraschnelles,
+        leichtgewichtiges Web-Framework.
+      </p>
+      <p>
+        <strong>Vorteile von Deno f&uuml;r unser Backend:</strong> TypeScript out-of-the-box ohne Kompilierung,
+        eingebaute Sicherheitsberechtigungen (<code>--allow-net</code>), kein <code>node_modules</code>-Ordner,
+        moderne Standard-Library.
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">backend/data.ts</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">// Typdefinitionen f&uuml;r das Backend (identisch zum Frontend)
+export type FlightType   = 'arrival' | 'departure';
+export type FlightStatus =
+  | 'on-time' | 'delayed' | 'boarding'
+  | 'departed' | 'landed' | 'cancelled';
+
+export interface Flight {
+  id:            number;
+  flightNumber:  string;
+  airline:       string;
+  type:          FlightType;
+  scheduledTime: string;
+  expectedTime?: string;
+  status:        FlightStatus;
+  airport:       string;
+  terminal:      string;
+  gate?:         string;
+}
+
+// Beispieldaten (sp&auml;ter durch Datenbankanbindung ersetzbar)
+export const flights: Flight[] = [
+  { id: 1, flightNumber: 'OS123', airline: 'Austrian Airlines',  type: 'departure', scheduledTime: '10:30', status: 'boarding',  airport: 'London Heathrow (LHR)', terminal: 'T3', gate: 'B12' },
+  { id: 2, flightNumber: 'LH456', airline: 'Lufthansa',          type: 'departure', scheduledTime: '11:15', expectedTime: '11:45', status: 'delayed',   airport: 'Frankfurt (FRA)',       terminal: 'T2', gate: 'A07' },
+  { id: 3, flightNumber: 'EK789', airline: 'Emirates',           type: 'arrival',   scheduledTime: '09:45', status: 'landed',   airport: 'Dubai (DXB)',            terminal: 'T1' },
+  { id: 4, flightNumber: 'BA234', airline: 'British Airways',    type: 'departure', scheduledTime: '12:00', status: 'on-time',  airport: 'London Heathrow (LHR)', terminal: 'T3', gate: 'C22' },
+  { id: 5, flightNumber: 'TK567', airline: 'Turkish Airlines',   type: 'arrival',   scheduledTime: '13:20', expectedTime: '14:05', status: 'delayed',   airport: 'Istanbul (IST)',         terminal: 'T2' },
+  { id: 6, flightNumber: 'FR890', airline: 'Ryanair',            type: 'departure', scheduledTime: '14:50', status: 'on-time',  airport: 'Dublin (DUB)',           terminal: 'T1', gate: 'D05' },
+  { id: 7, flightNumber: 'WZ112', airline: 'Wizz Air',           type: 'arrival',   scheduledTime: '15:30', status: 'on-time',  airport: 'Budapest (BUD)',         terminal: 'T2' },
+  { id: 8, flightNumber: 'VY334', airline: 'Vueling',            type: 'departure', scheduledTime: '16:10', status: 'cancelled', airport: 'Barcelona (BCN)',        terminal: 'T1' },
+];</code></pre>
+      </div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">backend/main.ts</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">// Hono und CORS-Middleware aus dem npm-Registry importieren
+import { Hono } from 'npm:hono';
+import { cors } from 'npm:hono/cors';
+import { flights } from './data.ts';
+
+const app = new Hono();
+
+// CORS aktivieren: erlaubt Anfragen vom Frontend (localhost:5173)
+// Ohne CORS: Browser blockiert Anfragen von unterschiedlichen Origins
+app.use('*', cors({
+  origin: 'http://localhost:5173',
+}));
+
+// GET /api/flights &ndash; alle Fl&uuml;ge, optional gefiltert
+app.get('/api/flights', (c) => {
+  const type   = c.req.query('type');    // z.B. ?type=departure
+  const status = c.req.query('status');  // z.B. ?status=delayed
+
+  let result = [...flights];
+
+  if (type)   result = result.filter(f =&gt; f.type === type);
+  if (status) result = result.filter(f =&gt; f.status === status);
+
+  return c.json(result);
+});
+
+// GET /api/flights/:id &ndash; einzelner Flug nach ID
+app.get('/api/flights/:id', (c) => {
+  const id     = Number(c.req.param('id'));
+  const flight = flights.find(f =&gt; f.id === id);
+
+  if (!flight) {
+    return c.json({ error: 'Flug nicht gefunden' }, 404);
+  }
+
+  return c.json(flight);
+});
+
+// Server starten auf Port 8000
+Deno.serve({ port: 8000 }, app.fetch);
+console.log('FlugBoard API l&auml;uft auf http://localhost:8000');</code></pre>
+      </div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">backend/deno.json</span>
+          <span class="code-lang">JSON</span>
+        </div>
+        <pre><code class="language-json">{
+  "tasks": {
+    "start": "deno run --allow-net main.ts",
+    "dev":   "deno run --allow-net --watch main.ts"
+  }
+}</code></pre>
+      </div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Terminal &ndash; Backend starten</span>
+          <span class="code-lang">Bash</span>
+        </div>
+        <pre><code class="language-bash"># Im backend/-Ordner:
+deno task dev
+
+# Ausgabe:
+# FlugBoard API l&auml;uft auf http://localhost:8000
+# Watcher l&auml;uft...
+
+# API testen im Browser oder mit curl:
+curl http://localhost:8000/api/flights
+curl http://localhost:8000/api/flights?type=departure
+curl http://localhost:8000/api/flights/1</code></pre>
+      </div>
+      <div class="callout callout-info">
+        <div class="callout-icon">&#8505;</div>
+        <div class="callout-body">
+          <div class="callout-title">Warum CORS?</div>
+          <p>
+            Browser verbieten aus Sicherheitsgr&uuml;nden Anfragen von einer <em>Origin</em>
+            (z.B. <code>http://localhost:5173</code>) an eine andere Origin
+            (z.B. <code>http://localhost:8000</code>). Das nennt sich <em>Same-Origin Policy</em>.
+            CORS (Cross-Origin Resource Sharing) ist der Mechanismus, mit dem der Server dem Browser
+            explizit erlaubt, Anfragen von anderen Origins anzunehmen.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Daten laden mit useEffect und fetch</h2>
+      <p>
+        Das typische Pattern f&uuml;r Datenabruf in React: drei State-Variablen (<code>data</code>,
+        <code>isLoading</code>, <code>error</code>) und ein <code>useEffect</code> mit leerem
+        Abh&auml;ngigkeiten-Array, der beim Mount ausgef&uuml;hrt wird. <strong>Achtung:</strong>
+        <code>useEffect</code> kann keine asynchrone Funktion direkt sein &ndash; deshalb definieren
+        wir eine innere <code>async</code>-Funktion und rufen sie sofort auf.
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">src/App.tsx &ndash; Daten vom Backend laden</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import { useState, useEffect } from 'react';
+import { Flight } from './types/flight';
+import FlightBoard from './components/FlightBoard';
+
+const API_URL = 'http://localhost:8000';
+
+function App() {
+  const [flights, setFlights]     = useState&lt;Flight[]&gt;([]);
+  const [isLoading, setIsLoading] = useState&lt;boolean&gt;(true);
+  const [error, setError]         = useState&lt;string | null&gt;(null);
+
+  useEffect(() => {
+    // ACHTUNG: useEffect-Callback darf nicht async sein!
+    // L&ouml;sung: innere async-Funktion definieren und sofort aufrufen
+    const fetchFlights = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const response = await fetch(`${API_URL}/api/flights`);
+
+        // HTTP-Fehler (z.B. 404, 500) werfen keinen Fehler &ndash; pr&uuml;fen!
+        if (!response.ok) {
+          throw new Error(`HTTP-Fehler ${response.status}: ${response.statusText}`);
+        }
+
+        const data: Flight[] = await response.json();
+        setFlights(data);
+      } catch (err) {
+        // Fehler in State speichern zur Anzeige f&uuml;r den Nutzer
+        setError(err instanceof Error ? err.message : 'Unbekannter Fehler');
+      } finally {
+        // finally: wird immer ausgef&uuml;hrt, auch bei Fehler
+        setIsLoading(false);
+      }
+    };
+
+    fetchFlights();
+  }, []); // Nur beim ersten Render ausf&uuml;hren
+
+  // Fehler-Zustand
+  if (error) {
+    return (
+      &lt;div className="status-screen status-screen-error"&gt;
+        &lt;p className="error-text"&gt;Fehler beim Laden: {error}&lt;/p&gt;
+        &lt;button
+          onClick={() => window.location.reload()}
+          className="retry-btn"
+        &gt;
+          Neu laden
+        &lt;/button&gt;
+      &lt;/div&gt;
+    );
+  }
+
+  // Normaler Zustand
+  return (
+    &lt;div className="app-page"&gt;
+      &lt;h1 className="app-title"&gt;&#9992; FlugBoard&lt;/h1&gt;
+      {isLoading ? (
+        &lt;div className="board-loading board-loading--muted"&gt;
+          &lt;div className="status-icon"&gt;&#9992;&lt;/div&gt;
+          &lt;p&gt;Flugdaten werden geladen...&lt;/p&gt;
+        &lt;/div&gt;
+      ) : (
+        &lt;&gt;
+          &lt;FlightBoard
+            flights={flights.filter(f =&gt; f.type === 'departure')}
+            title="Abfl&uuml;ge"
+          /&gt;
+          &lt;FlightBoard
+            flights={flights.filter(f =&gt; f.type === 'arrival')}
+            title="Ank&uuml;nfte"
+          /&gt;
+        &lt;/&gt;
+      )}
+    &lt;/div&gt;
+  );
+}
+
+export default App;</code></pre>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">&#8505;</div>
+        <div class="callout-body">
+          <div class="callout-title">Hinweis zu axios</div>
+          <p>
+            In diesem Kurs verwenden wir bewusst die native <code>fetch</code>-API, weil sie ohne
+            zus&auml;tzliche Bibliothek in Browser, Next.js und React Native verf&uuml;gbar ist.
+          </p>
+          <p>
+            <code>axios</code> ist trotzdem wichtig zu kennen: Es bietet eine komfortable API,
+            automatische JSON-Transformation und konsistentes Fehlerverhalten.
+            Bei <code>fetch</code> gilt ein HTTP-404/500 nicht automatisch als Exception,
+            bei <code>axios</code> landet das direkt im <code>catch</code>-Block.
+            Au&szlig;erdem bringt axios Features wie Request-/Response-Interceptors mit,
+            z.B. f&uuml;r zentrale Auth-Header, Logging oder Error-Mapping.
+          </p>
+          <p>
+            Weitere Vorteile sind globale Defaults (Base-URL, Timeouts),
+            einheitliches Verhalten in &auml;lteren Umgebungen und oft etwas
+            weniger Boilerplate bei gr&ouml;&szlig;eren API-Schichten.
+            F&uuml;r kleine bis mittlere Frontends reicht <code>fetch</code> aber in der Regel
+            v&ouml;llig aus, ist Standard-nah und spart eine externe Abh&auml;ngigkeit.
+            Deshalb lernen wir hier zuerst <code>fetch</code> und k&ouml;nnen sp&auml;ter bei Bedarf
+            gezielt auf axios wechseln.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>AbortController &ndash; Fetch sauber abbrechen</h2>
+      <p>
+        In React (<em>StrictMode</em>) wird jeder Effect zweimal ausgef&uuml;hrt: einmal gemountet, einmal
+        unmountet, einmal wieder gemountet. Ohne Cleanup k&ouml;nnte ein veralteter Fetch-Request nach dem
+        Unmount noch State aktualisieren &ndash; das f&uuml;hrt zu einem React-Warning:
+        <em>"Can't perform a React state update on an unmounted component."</em>
+        Die L&ouml;sung: <code>AbortController</code>.
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Fetch mit AbortController</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">useEffect(() => {
+  // AbortController erstellen
+  const controller = new AbortController();
+
+  const fetchFlights = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(`${API_URL}/api/flights`, {
+        signal: controller.signal,   // Signal an fetch &uuml;bergeben
+      });
+
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data: Flight[] = await response.json();
+      setFlights(data);
+    } catch (err) {
+      // AbortError ignorieren &ndash; das ist kein echter Fehler, sondern Cleanup
+      if (err instanceof Error &amp;&amp; err.name === 'AbortError') {
+        console.log('Fetch wurde abgebrochen (Cleanup)');
+        return;
+      }
+      setError(err instanceof Error ? err.message : 'Fehler');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  fetchFlights();
+
+  // Cleanup: Fetch abbrechen wenn Komponente unmountet oder Effect erneut l&auml;uft
+  return () => {
+    controller.abort();
+  };
+}, []);</code></pre>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Automatisches Polling</h2>
+      <p>
+        Fluganzeigetafeln m&uuml;ssen regelm&auml;&szlig;ig aktualisiert werden. Wir k&ouml;nnen <code>setInterval</code>
+        innerhalb von <code>useEffect</code> verwenden, um die Daten periodisch neu zu laden. Das
+        Cleanup-Muster stellt sicher, dass das Interval gestoppt wird wenn die Komponente nicht mehr
+        angezeigt wird.
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Polling alle 30 Sekunden</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">const [lastUpdated, setLastUpdated] = useState&lt;Date | null&gt;(null);
+const [isRefreshing, setIsRefreshing] = useState(false);
+
+// Separate Ladefunktion (wiederverwendbar f&uuml;r manuelles Aktualisieren)
+const fetchFlights = async (signal?: AbortSignal) => {
+  try {
+    setIsRefreshing(true);
+    const response = await fetch(`${API_URL}/api/flights`, { signal });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data: Flight[] = await response.json();
+    setFlights(data);
+    setLastUpdated(new Date());
+  } catch (err) {
+    if (err instanceof Error &amp;&amp; err.name !== 'AbortError') {
+      setError(err.message);
+    }
+  } finally {
+    setIsRefreshing(false);
+  }
+};
+
+useEffect(() => {
+  const controller = new AbortController();
+
+  // Sofort beim Mount laden
+  fetchFlights(controller.signal);
+
+  // Danach alle 30 Sekunden neu laden
+  const intervalId = setInterval(() => {
+    fetchFlights(controller.signal);
+  }, 30_000);  // 30 Sekunden = 30.000 Millisekunden
+
+  // Cleanup: Interval stoppen und laufenden Fetch abbrechen
+  return () => {
+    clearInterval(intervalId);
+    controller.abort();
+  };
+}, []);  // Einmalig beim Mount starten
+
+// In JSX: Letztes Update anzeigen
+{lastUpdated &amp;&amp; (
+  &lt;p style={{ color: '#8b949e', fontSize: '0.8rem' }}&gt;
+    Zuletzt aktualisiert: {lastUpdated.toLocaleTimeString('de-AT')}
+    {isRefreshing &amp;&amp; ' (wird aktualisiert...)'}
+  &lt;/p&gt;
+)}</code></pre>
+      </div>
+    </section>
+
+    <section class="section section-projekt">
+      <h2>Projektschritt</h2>
+      <div class="projekt-box">
+        <div class="projekt-box-header">
+          <span class="projekt-step">Projektschritt 2.2</span>
+          <h3>Backend anschlie&szlig;en</h3>
+        </div>
+        <p>
+          Das FlugBoard l&auml;dt seine Daten ab jetzt vom Deno+Hono-Backend. Die Beispieldaten aus
+          <code>src/data/flights.ts</code> werden nur noch als Fallback oder f&uuml;r Tests verwendet.
+        </p>
+        <p><strong>Schritte in dieser Lektion:</strong></p>
+        <ul>
+          <li>Ordner <code>backend/</code> mit <code>main.ts</code>, <code>data.ts</code> und <code>deno.json</code> anlegen</li>
+          <li><code>deno task dev</code> starten und API unter <code>http://localhost:8000/api/flights</code> testen</li>
+          <li><code>App.tsx</code> um <code>isLoading</code>- und <code>error</code>-State erweitern</li>
+          <li>Daten per <code>useEffect</code> laden (mit <code>AbortController</code> f&uuml;r sauberes Cleanup)</li>
+          <li>Loading-Anzeige w&auml;hrend der Daten geladen werden</li>
+          <li>Fehler-Anzeige mit &bdquo;Neu laden&ldquo;-Button wenn das Backend nicht erreichbar ist</li>
+        </ul>
+        <div class="callout callout-tip">
+          <div class="callout-icon">&#10003;</div>
+          <div class="callout-body">
+            <div class="callout-title">Zwei Terminals gleichzeitig</div>
+            <p>
+              Im Entwicklungsmodus laufen Frontend (Vite, Port 5173) und Backend (Deno, Port 8000)
+              als separate Prozesse. &Ouml;ffne daf&uuml;r zwei Terminal-Fenster oder verwende Terminal-Tabs.
+              Im ersten Fenster: <code>npm run dev</code> (im <code>flugboard/</code>-Ordner),
+              im zweiten: <code>deno task dev</code> (im <code>backend/</code>-Ordner).
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-fehler">
+      <h2>H&auml;ufige Fehler</h2>
+
+      <div class="fehler-item">
+        <div class="fehler-title">Fehler: Abh&auml;ngigkeiten vergessen &ndash; <em>Stale Closure</em></div>
+        <p>
+          Wenn eine Variable im Effect verwendet wird, aber nicht im Abh&auml;ngigkeiten-Array steht,
+          liest der Effect immer den Wert aus dem ersten Render &ndash; eine veraltete Closure.
+          Das ESLint-Plugin <code>react-hooks/exhaustive-deps</code> warnt davor.
+        </p>
+        <p class="fehler-fix">Alle im Effect verwendeten State-Variablen und Props ins Abh&auml;ngigkeiten-Array schreiben.</p>
+      </div>
+
+      <div class="fehler-item">
+        <div class="fehler-title">Fehler: State im Effect ohne Abh&auml;ngigkeiten &ndash; Endlosschleife</div>
+        <p>
+          <code>useEffect(() =&gt; &#123; setCount(count + 1); &#125;)</code> ohne Abh&auml;ngigkeiten-Array:
+          Effect l&auml;uft nach jedem Render &rarr; State &auml;ndert sich &rarr; Re-render &rarr; Effect l&auml;uft
+          wieder &rarr; Endlosschleife. Die App friert ein.
+        </p>
+        <p class="fehler-fix">Immer ein Abh&auml;ngigkeiten-Array angeben. Bei einmaliger Ausf&uuml;hrung: <code>[]</code>.</p>
+      </div>
+
+      <div class="fehler-item">
+        <div class="fehler-title">Fehler: CORS-Fehler im Browser</div>
+        <p>
+          <em>"Access to fetch at 'http://localhost:8000' from origin 'http://localhost:5173' has been
+          blocked by CORS policy."</em> &ndash; Das Backend gibt keine CORS-Header zur&uuml;ck. Der Browser
+          blockiert die Antwort.
+        </p>
+        <p class="fehler-fix">Im Hono-Backend <code>app.use('*', cors())</code> aktivieren und die erlaubte Origin korrekt konfigurieren.</p>
+      </div>
+
+      <div class="fehler-item">
+        <div class="fehler-title">Fehler: <code>async</code> direkt als useEffect-Callback</div>
+        <p>
+          <code>useEffect(async () =&gt; &#123;...&#125;, [])</code> ist nicht erlaubt. Ein asynchroner
+          useEffect-Callback w&uuml;rde ein Promise zur&uuml;ckgeben, aber React erwartet entweder nichts
+          oder eine Cleanup-Funktion als R&uuml;ckgabewert.
+        </p>
+        <p class="fehler-fix">Innere <code>async</code>-Funktion definieren und sofort aufrufen: <code>const load = async () =&gt; &#123;...&#125;; load();</code></p>
+      </div>
+    </section>
+
+    <section class="section section-aufgaben">
+      <h2>Aufgaben</h2>
+      <div class="aufgaben-list">
+
+        <div class="aufgabe">
+          <div class="aufgabe-header">
+            <span class="aufgabe-num">Aufgabe 1</span>
+            <span class="aufgabe-title">Backend starten und testen</span>
+          </div>
+          <p>
+            Richte das Deno+Hono-Backend ein und teste alle API-Endpunkte.
+          </p>
+          <ul>
+            <li>Erstelle den <code>backend/</code>-Ordner mit <code>main.ts</code>, <code>data.ts</code> und <code>deno.json</code></li>
+            <li>Starte mit <code>deno task dev</code> und rufe <code>http://localhost:8000/api/flights</code> im Browser auf</li>
+            <li>Teste die Query-Parameter: <code>?type=departure</code>, <code>?status=delayed</code></li>
+            <li>Teste den Endpunkt f&uuml;r einzelne Fl&uuml;ge: <code>/api/flights/1</code> und <code>/api/flights/999</code></li>
+          </ul>
+        </div>
+
+        <div class="aufgabe">
+          <div class="aufgabe-header">
+            <span class="aufgabe-num">Aufgabe 2</span>
+            <span class="aufgabe-title">Daten laden mit useEffect</span>
+          </div>
+          <p>
+            Lade die Flugdaten in <code>App.tsx</code> mit <code>useEffect</code> und <code>fetch</code>
+            vom laufenden Backend.
+          </p>
+          <ul>
+            <li>Drei State-Variablen: <code>flights</code>, <code>isLoading</code>, <code>error</code></li>
+            <li>Loading-Anzeige: Symbol und Text &bdquo;Flugdaten werden geladen...&ldquo;</li>
+            <li>Fehler-Anzeige: Fehlermeldung und &bdquo;Neu laden&ldquo;-Button</li>
+            <li>Verwende <code>AbortController</code> f&uuml;r sauberes Cleanup</li>
+          </ul>
+        </div>
+
+        <div class="aufgabe">
+          <div class="aufgabe-header">
+            <span class="aufgabe-num">Aufgabe 3</span>
+            <span class="aufgabe-title">Automatische Aktualisierung (Polling)</span>
+          </div>
+          <p>
+            F&uuml;ge eine automatische Aktualisierung alle 30 Sekunden hinzu.
+          </p>
+          <ul>
+            <li><code>setInterval</code> innerhalb des useEffect</li>
+            <li>Cleanup: <code>clearInterval</code> und <code>controller.abort()</code> in der Cleanup-Funktion</li>
+            <li>State <code>lastUpdated: Date | null</code> mit der Zeit der letzten Aktualisierung</li>
+            <li>Anzeige unter dem Header: &bdquo;Zuletzt aktualisiert: 14:32:05&ldquo;</li>
+          </ul>
+        </div>
+
+        <div class="aufgabe aufgabe-bonus">
+          <div class="aufgabe-header">
+            <span class="aufgabe-num">Bonus</span>
+            <span class="aufgabe-title">Manuell aktualisieren + Uhrzeit</span>
+          </div>
+          <p>
+            Erweitere das FlugBoard um zwei Features mit <code>useEffect</code>:
+          </p>
+          <ul>
+            <li>
+              <strong>Aktualisieren-Button:</strong> Ein &bdquo;Aktualisieren&ldquo;-Button l&auml;dt die Daten manuell neu.
+              W&auml;hrend des Ladens soll der Button deaktiviert sein (<code>disabled</code>) und einen
+              anderen Text zeigen (&bdquo;Wird geladen...&ldquo;).
+            </li>
+            <li>
+              <strong>Live-Uhrzeit:</strong> Erstelle eine separate <code>LiveClock</code>-Komponente, die
+              die aktuelle Uhrzeit jede Sekunde aktualisiert. Verwende <code>setInterval</code> mit Cleanup.
+              Platziere die Uhr im App-Header rechts neben dem Titel.
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+  </div><!-- /content-area -->
+
+        <nav class="lesson-nav">
+    <a class="nav-btn" href="2.1-formulare.html">&larr; Lektion 2.1: Formulare &amp; Inputs</a>
+    <span class="nav-center-info">Lektion 2.2</span>
+    <a class="nav-btn primary" href="2.3-kommunikation.html">Lektion 2.3: Komponentenkommunikation &rarr;</a>
+  </nav>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+<script>
+  // Hamburger menu
+  const ham = document.getElementById('hamburger');
+  const sb  = document.getElementById('sidebar');
+  const ov  = document.getElementById('overlay');
+  ham.addEventListener('click', () => { sb.classList.toggle('open'); ov.classList.toggle('visible'); });
+  ov.addEventListener('click',  () => { sb.classList.remove('open'); ov.classList.remove('visible'); });
+  // Active nav link
+  const cur = window.location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.nav-link').forEach(l => {
+    if (l.getAttribute('href') === cur) l.classList.add('active');
+  });
+  // Theme toggle — einfach & robust (kein CSS-Swap nötig)
+  const themeBtn = document.getElementById('theme-toggle');
+  const applyTheme = (t) => {
+    document.documentElement.setAttribute('data-theme', t);
+    if (themeBtn) themeBtn.innerHTML = t === 'dark' ? '&#9728;' : '&#9790;';
+  };
+  // Theme aus localStorage laden (alle Seiten teilen denselben Key)
+  applyTheme(localStorage.getItem('kurs-theme') || 'dark');
+  // Transitions erst nach dem initialen Render aktivieren (verhindert Flash)
+  setTimeout(() => document.documentElement.classList.add('theme-transitions'), 50);
+  if (themeBtn) themeBtn.addEventListener('click', () => {
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('kurs-theme', next);
+    applyTheme(next);
+  });
+  hljs.highlightAll();
+</script>
+</body>
+</html>

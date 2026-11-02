@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2.1 &ndash; Listen &amp; Conditional Rendering | React Kurs</title>
+  <script>(function(){var t=localStorage.getItem('kurs-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
+  <link rel="stylesheet" href="assets/kurs.css">
+  <link rel="stylesheet" id="hljs-theme" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+<body>
+
+<button class="hamburger" id="hamburger" aria-label="Navigation &ouml;ffnen">&#9776;</button>
+<div class="sidebar-overlay" id="overlay"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html">
+      <span class="brand-icon">&#9992;</span>
+      <div>
+        <div class="brand-name">React Kurs</div>
+        <div class="brand-sub">Web &amp; Mobile</div>
+      </div>
+    </a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Dark/Light Mode" title="Theme wechseln">&#9728;</button>
+  </div>
+        <nav class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-label react-label">Teil 1 &mdash; React Einführung</div>
+      <a class="nav-link" href="1.1-einfuehrung-spa.html"><span class="ln">1.1</span>Motivation &amp; SPA</a>
+      <a class="nav-link" href="1.2-einfuehrung.html"><span class="ln">1.2</span>Einführung &amp; Umgebung</a>
+      <a class="nav-link" href="1.3-komponenten-props-einfach.html"><span class="ln">1.3</span>Komponenten &amp; Props (einfach)</a>
+      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten &amp; Props (Vertiefung)</a>
+      <a class="nav-link" href="1.5-state-events.html"><span class="ln">1.5</span>State &amp; Events</a>
+      <a class="nav-link" href="1.6-listen-conditional.html"><span class="ln">1.6</span>Listen &amp; Conditional Rendering</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label react-label">Teil 2 &mdash; React Praxis</div>
+      <a class="nav-link" href="2.1-formulare.html"><span class="ln">2.1</span>Formulare &amp; Inputs</a>
+      <a class="nav-link" href="2.2-useeffect-api.html"><span class="ln">2.2</span>useEffect &amp; API</a>
+      <a class="nav-link" href="2.3-kommunikation.html"><span class="ln">2.3</span>Komponentenkommunikation</a>
+      <a class="nav-link" href="2.4-context.html"><span class="ln">2.4</span>Context API</a>
+      <a class="nav-link" href="2.5-custom-hooks.html"><span class="ln">2.5</span>Custom Hooks</a>
+      <a class="nav-link" href="2.6-testen-vitest-rtl.html"><span class="ln">2.6</span>Testen mit Vitest + RTL</a>
+      <a class="nav-link" href="2.7-react-router.html"><span class="ln">2.7</span>React Router</a>
+      <a class="nav-link" href="2.8-datenbank-drizzle-sqlite.html"><span class="ln">2.8</span>Datenbankzugriff mit Drizzle + SQLite</a>
+      <a class="nav-link" href="2.9-redux-state-management.html"><span class="ln">2.9</span>State Management mit Redux (Überblick)</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label next-label">Teil 3 &mdash; Next.js</div>
+      <a class="nav-link" href="3.1-nextjs-einfuehrung.html"><span class="ln">3.1</span>Einführung Next.js</a>
+      <a class="nav-link" href="3.2-nextjs-routing.html"><span class="ln">3.2</span>Routing &amp; Layouts</a>
+      <a class="nav-link" href="3.3-server-client.html"><span class="ln">3.3</span>Server &amp; Client Components</a>
+      <a class="nav-link" href="3.4-api-routes.html"><span class="ln">3.4</span>API Routes &amp; Datenabruf</a>
+      <a class="nav-link" href="3.5-playwright-e2e.html"><span class="ln">3.5</span>Playwright E2E</a>
+      <a class="nav-link" href="3.6-deployment.html"><span class="ln">3.6</span>Deployment</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label rn-label">Teil 4 &mdash; React Native</div>
+      <a class="nav-link" href="4.1-rn-einfuehrung.html"><span class="ln">4.1</span>Einführung React Native</a>
+      <a class="nav-link" href="4.2-rn-komponenten.html"><span class="ln">4.2</span>Native Komponenten &amp; Styling</a>
+      <a class="nav-link" href="4.3-rn-navigation.html"><span class="ln">4.3</span>Navigation &amp; State</a>
+    </div>
+  </nav>
+</aside>
+
+<main class="main-content">
+  <header class="lesson-header">
+    <p class="lesson-eyebrow">Lektion 1.6 &mdash; Teil 1: React Einführung</p>
+    <h1>Listen &amp; Conditional Rendering</h1>
+    <div class="lesson-tags">
+      <span class="tag tag-react">React</span>
+      <span class="tag tag-time">ca. 75 min</span>
+    </div>
+  </header>
+
+  <div class="content-area">
+
+    <section class="section section-lernziele">
+      <h2>Lernziele</h2>
+      <ul class="lernziele-list">
+        <li>Listen mit <code>.map()</code> rendern</li>
+        <li>Den <code>key</code>-Prop korrekt verwenden und verstehen warum er wichtig ist</li>
+        <li>Elemente bedingt rendern mit <code>&amp;&amp;</code>, Ternary und fr&uuml;hem Return</li>
+        <li>Status-Badges mit bedingtem Styling</li>
+        <li><code>.filter()</code> und <code>.sort()</code> f&uuml;r Listenmanipulation</li>
+        <li>Leere Zust&auml;nde (Empty States) anzeigen</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>Listen mit .map() rendern</h2>
+      <p>
+        In React rendert man Listen, indem man ein Array mit der <code>.map()</code>-Methode in ein Array
+        von JSX-Elementen umwandelt. React kann Arrays von JSX-Elementen direkt rendern. Das <code>key</code>-Prop
+        ist dabei <strong>Pflicht</strong> &ndash; es hilft React, die Elemente bei &Auml;nderungen effizient
+        zu identifizieren.
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Listen rendern &ndash; Grundlagen</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">// Einfaches Beispiel: Array von Strings
+const staedte = ['Wien', 'Berlin', 'Paris'];
+
+const Stadtliste = () => (
+  &lt;ul&gt;
+    {staedte.map((stadt) => (
+      &lt;li key={stadt}&gt;{stadt}&lt;/li&gt;
+    ))}
+  &lt;/ul&gt;
+);
+
+// Mit Objekten: Immer eine eindeutige ID als key verwenden!
+const FlightList = ({ flights }: { flights: Flight[] }) => (
+  &lt;tbody&gt;
+    {flights.map((flight) => (
+      &lt;FlightCard key={flight.id} flight={flight} /&gt;
+    ))}
+  &lt;/tbody&gt;
+);
+
+// SCHLECHT: Index als key (nur wenn Liste sich nie &auml;ndert!)
+{flights.map((flight, index) => (
+  &lt;FlightCard key={index} flight={flight} /&gt;  // Vermeiden bei dynamischen Listen
+))}</code></pre>
+      </div>
+      <div class="callout callout-warning">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">Warum ist <code>key</code> so wichtig?</div>
+          <p>
+            Beim Diffing-Algorithmus vergleicht React alte und neue Listen anhand der <code>key</code>-Props.
+            Mit einem stabilen, eindeutigen <code>key</code> (z.B. ID aus der Datenbank) kann React genau
+            feststellen: welches Element wurde hinzugef&uuml;gt, entfernt oder verschoben? Ohne <code>key</code>
+            oder mit dem Index als <code>key</code> bei dynamischen Listen kann React falsche DOM-Updates
+            durchf&uuml;hren und internen State von Komponenten durcheinanderbringen.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Der key-Prop im Detail</h2>
+      <p>
+        Das folgende Diagramm verdeutlicht das Problem mit dem Index als <code>key</code>:
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">key-Prop: Index vs. ID</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">// Ausgangsliste:
+// [OS123 (id:1), LH456 (id:2), BA234 (id:4)]
+//  key=0           key=1           key=2           (mit Index als key)
+//  key=1           key=2           key=4           (mit ID als key)
+
+// Nach L&ouml;schen von LH456 (id:2):
+// [OS123 (id:1), BA234 (id:4)]
+
+// MIT INDEX ALS KEY (falsch):
+// React sieht: key=0 gleich, key=1 ANDERS (jetzt BA234 statt LH456)
+// React denkt: key=1 wurde ge&auml;ndert, key=2 wurde entfernt
+// Problem: BA234 erbt State/Fokus von LH456!
+
+// MIT ID ALS KEY (richtig):
+// React sieht: key=1 gleich, key=2 wurde entfernt, key=4 gleich
+// React wei&szlig;: LH456 wurde entfernt, alle anderen bleiben unver&auml;ndert
+// Korrekt: BA234 hat seinen eigenen State
+
+// Fazit: Bei statischen Listen (Reihenfolge &auml;ndert sich nie) ist Index ok.
+//        Bei dynamischen Listen (hinzuf&uuml;gen, l&ouml;schen, sortieren) immer eine stabile ID nutzen!</code></pre>
+      </div>
+      <div class="callout callout-info">
+        <div class="callout-icon">&#8505;</div>
+        <div class="callout-body">
+          <div class="callout-title">key ist kein normales Prop</div>
+          <p>
+            <code>key</code> wird von React intern verwendet und ist in der Komponente selbst nicht
+            zug&auml;nglich. Wenn du die ID innerhalb der Komponente ben&ouml;tigst, &uuml;bergib sie zus&auml;tzlich
+            als normales Prop: <code>&lt;FlightCard key={flight.id} id={flight.id} flight={flight} /&gt;</code>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Conditional Rendering &ndash; Drei Patterns</h2>
+      <p>
+        React rendert bedingt, indem JavaScript-Ausdr&uuml;cke direkt in JSX verwendet werden. Es gibt drei
+        g&auml;ngige Patterns &ndash; jedes hat seine Berechtigung:
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Pattern 1: &amp;&amp; Operator</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">// Wenn die Bedingung wahr ist, wird der rechte Teil gerendert.
+// Wenn falsch, wird nichts gerendert (undefined/false wird von React ignoriert).
+
+{flight.status === 'delayed' &amp;&amp; (
+  &lt;span className="status-delayed"&gt;
+    Versp&auml;tet: {flight.expectedTime} Uhr
+  &lt;/span&gt;
+)}
+
+{flight.gate &amp;&amp; (
+  &lt;span&gt;Gate: {flight.gate}&lt;/span&gt;
+)}
+
+// ACHTUNG: Zahlen! 0 wird als "0" gerendert, nicht als nichts!
+// FALSCH:
+{flights.length &amp;&amp; &lt;span&gt;{flights.length} Fl&uuml;ge&lt;/span&gt;}
+// Wenn flights.length === 0, wird "0" im DOM angezeigt!
+
+// RICHTIG:
+{flights.length &gt; 0 &amp;&amp; &lt;span&gt;{flights.length} Fl&uuml;ge&lt;/span&gt;}</code></pre>
+      </div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Pattern 2: Ternary Operator</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">// Bedingung ? WennWahr : WennFalsch
+// Gut wenn es zwei alternative Darstellungen gibt.
+
+{flight.gate ? (
+  &lt;span&gt;Gate: {flight.gate}&lt;/span&gt;
+) : (
+  &lt;span className="text-muted"&gt;Kein Gate zugewiesen&lt;/span&gt;
+)}
+
+// Mit CSS-Klassen statt Inline-Styles (Inline nur f&uuml;r dynamische Laufzeitwerte):
+&lt;td className={flight.status === 'cancelled' ? 'flight-number is-cancelled' : 'flight-number'}&gt;
+  {flight.flightNumber}
+&lt;/td&gt;
+
+// F&uuml;r den Zeitstempel:
+&lt;td&gt;
+  {flight.expectedTime &amp;&amp; flight.expectedTime !== flight.scheduledTime
+    ? `${flight.scheduledTime} \u2192 ${flight.expectedTime}`
+    : flight.scheduledTime
+  }
+&lt;/td&gt;</code></pre>
+      </div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Pattern 3: Fr&uuml;her Return</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">// F&uuml;r komplexere Logik: vor dem Haupt-JSX zur&uuml;ckkehren.
+// Gut lesbar und vermeidet tief verschachtelte Bedingungen.
+
+const FlightRow = ({ flight }: { flight: Flight }) => {
+  // Annullierte Fl&uuml;ge bekommen eine spezielle Darstellung
+  if (flight.status === 'cancelled') {
+    return (
+      &lt;tr className="flight-row is-cancelled"&gt;
+        &lt;td colSpan={7} className="flight-cell flight-cancelled-note"&gt;
+          {flight.flightNumber} &ndash; {flight.airline} &ndash; Annulliert
+        &lt;/td&gt;
+      &lt;/tr&gt;
+    );
+  }
+
+  // Normaler Fall: vollst&auml;ndige Zeile
+  return (
+    &lt;tr&gt;
+      {/* ... alle Spalten ... */}
+    &lt;/tr&gt;
+  );
+};</code></pre>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>FlightStatusBadge &ndash; Vollst&auml;ndige Version</h2>
+      <p>
+        Mit dem Wissen &uuml;ber Conditional Rendering und TypeScript-Records bauen wir die
+        <code>FlightStatusBadge</code>-Komponente nun vollst&auml;ndig aus. Ein zentrales Konfigurations-Objekt
+        (<code>Record&lt;FlightStatus, StatusConfig&gt;</code>) macht den Code wartbar und typsicher.
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">src/components/FlightStatusBadge.tsx</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import { FlightStatus } from '../types/flight';
+import './FlightStatusBadge.css';
+
+// Konfiguration f&uuml;r jeden Status
+interface StatusConfig {
+  label: string;
+  className: string;
+}
+
+// Record sicherstellen: alle 6 Status-Werte MÜSSEN abgedeckt sein
+const STATUS_CONFIG: Record&lt;FlightStatus, StatusConfig&gt; = {
+  'on-time':   { label: 'P&uuml;nktlich', className: 'status-on-time' },
+  'delayed':   { label: 'Versp&auml;tet', className: 'status-delayed' },
+  'boarding':  { label: 'Boarding', className: 'status-boarding' },
+  'departed':  { label: 'Abgeflogen', className: 'status-departed' },
+  'landed':    { label: 'Gelandet', className: 'status-landed' },
+  'cancelled': { label: 'Annulliert', className: 'status-cancelled' },
+};
+
+interface FlightStatusBadgeProps {
+  status: FlightStatus;
+}
+
+const FlightStatusBadge = ({ status }: FlightStatusBadgeProps) => {
+  const { label, className } = STATUS_CONFIG[status];
+  return &lt;span className={`status-pill ${className}`}&gt;{label}&lt;/span&gt;;
+};
+
+export default FlightStatusBadge;</code></pre>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Filter und Sortierung</h2>
+      <p>
+        JavaScript-Array-Methoden wie <code>.filter()</code> und <code>.sort()</code> eignen sich perfekt
+        f&uuml;r die Transformation von Flugdaten vor dem Rendern. Wichtig: <code>.sort()</code> mutiert das
+        Original-Array! Deshalb immer zuerst eine Kopie mit dem Spread-Operator erstellen.
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Filter und Sortierung in FlightBoard</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import { useState } from 'react';
+import { Flight, FlightStatus } from '../types/flight';
+import FlightCard from './FlightCard';
+
+type StatusFilter = 'all' | FlightStatus;
+
+interface FlightBoardProps {
+  flights: Flight[];
+  title: string;
+}
+
+const FlightBoard = ({ flights, title }: FlightBoardProps) => {
+  const [statusFilter, setStatusFilter] = useState&lt;StatusFilter&gt;('all');
+
+  // Verarbeitung: erst filtern, dann sortieren
+  const processedFlights = [...flights]        // Kopie! .sort() mutiert das Original
+    .filter(f => statusFilter === 'all' || f.status === statusFilter)
+    .sort((a, b) => a.scheduledTime.localeCompare(b.scheduledTime));
+    // Stringvergleich funktioniert f&uuml;r "HH:MM"-Format korrekt
+
+  return (
+    &lt;section className="flight-board-section"&gt;
+      &lt;div className="status-filter-row"&gt;
+        {(['all', 'on-time', 'delayed', 'boarding', 'cancelled'] as StatusFilter[]).map(f => (
+          &lt;button
+            key={f}
+            onClick={() => setStatusFilter(f)}
+            className={statusFilter === f ? 'status-filter-btn is-active' : 'status-filter-btn'}
+          &gt;
+            {f === 'all' ? 'Alle' : f}
+          &lt;/button&gt;
+        ))}
+      &lt;/div&gt;
+
+      &lt;table className="flight-board-table"&gt;
+        &lt;tbody&gt;
+          {processedFlights.length === 0 ? (
+            &lt;tr&gt;
+              &lt;td colSpan={7} className="flight-board-empty-cell"&gt;
+                Keine Fl&uuml;ge in dieser Kategorie gefunden.
+              &lt;/td&gt;
+            &lt;/tr&gt;
+          ) : (
+            processedFlights.map(f => &lt;FlightCard key={f.id} flight={f} /&gt;)
+          )}
+        &lt;/tbody&gt;
+      &lt;/table&gt;
+    &lt;/section&gt;
+  );
+};</code></pre>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Empty States</h2>
+      <p>
+        Wenn eine Liste leer ist &ndash; z.B. weil kein Flug den aktiven Filter erf&uuml;llt &ndash; sollte die
+        App eine hilfreiche Nachricht anzeigen statt einer leeren Tabelle. Das nennt sich <em>Empty State</em>.
+        Ein guter Empty State erkl&auml;rt warum die Liste leer ist und bietet M&ouml;glichkeiten zur Abhilfe.
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Empty State Komponente</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import './EmptyState.css';
+
+interface EmptyStateProps {
+  message?: string;
+  onReset?: () => void;
+}
+
+/**
+ * Zeigt einen leeren Zustand an, wenn keine Daten vorhanden sind.
+ */
+const EmptyState = ({
+  message = 'Keine Fl&uuml;ge gefunden.',
+  onReset,
+}: EmptyStateProps) => (
+  &lt;div className="empty-state"&gt;
+    &lt;div className="empty-state-icon"&gt;&#9992;&lt;/div&gt;
+    &lt;p className="empty-state-message"&gt;{message}&lt;/p&gt;
+    {onReset &amp;&amp; (
+      &lt;button onClick={onReset} className="empty-state-reset-btn"&gt;
+        Filter zur&uuml;cksetzen
+      &lt;/button&gt;
+    )}
+  &lt;/div&gt;
+);</code></pre>
+      </div>
+    </section>
+
+    <section class="section section-projekt">
+      <h2>Projektschritt</h2>
+      <div class="projekt-box">
+        <div class="projekt-box-header">
+          <span class="projekt-step">Projektschritt 1.6</span>
+          <h3>Status-Badges, Sortierung &amp; Empty State</h3>
+        </div>
+        <p>
+          In dieser Lektion verfeinern wir die Darstellung des FlugBoards erheblich:
+        </p>
+        <ul>
+          <li>Alle Fl&uuml;ge sind nach <code>scheduledTime</code> aufsteigend sortiert</li>
+          <li>Verspätete Fl&uuml;ge zeigen BEIDE Zeiten: <code>11:15 &rarr; 11:45</code></li>
+          <li>Annullierte Fl&uuml;ge werden durchgestrichen dargestellt</li>
+          <li>Der vollst&auml;ndige <code>FlightStatusBadge</code> mit allen 6 Status und Farben ist eingebaut</li>
+          <li>Bei leerer gefilterter Liste erscheint der Empty State</li>
+        </ul>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">FlightCard &ndash; Annullierte Fl&uuml;ge</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">const FlightCard = ({ flight }: FlightCardProps) => {
+  // Fr&uuml;her Return f&uuml;r annullierte Fl&uuml;ge
+  if (flight.status === 'cancelled') {
+    return (
+      &lt;tr className="flight-row is-cancelled"&gt;
+        &lt;td className="flight-cell"&gt;
+          {flight.flightNumber}
+        &lt;/td&gt;
+        &lt;td className="flight-cell"&gt;
+          {flight.airline}
+        &lt;/td&gt;
+        &lt;td colSpan={4} className="flight-cell flight-cancelled-note"&gt;
+          Flug nach {flight.airport} wurde annulliert
+        &lt;/td&gt;
+        &lt;td className="flight-cell"&gt;
+          &lt;FlightStatusBadge status="cancelled" /&gt;
+        &lt;/td&gt;
+      &lt;/tr&gt;
+    );
+  }
+
+  // Normaler Fall
+  const timeDisplay =
+    flight.expectedTime &amp;&amp; flight.expectedTime !== flight.scheduledTime
+      ? `${flight.scheduledTime} \u2192 ${flight.expectedTime}`
+      : flight.scheduledTime;
+
+  return (
+    &lt;tr className="flight-row"&gt;
+      {/* ... normale Zellen ... */}
+    &lt;/tr&gt;
+  );
+};</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-fehler">
+      <h2>H&auml;ufige Fehler</h2>
+
+      <div class="fehler-item">
+        <div class="fehler-title">Fehler: <code>key</code>-Prop fehlt bei <code>.map()</code></div>
+        <p>
+          React gibt in der Browser-Konsole eine Warnung aus: <em>"Each child in a list should have a
+          unique &lsquo;key&rsquo; prop."</em> Ohne <code>key</code> f&auml;llt React auf langsame, fehleranf&auml;llige
+          Heuristiken zur&uuml;ck.
+        </p>
+        <p class="fehler-fix">Immer <code>key=&#123;element.id&#125;</code> beim <code>.map()</code> setzen &ndash; TypeScript pr&uuml;ft das nicht automatisch.</p>
+      </div>
+
+      <div class="fehler-item">
+        <div class="fehler-title">Fehler: Index als <code>key</code> bei dynamischen Listen</div>
+        <p>
+          <code>key={index}</code> ist nur sicher wenn die Liste statisch ist. Sobald Elemente hinzugef&uuml;gt,
+          gel&ouml;scht oder umsortiert werden, f&uuml;hrt der Index-als-Key zu falschen Updates und kann internen
+          Komponenten-State korrumpieren.
+        </p>
+        <p class="fehler-fix">Bei dynamischen Listen immer eine stabile, eindeutige ID aus den Daten verwenden.</p>
+      </div>
+
+      <div class="fehler-item">
+        <div class="fehler-title">Fehler: <code>&amp;&amp;</code> mit dem Wert <code>0</code></div>
+        <p>
+          <code>{flights.length &amp;&amp; &lt;span&gt;...&lt;/span&gt;}</code> rendert den Wert <code>0</code> ins DOM,
+          wenn <code>flights.length === 0</code> ist. JavaScript wertet <code>0 &amp;&amp; anything</code> als
+          <code>0</code> aus (kein leerer Wert!), und React rendert Zahlen direkt.
+        </p>
+        <p class="fehler-fix">Expliziten Vergleich verwenden: <code>{flights.length &gt; 0 &amp;&amp; ...}</code> oder Ternary: <code>{flights.length ? ... : null}</code></p>
+      </div>
+
+      <div class="fehler-item">
+        <div class="fehler-title">Fehler: Original-Array mit <code>.sort()</code> mutieren</div>
+        <p>
+          <code>flights.sort(...)</code> sortiert das Array <em>in-place</em> &ndash; das bedeutet, das
+          urspr&uuml;ngliche Props-Array wird ver&auml;ndert. Das ist eine unerlaubte Mutation und kann zu
+          unerwartetem Verhalten f&uuml;hren.
+        </p>
+        <p class="fehler-fix">Vor <code>.sort()</code> immer eine Kopie erstellen: <code>[...flights].sort(...)</code></p>
+      </div>
+    </section>
+
+    <section class="section section-aufgaben">
+      <h2>Aufgaben</h2>
+      <div class="aufgaben-list">
+
+        <div class="aufgabe">
+          <div class="aufgabe-header">
+            <span class="aufgabe-num">Aufgabe 1</span>
+            <span class="aufgabe-title">FlightStatusBadge vervollst&auml;ndigen</span>
+          </div>
+          <p>
+            &Uuml;berarbeite <code>FlightStatusBadge</code> so, dass alle 6 Status-Werte korrekte Farben und
+            deutsche Labels haben.
+          </p>
+          <ul>
+            <li>Nutze ein <code>Record&lt;FlightStatus, &#123; label: string; color: string; bg: string &#125;&gt;</code>-Objekt</li>
+            <li>TypeScript soll einen Fehler melden, wenn ein Status-Wert im Record fehlt</li>
+            <li>Teste alle 6 Badges nebeneinander in <code>App.tsx</code></li>
+          </ul>
+        </div>
+
+        <div class="aufgabe">
+          <div class="aufgabe-header">
+            <span class="aufgabe-num">Aufgabe 2</span>
+            <span class="aufgabe-title">Sortierung und Zeitanzeige</span>
+          </div>
+          <p>
+            Sortiere die Fl&uuml;ge im <code>FlightBoard</code> nach <code>scheduledTime</code> aufsteigend
+            und verbessere die Zeitanzeige f&uuml;r versp&auml;tete Fl&uuml;ge.
+          </p>
+          <ul>
+            <li>Verwende <code>[...flights].sort((a, b) =&gt; a.scheduledTime.localeCompare(b.scheduledTime))</code></li>
+            <li>Bei versp&auml;teten Fl&uuml;gen BEIDE Zeiten anzeigen: <code>"11:15 &rarr; 11:45"</code>, wobei die neue Zeit in einer Warnfarbe erscheint</li>
+            <li>Teste mit den Musterfl&uuml;gen TK567 (13:20 &rarr; 14:05) und LH456 (11:15 &rarr; 11:45)</li>
+          </ul>
+        </div>
+
+        <div class="aufgabe">
+          <div class="aufgabe-header">
+            <span class="aufgabe-num">Aufgabe 3</span>
+            <span class="aufgabe-title">Empty State einbauen</span>
+          </div>
+          <p>
+            F&uuml;ge einen Empty State hinzu, der erscheint wenn die gefilterte Liste leer ist.
+          </p>
+          <ul>
+            <li>Erstelle eine wiederverwendbare <code>EmptyState</code>-Komponente</li>
+            <li>Zeige ein Flugzeug-Symbol (&#9992;) und die Meldung &bdquo;Keine Fl&uuml;ge in dieser Kategorie&ldquo;</li>
+            <li>Ein &bdquo;Filter zur&uuml;cksetzen&ldquo;-Button als optionales Prop (<code>onReset?: () =&gt; void</code>)</li>
+            <li>Teste: Setze den Status-Filter auf einen Status ohne Treffer</li>
+          </ul>
+        </div>
+
+        <div class="aufgabe aufgabe-bonus">
+          <div class="aufgabe-header">
+            <span class="aufgabe-num">Bonus</span>
+            <span class="aufgabe-title">Sortierbare Spalten</span>
+          </div>
+          <p>
+            F&uuml;ge eine Sortierfunktion hinzu: Klick auf einen Tabellen-Header sortiert die Spalte
+            auf- oder absteigend.
+          </p>
+          <ul>
+            <li>State: <code>sortBy: 'scheduledTime' | 'flightNumber' | 'airline'</code> und <code>sortDir: 'asc' | 'desc'</code></li>
+            <li>Klick auf den gleichen Header wechselt die Richtung; Klick auf anderen Header setzt <code>sortDir</code> auf <code>'asc'</code></li>
+            <li>Zeige einen Pfeil im aktiven Header: &#9650; (asc) oder &#9660; (desc)</li>
+            <li>Implementiere eine generische <code>sortFlights</code>-Hilfsfunktion</li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+  </div><!-- /content-area -->
+
+        <nav class="lesson-nav">
+    <a class="nav-btn" href="1.5-state-events.html">&larr; Lektion 1.5: State &amp; Events</a>
+    <span class="nav-center-info">Lektion 1.6</span>
+    <a class="nav-btn primary" href="2.1-formulare.html">Lektion 2.1: Formulare &amp; Inputs &rarr;</a>
+  </nav>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+<script>
+  // Hamburger menu
+  const ham = document.getElementById('hamburger');
+  const sb  = document.getElementById('sidebar');
+  const ov  = document.getElementById('overlay');
+  ham.addEventListener('click', () => { sb.classList.toggle('open'); ov.classList.toggle('visible'); });
+  ov.addEventListener('click',  () => { sb.classList.remove('open'); ov.classList.remove('visible'); });
+  // Active nav link
+  const cur = window.location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.nav-link').forEach(l => {
+    if (l.getAttribute('href') === cur) l.classList.add('active');
+  });
+  // Theme toggle — einfach & robust (kein CSS-Swap nötig)
+  const themeBtn = document.getElementById('theme-toggle');
+  const applyTheme = (t) => {
+    document.documentElement.setAttribute('data-theme', t);
+    if (themeBtn) themeBtn.innerHTML = t === 'dark' ? '&#9728;' : '&#9790;';
+  };
+  // Theme aus localStorage laden (alle Seiten teilen denselben Key)
+  applyTheme(localStorage.getItem('kurs-theme') || 'dark');
+  // Transitions erst nach dem initialen Render aktivieren (verhindert Flash)
+  setTimeout(() => document.documentElement.classList.add('theme-transitions'), 50);
+  if (themeBtn) themeBtn.addEventListener('click', () => {
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('kurs-theme', next);
+    applyTheme(next);
+  });
+  hljs.highlightAll();
+</script>
+</body>
+</html>

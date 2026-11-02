@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1.4 &ndash; Komponenten &amp; Props (Vertiefung) | React Kurs</title>
+  <script>(function () { var t = localStorage.getItem('kurs-theme') || 'dark'; document.documentElement.setAttribute('data-theme', t); })();</script>
+  <link rel="stylesheet" href="assets/kurs.css">
+  <link rel="stylesheet" id="hljs-theme"
+    href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+
+<body>
+
+  <button class="hamburger" id="hamburger" aria-label="Navigation &ouml;ffnen">&#9776;</button>
+  <div class="sidebar-overlay" id="overlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <a href="index.html">
+        <span class="brand-icon">&#9992;</span>
+        <div>
+          <div class="brand-name">React Kurs</div>
+          <div class="brand-sub">Web &amp; Mobile</div>
+        </div>
+      </a>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Dark/Light Mode"
+        title="Theme wechseln">&#9728;</button>
+    </div>
+          <nav class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-label react-label">Teil 1 &mdash; React Einführung</div>
+      <a class="nav-link" href="1.1-einfuehrung-spa.html"><span class="ln">1.1</span>Motivation &amp; SPA</a>
+      <a class="nav-link" href="1.2-einfuehrung.html"><span class="ln">1.2</span>Einführung &amp; Umgebung</a>
+      <a class="nav-link" href="1.3-komponenten-props-einfach.html"><span class="ln">1.3</span>Komponenten &amp; Props (einfach)</a>
+      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten &amp; Props (Vertiefung)</a>
+      <a class="nav-link" href="1.5-state-events.html"><span class="ln">1.5</span>State &amp; Events</a>
+      <a class="nav-link" href="1.6-listen-conditional.html"><span class="ln">1.6</span>Listen &amp; Conditional Rendering</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label react-label">Teil 2 &mdash; React Praxis</div>
+      <a class="nav-link" href="2.1-formulare.html"><span class="ln">2.1</span>Formulare &amp; Inputs</a>
+      <a class="nav-link" href="2.2-useeffect-api.html"><span class="ln">2.2</span>useEffect &amp; API</a>
+      <a class="nav-link" href="2.3-kommunikation.html"><span class="ln">2.3</span>Komponentenkommunikation</a>
+      <a class="nav-link" href="2.4-context.html"><span class="ln">2.4</span>Context API</a>
+      <a class="nav-link" href="2.5-custom-hooks.html"><span class="ln">2.5</span>Custom Hooks</a>
+      <a class="nav-link" href="2.6-testen-vitest-rtl.html"><span class="ln">2.6</span>Testen mit Vitest + RTL</a>
+      <a class="nav-link" href="2.7-react-router.html"><span class="ln">2.7</span>React Router</a>
+      <a class="nav-link" href="2.8-datenbank-drizzle-sqlite.html"><span class="ln">2.8</span>Datenbankzugriff mit Drizzle + SQLite</a>
+      <a class="nav-link" href="2.9-redux-state-management.html"><span class="ln">2.9</span>State Management mit Redux (Überblick)</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label next-label">Teil 3 &mdash; Next.js</div>
+      <a class="nav-link" href="3.1-nextjs-einfuehrung.html"><span class="ln">3.1</span>Einführung Next.js</a>
+      <a class="nav-link" href="3.2-nextjs-routing.html"><span class="ln">3.2</span>Routing &amp; Layouts</a>
+      <a class="nav-link" href="3.3-server-client.html"><span class="ln">3.3</span>Server &amp; Client Components</a>
+      <a class="nav-link" href="3.4-api-routes.html"><span class="ln">3.4</span>API Routes &amp; Datenabruf</a>
+      <a class="nav-link" href="3.5-playwright-e2e.html"><span class="ln">3.5</span>Playwright E2E</a>
+      <a class="nav-link" href="3.6-deployment.html"><span class="ln">3.6</span>Deployment</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label rn-label">Teil 4 &mdash; React Native</div>
+      <a class="nav-link" href="4.1-rn-einfuehrung.html"><span class="ln">4.1</span>Einführung React Native</a>
+      <a class="nav-link" href="4.2-rn-komponenten.html"><span class="ln">4.2</span>Native Komponenten &amp; Styling</a>
+      <a class="nav-link" href="4.3-rn-navigation.html"><span class="ln">4.3</span>Navigation &amp; State</a>
+    </div>
+  </nav>
+  </aside>
+
+  <main class="main-content">
+    <header class="lesson-header">
+      <p class="lesson-eyebrow">Lektion 1.4 &mdash; Teil 1: React Einführung</p>
+      <h1>Komponenten &amp; Props</h1>
+      <div class="lesson-tags">
+        <span class="tag tag-react">React</span>
+        <span class="tag tag-time">ca. 90 min</span>
+      </div>
+    </header>
+
+    <div class="content-area">
+
+      <section class="section section-lernziele">
+        <h2>Lernziele</h2>
+        <ul class="lernziele-list">
+          <li>Eigene Funktionskomponenten erstellen</li>
+          <li>Props definieren mit TypeScript-Interfaces</li>
+          <li>Komponenten zusammensetzen (Komposition)</li>
+          <li>Children Props verstehen</li>
+          <li>Default Props und optionale Props mit <code>?</code> nutzen</li>
+          <li>Komponenten in eigene Dateien auslagern</li>
+        </ul>
+      </section>
+
+      <section class="section">
+        <h2>Was ist eine Komponente?</h2>
+        <p>
+          Eine Komponente ist der wichtigste Baustein in React. Sie ist eine TypeScript-Funktion, die JSX
+          zur&uuml;ckgibt und einen eigenst&auml;ndigen, wiederverwendbaren Teil der Benutzeroberfl&auml;che
+          repr&auml;sentiert.
+          Komponenten k&ouml;nnen verschachtelt werden: eine Komponente nutzt andere Komponenten &ndash; genau wie
+          HTML-Elemente verschachtelt werden.
+        </p>
+        <p>Die wichtigste Konvention: Komponenten-Namen beginnen <strong>immer mit einem Gro&szlig;buchstaben</strong>
+          (PascalCase).</p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">Einfache Komponente</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">// Einfachste m&ouml;gliche Komponente &ndash; gibt JSX zur&uuml;ck
+const WelcomeMessage = () => {
+  return &lt;h1&gt;Willkommen beim FlugBoard!&lt;/h1&gt;;
+};
+
+// Kurzschreibweise mit implizitem Return:
+const WelcomeMessage = () => &lt;h1&gt;Willkommen beim FlugBoard!&lt;/h1&gt;;
+
+// Verwendung in einer anderen Komponente:
+function App() {
+  return (
+    &lt;div&gt;
+      &lt;WelcomeMessage /&gt;  {/* Gro&szlig;buchstabe = eigene Komponente */}
+      &lt;p&gt;Flughafen Wien-Schwechat&lt;/p&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+        </div>
+        <div class="callout callout-info">
+          <div class="callout-icon">&#8505;</div>
+          <div class="callout-body">
+            <div class="callout-title">Gro&szlig;- vs. Kleinbuchstabe ist entscheidend</div>
+            <p>
+              React unterscheidet anhand des ersten Buchstabens: <code>&lt;div&gt;</code> ist ein nativer
+              HTML-Tag, <code>&lt;Div&gt;</code> w&auml;re eine benutzerdefinierte Komponente. Ein Komponentenname
+              mit Kleinbuchstaben wird als HTML-Element behandelt und f&uuml;hrt zu unerwartetem Verhalten.
+            </p>
+          </div>
+        </div>
+
+        <div class="callout callout-tip">
+          <div class="callout-icon">&#128161;</div>
+          <div class="callout-body">
+            <div class="callout-title">Hinweis zu Klassenkomponenten</div>
+            <p>
+              Neben Funktionskomponenten gibt es in React auch historische Klassenkomponenten
+              (<code>class ... extends React.Component</code>). Sie verwenden Lifecycle-Methoden wie
+              <code>componentDidMount</code> statt Hooks. In modernem React werden neue Anwendungen
+              fast immer mit Funktionskomponenten und Hooks gebaut. Deshalb verwenden wir in
+              diesem Kurs konsequent den Funktionskomponenten-Ansatz.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Props: Eingabeparameter f&uuml;r Komponenten</h2>
+        <p>
+          Props (kurz f&uuml;r <em>Properties</em>) sind die Eingabeparameter einer Komponente &ndash; &auml;hnlich wie
+          Funktionsargumente. Sie flie&szlig;en immer <strong>von oben nach unten</strong> (vom Eltern- zum
+          Kindkind-Element). Props sind <strong>read-only</strong>: Eine Komponente darf ihre eigenen Props
+          niemals ver&auml;ndern.
+        </p>
+        <p>
+          In TypeScript definieren wir Props mit einem <strong>Interface</strong>. Das gibt uns vollst&auml;ndige
+          Typsicherheit: falsch geschriebene Prop-Namen oder falsche Typen werden sofort als Fehler markiert.
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">src/components/FlightStatusBadge.tsx</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">import './FlightStatusBadge.css';
+
+// Typdefinition f&uuml;r den Flugstatus
+type FlightStatus =
+  | 'on-time'
+  | 'delayed'
+  | 'boarding'
+  | 'departed'
+  | 'landed'
+  | 'cancelled';
+
+// Props-Interface: Legt fest, welche Props die Komponente erwartet
+interface FlightStatusBadgeProps {
+  status: FlightStatus;
+}
+
+/**
+ * Zeigt den Status eines Fluges als farbiges Badge an.
+ * @param status - Der aktuelle Flugstatus
+ */
+const FlightStatusBadge = ({ status }: FlightStatusBadgeProps) => {
+  // Konfigurationsobjekt: Status-Wert -> Label und CSS-Klasse
+  const config: Record&lt;FlightStatus, { label: string; className: string }&gt; = {
+    'on-time':   { label: 'P&uuml;nktlich', className: 'status-on-time' },
+    'delayed':   { label: 'Versp&auml;tet', className: 'status-delayed' },
+    'boarding':  { label: 'Boarding', className: 'status-boarding' },
+    'departed':  { label: 'Abgeflogen', className: 'status-departed' },
+    'landed':    { label: 'Gelandet', className: 'status-landed' },
+    'cancelled': { label: 'Annulliert', className: 'status-cancelled' },
+  };
+
+  const { label, className } = config[status];
+  return &lt;span className={`status-pill ${className}`}&gt;{label}&lt;/span&gt;;
+};
+
+export default FlightStatusBadge;</code></pre>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Optionale Props und Default-Werte</h2>
+        <p>
+          In TypeScript markiert man optionale Props mit einem Fragezeichen (<code>?</code>). Im Funktionskopf
+          k&ouml;nnen direkt Default-Werte angegeben werden. Das ist der idiomatische React+TypeScript-Weg &ndash;
+          die fr&uuml;her gebr&auml;uchliche <code>defaultProps</code>-Eigenschaft ist veraltet.
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">Optionale Props mit Defaults</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">interface AirportHeaderProps {
+  airportName: string;           // Pflichtfeld
+  iataCode: string;              // Pflichtfeld
+  subtitle?: string;             // Optional (mit ?)
+  showTime?: boolean;            // Optional, Default: false
+}
+
+const AirportHeader = ({
+  airportName,
+  iataCode,
+  subtitle = 'Flugplan aktuell',  // Default-Wert direkt hier
+  showTime = false,               // Default-Wert
+}: AirportHeaderProps) => {
+  return (
+    &lt;header&gt;
+      &lt;h1&gt;&#9992; {airportName} ({iataCode})&lt;/h1&gt;
+      &lt;p&gt;{subtitle}&lt;/p&gt;
+      {/* Optionaler Zeitstempel */}
+      {showTime &amp;&amp; &lt;p&gt;{new Date().toLocaleTimeString('de-AT')}&lt;/p&gt;}
+    &lt;/header&gt;
+  );
+};
+
+// Verwendung &ndash; nur Pflichtfelder:
+&lt;AirportHeader airportName="Wien-Schwechat" iataCode="VIE" /&gt;
+
+// Verwendung &ndash; mit optionalen Feldern:
+&lt;AirportHeader
+  airportName="Wien-Schwechat"
+  iataCode="VIE"
+  subtitle="Live-Flugplan"
+  showTime={true}
+/&gt;</code></pre>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>FlightCard &ndash; Eine Komponente pro Tabellenzeile</h2>
+        <p>
+          Anstatt die Tabelle mit hartkodierten <code>&lt;tr&gt;</code>-Elementen zu f&uuml;llen, extrahieren wir
+          jede Zeile in eine eigene <code>FlightCard</code>-Komponente. Die Komponente bekommt ein vollst&auml;ndiges
+          <code>Flight</code>-Objekt als Prop.
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">src/components/FlightCard.tsx</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">import FlightStatusBadge from './FlightStatusBadge';
+import { Flight } from '../types/flight';
+import './FlightCard.css';
+
+// Props-Interface: Ein einziges flight-Objekt als Prop
+interface FlightCardProps {
+  flight: Flight;
+}
+
+/**
+ * Stellt einen einzelnen Flug als Tabellenzeile dar.
+ */
+const FlightCard = ({ flight }: FlightCardProps) => {
+  // Zeitanzeige: Falls Versp&auml;tung vorliegt, beide Zeiten anzeigen
+  const timeDisplay =
+    flight.expectedTime &amp;&amp; flight.expectedTime !== flight.scheduledTime
+      ? `${flight.scheduledTime} (${flight.expectedTime})`
+      : flight.scheduledTime;
+
+  return (
+    &lt;tr className="flight-row"&gt;
+      &lt;td className="flight-cell flight-cell-number"&gt;
+        {flight.flightNumber}
+      &lt;/td&gt;
+      &lt;td className="flight-cell flight-cell-airline"&gt;
+        {flight.airline}
+      &lt;/td&gt;
+      &lt;td className="flight-cell"&gt;{flight.airport}&lt;/td&gt;
+      &lt;td className="flight-cell flight-cell-time"&gt;
+        {timeDisplay}
+      &lt;/td&gt;
+      &lt;td className="flight-cell"&gt;{flight.terminal}&lt;/td&gt;
+      {/* Nullish Coalescing: falls gate undefined, zeige &mdash; */}
+      &lt;td className="flight-cell"&gt;{flight.gate ?? '&mdash;'}&lt;/td&gt;
+      &lt;td className="flight-cell"&gt;
+        &lt;FlightStatusBadge status={flight.status} /&gt;
+      &lt;/td&gt;
+    &lt;/tr&gt;
+  );
+};
+
+export default FlightCard;</code></pre>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>FlightBoard &ndash; Komponenten zusammensetzen</h2>
+        <p>
+          <code>FlightBoard</code> ist eine Container-Komponente: Sie erh&auml;lt ein Array von Fl&uuml;gen und
+          einen Titel als Props und rendert f&uuml;r jeden Flug eine <code>FlightCard</code>. Das <code>.map()</code>
+          wird sp&auml;ter in Lektion 1.6 ausf&uuml;hrlich erkl&auml;rt; hier sehen wir es schon im Einsatz.
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">src/components/FlightBoard.tsx</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">import FlightCard from './FlightCard';
+import { Flight } from '../types/flight';
+import './FlightBoard.css';
+
+interface FlightBoardProps {
+  flights: Flight[];   // Array von Fl&uuml;gen
+  title: string;       // &Uuml;berschrift der Tabelle
+}
+
+/**
+ * Tabellenansicht f&uuml;r eine Liste von Fl&uuml;gen.
+ */
+const FlightBoard = ({ flights, title }: FlightBoardProps) => {
+  return (
+    &lt;section className="flight-board-section"&gt;
+      &lt;h2 className="flight-board-title"&gt;{title}&lt;/h2&gt;
+      &lt;table className="flight-board-table"&gt;
+        &lt;thead&gt;
+          &lt;tr&gt;
+            &lt;th className="flight-board-heading"&gt;Flug&lt;/th&gt;
+            &lt;th className="flight-board-heading"&gt;Airline&lt;/th&gt;
+            &lt;th className="flight-board-heading"&gt;Ziel / Herkunft&lt;/th&gt;
+            &lt;th className="flight-board-heading"&gt;Zeit&lt;/th&gt;
+            &lt;th className="flight-board-heading"&gt;Terminal&lt;/th&gt;
+            &lt;th className="flight-board-heading"&gt;Gate&lt;/th&gt;
+            &lt;th className="flight-board-heading"&gt;Status&lt;/th&gt;
+          &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+          {flights.map((flight) => (
+            // key ist Pflicht beim Rendern von Listen &ndash; mehr dazu in L04
+            &lt;FlightCard key={flight.id} flight={flight} /&gt;
+          ))}
+        &lt;/tbody&gt;
+      &lt;/table&gt;
+    &lt;/section&gt;
+  );
+};
+
+export default FlightBoard;</code></pre>
+        </div>
+        <p>In <code>App.tsx</code> werden die Fl&uuml;ge nach Typ aufgeteilt und an zwei
+          <code>FlightBoard</code>-Instanzen &uuml;bergeben:</p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">src/App.tsx</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">import FlightBoard from './components/FlightBoard';
+import { sampleFlights } from './data/flights';
+
+function App() {
+  // Fl&uuml;ge nach Typ aufteilen
+  const departures = sampleFlights.filter(f => f.type === 'departure');
+  const arrivals   = sampleFlights.filter(f => f.type === 'arrival');
+
+  return (
+    &lt;div className="app-page"&gt;
+      &lt;header className="app-header"&gt;
+        &lt;h1 className="app-title"&gt;&#9992; FlugBoard &ndash; Wien International&lt;/h1&gt;
+        &lt;p className="app-subtitle"&gt;Flughafen Wien-Schwechat (VIE)&lt;/p&gt;
+      &lt;/header&gt;
+
+      {/* Gleiche Komponente, unterschiedliche Props */}
+      &lt;FlightBoard flights={departures} title="Abfl&uuml;ge" /&gt;
+      &lt;FlightBoard flights={arrivals}   title="Ank&uuml;nfte" /&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default App;</code></pre>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Children Props</h2>
+        <p>
+          Jede Komponente hat automatisch Zugriff auf ein spezielles Prop namens <code>children</code>. Es
+          enth&auml;lt alles, was zwischen dem &ouml;ffnenden und schlie&szlig;enden Tag der Komponente steht &ndash;
+          &auml;hnlich wie der Inhalt eines HTML-Elements. Der Typ f&uuml;r children ist <code>React.ReactNode</code>.
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">Children Props Beispiel</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">import { ReactNode } from 'react';
+
+// Props-Interface mit children
+interface SectionProps {
+  title: string;
+  children: ReactNode;   // Alles was zwischen die Tags kommt
+}
+
+// Layout-Komponente, die Kinder-Elemente einbettet
+const BoardSection = ({ title, children }: SectionProps) => (
+  &lt;section className="board-section"&gt;
+    &lt;h2 className="board-section-title"&gt;{title}&lt;/h2&gt;
+    {children}
+  &lt;/section&gt;
+);
+
+// Verwendung: Alles zwischen den Tags wird als children &uuml;bergeben
+&lt;BoardSection title="Abfl&uuml;ge"&gt;
+  &lt;FlightBoard flights={departures} title="Abfl&uuml;ge" /&gt;
+  &lt;p className="board-section-note"&gt;{departures.length} Fl&uuml;ge angezeigt&lt;/p&gt;
+&lt;/BoardSection&gt;</code></pre>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Typdefinitionen in eigene Datei auslagern</h2>
+        <p>
+          Wenn mehrere Komponenten dasselbe Interface verwenden, lagert man Typen in eine eigene Datei aus.
+          Dadurch vermeiden wir Duplikation und haben eine einzige &bdquo;Source of Truth&ldquo; f&uuml;r unser
+          Datenmodell.
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">src/types/flight.ts</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">// Zentrales Datenmodell f&uuml;r den FlugBoard-Kurs
+// Diese Typen werden in allen Lektionen verwendet
+
+export type FlightType   = 'arrival' | 'departure';
+export type FlightStatus =
+  | 'on-time'
+  | 'delayed'
+  | 'boarding'
+  | 'departed'
+  | 'landed'
+  | 'cancelled';
+
+export interface Flight {
+  id:            number;
+  flightNumber:  string;
+  airline:       string;
+  type:          FlightType;
+  scheduledTime: string;       // Format: "HH:MM"
+  expectedTime?: string;       // Optional: nur bei Versp&auml;tung gesetzt
+  status:        FlightStatus;
+  airport:       string;       // Herkunft (arrival) / Ziel (departure)
+  terminal:      string;
+  gate?:         string;       // Optional: nicht immer bekannt
+}</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">src/data/flights.ts</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">import { Flight } from '../types/flight';
+
+// Beispieldaten f&uuml;r den FlugBoard-Kurs
+export const sampleFlights: Flight[] = [
+  {
+    id: 1, flightNumber: 'OS123', airline: 'Austrian Airlines',
+    type: 'departure', scheduledTime: '10:30', status: 'boarding',
+    airport: 'London Heathrow (LHR)', terminal: 'T3', gate: 'B12',
+  },
+  {
+    id: 2, flightNumber: 'LH456', airline: 'Lufthansa',
+    type: 'departure', scheduledTime: '11:15', expectedTime: '11:45',
+    status: 'delayed', airport: 'Frankfurt (FRA)', terminal: 'T2', gate: 'A07',
+  },
+  {
+    id: 3, flightNumber: 'EK789', airline: 'Emirates',
+    type: 'arrival', scheduledTime: '09:45', status: 'landed',
+    airport: 'Dubai (DXB)', terminal: 'T1',
+  },
+  {
+    id: 4, flightNumber: 'BA234', airline: 'British Airways',
+    type: 'departure', scheduledTime: '12:00', status: 'on-time',
+    airport: 'London Heathrow (LHR)', terminal: 'T3', gate: 'C22',
+  },
+  {
+    id: 5, flightNumber: 'TK567', airline: 'Turkish Airlines',
+    type: 'arrival', scheduledTime: '13:20', expectedTime: '14:05',
+    status: 'delayed', airport: 'Istanbul (IST)', terminal: 'T2',
+  },
+  {
+    id: 6, flightNumber: 'FR890', airline: 'Ryanair',
+    type: 'departure', scheduledTime: '14:50', status: 'on-time',
+    airport: 'Dublin (DUB)', terminal: 'T1', gate: 'D05',
+  },
+  {
+    id: 7, flightNumber: 'WZ112', airline: 'Wizz Air',
+    type: 'arrival', scheduledTime: '15:30', status: 'on-time',
+    airport: 'Budapest (BUD)', terminal: 'T2',
+  },
+  {
+    id: 8, flightNumber: 'VY334', airline: 'Vueling',
+    type: 'departure', scheduledTime: '16:10', status: 'cancelled',
+    airport: 'Barcelona (BCN)', terminal: 'T1',
+  },
+];</code></pre>
+        </div>
+      </section>
+
+      <section class="section section-projekt">
+        <h2>Projektschritt</h2>
+        <div class="projekt-box">
+          <div class="projekt-box-header">
+            <span class="projekt-step">Projektschritt 1.4</span>
+            <h3>Komponenten extrahieren</h3>
+          </div>
+          <p>
+            Wir zerlegen die monolithische <code>App.tsx</code> aus Lektion 1.2 in wiederverwendbare Komponenten.
+            Am Ende dieser Lektion hat das Projekt folgende Struktur:
+          </p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-filename">Neue Projektstruktur</span>
+              <span class="code-lang">Bash</span>
+            </div>
+            <pre><code class="language-bash">src/
+├── App.tsx                     &larr; Nutzt FlightBoard, importiert sampleFlights
+├── components/
+│   ├── FlightCard.tsx          &larr; Einzelne Tabellenzeile
+│   ├── FlightBoard.tsx         &larr; Tabelle + Header
+│   └── FlightStatusBadge.tsx   &larr; Status-Badge mit Farben
+├── data/
+│   └── flights.ts              &larr; sampleFlights Array (alle 8 Fl&uuml;ge)
+└── types/
+    └── flight.ts               &larr; Flight Interface &amp; Typen (exportiert)</code></pre>
+          </div>
+          <p>
+            Jede Komponente ist in einer eigenen Datei. Typen werden aus <code>src/types/flight.ts</code>
+            importiert &ndash; kein Duplizieren von Interfaces! Gleiches gilt f&uuml;rs Styling: standardm&auml;&szlig;ig
+            <code>className</code> und eigene CSS-Datei pro Komponente statt statischer Inline-Styles.
+          </p>
+          <div class="callout callout-tip">
+            <div class="callout-icon">&#10003;</div>
+            <div class="callout-body">
+              <div class="callout-title">Wann eine Komponente auslagern?</div>
+              <p>
+                Eine gute Faustregel: Lagere eine Komponente aus, wenn sie (a) an mehreren Stellen
+                verwendet wird, (b) zu komplex wird um sie zu &uuml;berblicken, oder (c) einen klar
+                abgegrenzten Verantwortungsbereich hat. <code>FlightStatusBadge</code> ist ein
+                perfektes Beispiel: klar definiert, wiederverwendbar, eigenst&auml;ndig testbar.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section-fehler">
+        <h2>H&auml;ufige Fehler</h2>
+
+        <div class="fehler-item">
+          <div class="fehler-title">Fehler: Komponenten-Name beginnt mit Kleinbuchstabe</div>
+          <p>
+            <code>const flightCard = ...</code> &ndash; React behandelt <code>&lt;flightCard /&gt;</code> als
+            unbekannten HTML-Tag und gibt eine Warnung aus: <em>"The tag flightCard is unrecognized in this
+              browser."</em> Die Komponente wird nicht korrekt gerendert.
+          </p>
+          <p class="fehler-fix">Immer PascalCase verwenden: <code>const FlightCard = ...</code></p>
+        </div>
+
+        <div class="fehler-item">
+          <div class="fehler-title">Fehler: Props-Typ nicht mit Interface definiert</div>
+          <p>
+            Ohne TypeScript-Interface f&uuml;r Props hat man keinen Typen-Schutz. Tippfehler in Prop-Namen
+            (<code>flightt</code> statt <code>flight</code>) oder falsche Typen werden erst zur Laufzeit
+            auffallen &ndash; oder gar nicht.
+          </p>
+          <p class="fehler-fix">Immer ein <code>interface FooProps</code> definieren und als Typ des Parameters angeben.
+          </p>
+        </div>
+
+        <div class="fehler-item">
+          <div class="fehler-title">Fehler: <code>key</code>-Prop beim Rendern von Listen vergessen</div>
+          <p>
+            Wenn man <code>.map()</code> verwendet und kein <code>key</code>-Prop angibt, erscheint in der
+            Browser-Konsole: <em>"Each child in a list should have a unique key prop."</em> React kann die
+            Liste dann nicht effizient aktualisieren. Mehr dazu in Lektion 1.6.
+          </p>
+          <p class="fehler-fix">Beim <code>.map()</code> immer <code>key=&#123;flight.id&#125;</code> setzen.</p>
+        </div>
+
+        <div class="fehler-item">
+          <div class="fehler-title">Fehler: <code>export default</code> vergessen</div>
+          <p>
+            Ohne Export kann die Komponente nicht importiert werden. Der Fehler lautet:
+            <em>"Module has no default export."</em>
+          </p>
+          <p class="fehler-fix">Jede Komponentendatei ben&ouml;tigt <code>export default KomponentenName;</code> am
+            Ende.</p>
+        </div>
+      </section>
+
+      <section class="section section-aufgaben">
+        <h2>Aufgaben</h2>
+        <div class="aufgaben-list">
+
+          <div class="aufgabe">
+            <div class="aufgabe-header">
+              <span class="aufgabe-num">Aufgabe 1</span>
+              <span class="aufgabe-title">FlightStatusBadge erstellen</span>
+            </div>
+            <p>
+              Erstelle die Komponente <code>FlightStatusBadge</code> in
+              <code>src/components/FlightStatusBadge.tsx</code> mit korrekten TypeScript-Typen.
+            </p>
+            <ul>
+              <li>Definiere den Typ <code>FlightStatus</code> als Union Type mit allen 6 Status-Werten</li>
+              <li>Erstelle ein <code>Record&lt;FlightStatus, ...&gt;</code>-Konfigurationsobjekt mit Label und Farbe
+              </li>
+              <li>Teste alle 6 Status-Werte, indem du 6 Badges nebeneinander in <code>App.tsx</code> renderst</li>
+              <li>Stelle sicher, dass TypeScript einen Fehler meldet, wenn ein ung&uuml;ltiger Status &uuml;bergeben
+                wird</li>
+            </ul>
+          </div>
+
+          <div class="aufgabe">
+            <div class="aufgabe-header">
+              <span class="aufgabe-num">Aufgabe 2</span>
+              <span class="aufgabe-title">FlightCard und FlightBoard bauen</span>
+            </div>
+            <p>
+              Erstelle <code>FlightCard</code> als Tabellenzeile und <code>FlightBoard</code> als Tabellen-Container.
+              Trenne die Typdefinitionen in <code>src/types/flight.ts</code> und die Daten in
+              <code>src/data/flights.ts</code>.
+            </p>
+            <ul>
+              <li>Exportiere <code>Flight</code>, <code>FlightType</code> und <code>FlightStatus</code> aus
+                <code>types/flight.ts</code></li>
+              <li>Exportiere <code>sampleFlights</code> mit allen 8 Musterfl&uuml;gen aus <code>data/flights.ts</code>
+              </li>
+              <li><code>FlightCard</code> bekommt ein einzelnes <code>flight: Flight</code>-Prop</li>
+              <li><code>FlightBoard</code> bekommt <code>flights: Flight[]</code> und <code>title: string</code></li>
+              <li><code>App.tsx</code> filtert nach Typ und zeigt zwei <code>FlightBoard</code>-Instanzen</li>
+            </ul>
+          </div>
+
+          <div class="aufgabe">
+            <div class="aufgabe-header">
+              <span class="aufgabe-num">Aufgabe 3</span>
+              <span class="aufgabe-title">AirportHeader Komponente</span>
+            </div>
+            <p>
+              Erstelle eine neue Komponente <code>AirportHeader</code> in
+              <code>src/components/AirportHeader.tsx</code>.
+            </p>
+            <ul>
+              <li>Props: <code>airportName: string</code>, <code>iataCode: string</code>,
+                <code>children?: React.ReactNode</code></li>
+              <li>Die Komponente zeigt einen Seitentitel mit dem Flugzeug-Symbol (&#9992;) und optional Kinder-Elemente
+                darunter</li>
+              <li>Verwende die Komponente in <code>App.tsx</code> und platziere darin einen kurzen Info-Text als
+                children</li>
+            </ul>
+          </div>
+
+          <div class="aufgabe aufgabe-bonus">
+            <div class="aufgabe-header">
+              <span class="aufgabe-num">Bonus</span>
+              <span class="aufgabe-title">InfoBadge f&uuml;r Terminal &amp; Gate</span>
+            </div>
+            <p>
+              Erstelle eine <code>InfoBadge</code>-Komponente (<code>src/components/InfoBadge.tsx</code>),
+              die Terminal und Gate kombiniert anzeigt.
+            </p>
+            <ul>
+              <li>Props: <code>terminal: string</code>, <code>gate?: string</code></li>
+              <li>Anzeige: <code>"T3 / B12"</code> oder <code>"T2 / &mdash;"</code> falls kein Gate vorhanden</li>
+              <li>Verwende die Komponente in <code>FlightCard</code> statt der getrennten Terminal- und Gate-Spalten
+              </li>
+              <li>Das Badge soll einen dezenten Hintergrund und abgerundete Ecken haben</li>
+            </ul>
+          </div>
+
+        </div>
+      </section>
+
+    </div><!-- /content-area -->
+
+          <nav class="lesson-nav">
+    <a class="nav-btn" href="1.3-komponenten-props-einfach.html">&larr; Lektion 1.3: Komponenten &amp; Props (einfach)</a>
+    <span class="nav-center-info">Lektion 1.4</span>
+    <a class="nav-btn primary" href="1.5-state-events.html">Lektion 1.5: State &amp; Events &rarr;</a>
+  </nav>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+  <script>
+    // Hamburger menu
+    const ham = document.getElementById('hamburger');
+    const sb = document.getElementById('sidebar');
+    const ov = document.getElementById('overlay');
+    ham.addEventListener('click', () => { sb.classList.toggle('open'); ov.classList.toggle('visible'); });
+    ov.addEventListener('click', () => { sb.classList.remove('open'); ov.classList.remove('visible'); });
+    // Active nav link
+    const cur = window.location.pathname.split('/').pop() || 'index.html';
+    document.querySelectorAll('.nav-link').forEach(l => {
+      if (l.getAttribute('href') === cur) l.classList.add('active');
+    });
+    // Theme toggle — einfach & robust (kein CSS-Swap nötig)
+    const themeBtn = document.getElementById('theme-toggle');
+    const applyTheme = (t) => {
+      document.documentElement.setAttribute('data-theme', t);
+      if (themeBtn) themeBtn.innerHTML = t === 'dark' ? '&#9728;' : '&#9790;';
+    };
+    // Theme aus localStorage laden (alle Seiten teilen denselben Key)
+    applyTheme(localStorage.getItem('kurs-theme') || 'dark');
+    // Transitions erst nach dem initialen Render aktivieren (verhindert Flash)
+    setTimeout(() => document.documentElement.classList.add('theme-transitions'), 50);
+    if (themeBtn) themeBtn.addEventListener('click', () => {
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('kurs-theme', next);
+      applyTheme(next);
+    });
+    hljs.highlightAll();
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,38 @@
+.top-nav {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  height: 56px;
+  padding: 0 2rem;
+  background: var(--bg-sidebar);
+  border-bottom: 1px solid var(--border);
+}
+
+.brand-link {
+  color: var(--accent);
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.nav-link {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.nav-link.active {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.top-nav-actions {
+  margin-left: auto;
+}
+
+.theme-toggle {
+  padding: 4px 10px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+}

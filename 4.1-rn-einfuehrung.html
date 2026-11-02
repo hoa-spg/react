@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4.1 &ndash; Einf&uuml;hrung React Native | React Kurs</title>
+  <script>(function () { var t = localStorage.getItem('kurs-theme') || 'dark'; document.documentElement.setAttribute('data-theme', t); })();</script>
+  <link rel="stylesheet" href="assets/kurs.css">
+  <link rel="stylesheet" id="hljs-theme"
+    href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+
+<body>
+
+  <button class="hamburger" id="hamburger" aria-label="Navigation &ouml;ffnen">&#9776;</button>
+  <div class="sidebar-overlay" id="overlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <a href="index.html">
+        <span class="brand-icon">&#9992;</span>
+        <div>
+          <div class="brand-name">React Kurs</div>
+          <div class="brand-sub">Web &amp; Mobile</div>
+        </div>
+      </a>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Dark/Light Mode"
+        title="Theme wechseln">&#9728;</button>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-group">
+        <div class="nav-group-label react-label">Teil 1 &mdash; React Einführung</div>
+        <a class="nav-link" href="1.1-einfuehrung-spa.html"><span class="ln">1.1</span>Motivation &amp; SPA</a>
+        <a class="nav-link" href="1.2-einfuehrung.html"><span class="ln">1.2</span>Einführung &amp; Umgebung</a>
+        <a class="nav-link" href="1.3-komponenten-props-einfach.html"><span class="ln">1.3</span>Komponenten &amp; Props
+          (einfach)</a>
+        <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten &amp;
+          Props (Vertiefung)</a>
+        <a class="nav-link" href="1.5-state-events.html"><span class="ln">1.5</span>State &amp; Events</a>
+        <a class="nav-link" href="1.6-listen-conditional.html"><span class="ln">1.6</span>Listen &amp; Conditional
+          Rendering</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label react-label">Teil 2 &mdash; React Praxis</div>
+        <a class="nav-link" href="2.1-formulare.html"><span class="ln">2.1</span>Formulare &amp; Inputs</a>
+        <a class="nav-link" href="2.2-useeffect-api.html"><span class="ln">2.2</span>useEffect &amp; API</a>
+        <a class="nav-link" href="2.3-kommunikation.html"><span class="ln">2.3</span>Komponentenkommunikation</a>
+        <a class="nav-link" href="2.4-context.html"><span class="ln">2.4</span>Context API</a>
+        <a class="nav-link" href="2.5-custom-hooks.html"><span class="ln">2.5</span>Custom Hooks</a>
+        <a class="nav-link" href="2.6-testen-vitest-rtl.html"><span class="ln">2.6</span>Testen mit Vitest + RTL</a>
+        <a class="nav-link" href="2.7-react-router.html"><span class="ln">2.7</span>React Router</a>
+        <a class="nav-link" href="2.8-datenbank-drizzle-sqlite.html"><span class="ln">2.8</span>Datenbankzugriff mit
+          Drizzle + SQLite</a>
+        <a class="nav-link" href="2.9-redux-state-management.html"><span class="ln">2.9</span>State Management mit Redux
+          (Überblick)</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label next-label">Teil 3 &mdash; Next.js</div>
+        <a class="nav-link" href="3.1-nextjs-einfuehrung.html"><span class="ln">3.1</span>Einführung Next.js</a>
+        <a class="nav-link" href="3.2-nextjs-routing.html"><span class="ln">3.2</span>Routing &amp; Layouts</a>
+        <a class="nav-link" href="3.3-server-client.html"><span class="ln">3.3</span>Server &amp; Client Components</a>
+        <a class="nav-link" href="3.4-api-routes.html"><span class="ln">3.4</span>API Routes &amp; Datenabruf</a>
+        <a class="nav-link" href="3.5-playwright-e2e.html"><span class="ln">3.5</span>Playwright E2E</a>
+        <a class="nav-link" href="3.6-deployment.html"><span class="ln">3.6</span>Deployment</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label rn-label">Teil 4 &mdash; React Native</div>
+        <a class="nav-link" href="4.1-rn-einfuehrung.html"><span class="ln">4.1</span>Einführung React Native</a>
+        <a class="nav-link" href="4.2-rn-komponenten.html"><span class="ln">4.2</span>Native Komponenten &amp;
+          Styling</a>
+        <a class="nav-link" href="4.3-rn-navigation.html"><span class="ln">4.3</span>Navigation &amp; State</a>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+
+    <header class="lesson-header">
+      <p class="lesson-eyebrow">Lektion 4.1 &mdash; Teil 4: React Native</p>
+      <h1>Einf&uuml;hrung React Native</h1>
+      <div class="lesson-tags">
+        <span class="tag tag-rn">React Native</span>
+        <span class="tag tag-time">ca. 90 min</span>
+      </div>
+    </header>
+
+    <div class="content-area">
+
+      <!-- Lernziele -->
+      <section class="section-lernziele">
+        <h2>Lernziele</h2>
+        <ul>
+          <li>React Native als Technologie f&uuml;r mobile Apps verstehen</li>
+          <li>Den Unterschied zwischen React (Web) und React Native kennen</li>
+          <li>Expo einrichten und ein erstes Projekt erstellen</li>
+          <li>Core Components verwenden: <code>View</code>, <code>Text</code>, <code>StyleSheet</code>,
+            <code>TouchableOpacity</code></li>
+          <li>Expo Go f&uuml;r schnelles Testen auf dem Smartphone nutzen</li>
+          <li><code>Platform.OS</code> f&uuml;r plattformspezifisches Styling einsetzen</li>
+        </ul>
+      </section>
+
+      <!-- Section 1: Was ist React Native? -->
+      <section>
+        <h2>1 &mdash; Was ist React Native?</h2>
+        <p>
+          React Native ist ein Framework von Meta (ehemals Facebook), mit dem man native mobile
+          Apps f&uuml;r iOS und Android mit JavaScript und React schreiben kann. Im Gegensatz zu
+          WebViews oder Hybrid-L&ouml;sungen rendert React Native echte, native Platform-Komponenten:
+          auf iOS wird eine <code>View</code>-Komponente zu einem <code>UIView</code>, auf Android
+          zu einem <code>android.view.View</code>. Das Ergebnis ist eine App, die sich wie eine
+          &bdquo;echte&ldquo; App anf&uuml;hlt &ndash; keine Browser-Emulation.
+        </p>
+        <p>
+          Das Entscheidende: Dein gesamtes React-Wissen &uuml;bertr&auml;gt sich direkt. JSX,
+          Props, State, Hooks, Context &ndash; alles identisch. Was sich &auml;ndert, sind
+          ausschlie&szlig;lich die primitiven Bausteine (die Komponenten) und das Styling-System.
+        </p>
+
+        <h3>React (Web) vs. React Native &ndash; Vergleich</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Konzept</th>
+                <th>React (Web)</th>
+                <th>React Native</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Container-Element</td>
+                <td><code>div</code></td>
+                <td><code>View</code></td>
+              </tr>
+              <tr>
+                <td>Text anzeigen</td>
+                <td><code>p</code>, <code>span</code>, <code>h1</code></td>
+                <td><code>Text</code></td>
+              </tr>
+              <tr>
+                <td>Bild anzeigen</td>
+                <td><code>img</code></td>
+                <td><code>Image</code></td>
+              </tr>
+              <tr>
+                <td>Texteingabe</td>
+                <td><code>input</code></td>
+                <td><code>TextInput</code></td>
+              </tr>
+              <tr>
+                <td>Lange Listen</td>
+                <td><code>ul</code> + <code>.map()</code></td>
+                <td><code>FlatList</code></td>
+              </tr>
+              <tr>
+                <td>Styling</td>
+                <td>CSS (Klassen, Kaskade)</td>
+                <td><code>StyleSheet.create()</code> (kein CSS)</td>
+              </tr>
+              <tr>
+                <td>Navigation/Routing</td>
+                <td>React Router</td>
+                <td>React Navigation</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-info">
+          <div class="callout-icon">&#8505;</div>
+          <div class="callout-body">
+            <div class="callout-title">JSX, Props, State und Hooks sind identisch</div>
+            <p>
+              Alles, was du in Lektion 1&ndash;15 gelernt hast, funktioniert in React Native
+              genauso. <code>useState</code>, <code>useEffect</code>, <code>useContext</code>,
+              Custom Hooks &ndash; kein einziges Konzept musst du neu lernen. Du tauschst nur
+              <code>div</code> gegen <code>View</code> und CSS gegen <code>StyleSheet</code>.
+            </p>
+          </div>
+        </div>
+
+        <h3>Wie funktioniert React Native intern?</h3>
+        <p>
+          React Native verwendet eine sogenannte &bdquo;Bridge&ldquo; (oder in neueren Versionen
+          die JSI &ndash; JavaScript Interface), um zwischen dem JavaScript-Thread und dem nativen
+          UI-Thread zu kommunizieren. Dein JavaScript-Code beschreibt den gew&uuml;nschten
+          UI-Zustand, und React Native &uuml;bersetzt diesen in native Aufrufe. Das Ergebnis:
+          flotte, nativ wirkende Animationen und Gesten ohne Kompromisse.
+        </p>
+      </section>
+
+      <!-- Section 2: Expo einrichten -->
+      <section>
+        <h2>2 &mdash; Expo einrichten</h2>
+        <p>
+          F&uuml;r den Einstieg in React Native ist <strong>Expo</strong> die empfohlene Wahl.
+          Expo ist ein Framework und eine Plattform rund um React Native, das die Einrichtung
+          dramatisch vereinfacht: kein Xcode (au&szlig;er f&uuml;r native Builds), kein Android
+          Studio, keine komplexe Build-Konfiguration. Du schreibst TypeScript, speicherst die
+          Datei &ndash; und die App auf deinem Smartphone aktualisiert sich sofort.
+        </p>
+
+        <div class="callout callout-info">
+          <div class="callout-icon">&#8505;</div>
+          <div class="callout-body">
+            <div class="callout-title">Expo Go &ndash; Dein Entwicklungs-Companion</div>
+            <p>
+              Installiere <strong>Expo Go</strong> aus dem iOS App Store oder dem Google Play
+              Store auf deinem Smartphone. Scanns dann einfach den QR-Code, der beim Start des
+              Entwicklungsservers erscheint &ndash; und deine App l&auml;uft direkt auf deinem
+              echten Ger&auml;t. Kein Kabel, kein Emulator n&ouml;tig.
+            </p>
+          </div>
+        </div>
+
+        <h3>Projekt anlegen</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">Terminal</span>
+            <span class="code-lang">Bash</span>
+          </div>
+          <pre><code class="language-bash"># Neues Expo-Projekt mit TypeScript-Template erstellen
+npx create-expo-app@latest flugboard-mobile --template blank-typescript
+
+# In das Projektverzeichnis wechseln
+cd flugboard-mobile
+
+# Entwicklungsserver starten
+npx expo start
+
+# Im Terminal stehen dann folgende Optionen:
+# › Scan den QR-Code mit Expo Go (Android) oder der Kamera-App (iOS)
+# › w  = im Browser öffnen (Web-Preview)
+# › i  = iOS Simulator öffnen (nur macOS mit Xcode)
+# › a  = Android Emulator öffnen (Android Studio nötig)</code></pre>
+        </div>
+
+        <p>
+          Nach <code>npx expo start</code> erscheint ein QR-Code im Terminal. Scanne ihn mit
+          der <strong>Expo Go</strong> App (Android) oder der <strong>Kamera-App</strong> (iOS
+          16+) &ndash; die App &ouml;ffnet sich sofort auf deinem Telefon. Jede &Auml;nderung
+          im Code l&auml;dt die App automatisch neu (Fast Refresh).
+        </p>
+
+        <h3>Abh&auml;ngigkeiten verstehen</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">package.json</span>
+            <span class="code-lang">JSON</span>
+          </div>
+          <pre><code class="language-json">{
+  "name": "flugboard-mobile",
+  "version": "1.0.0",
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "expo": "~51.0.0",
+    "expo-status-bar": "~1.12.1",
+    "react": "18.2.0",
+    "react-native": "0.74.5"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.24.0",
+    "@types/react": "~18.2.79",
+    "typescript": "^5.3.3"
+  }
+}</code></pre>
+        </div>
+      </section>
+
+      <!-- Section 3: Projektstruktur -->
+      <section>
+        <h2>3 &mdash; Projektstruktur</h2>
+        <p>
+          Ein frisches Expo-Projekt hat eine &uuml;berschaubare Struktur. Wir werden sie im
+          Laufe der Lektionen 4.1&ndash;4.3 Schritt f&uuml;r Schritt erweitern.
+        </p>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">Verzeichnisstruktur</span>
+            <span class="code-lang">Bash</span>
+          </div>
+          <pre><code class="language-bash">flugboard-mobile/
+├── App.tsx              ← Einstiegspunkt der App
+├── app.json             ← Expo-Konfiguration (Name, Icon, Splash)
+├── assets/
+│   ├── icon.png         ← App-Icon (1024×1024 px)
+│   ├── splash.png       ← Splash Screen
+│   ├── adaptive-icon.png
+│   └── favicon.png
+├── tsconfig.json        ← TypeScript-Konfiguration
+└── package.json
+
+# Nach unserer Erweiterung (ab Lektion 4.1):
+flugboard-mobile/
+├── App.tsx
+├── app.json
+├── assets/
+├── src/
+│   ├── components/
+│   │   ├── FlightCard.tsx
+│   │   ├── FlightList.tsx
+│   │   └── SearchBar.tsx
+│   ├── screens/
+│   │   ├── DepartureListScreen.tsx
+│   │   ├── ArrivalListScreen.tsx
+│   │   └── FlightDetailScreen.tsx
+│   ├── context/
+│   │   └── FlightContext.tsx
+│   ├── types/
+│   │   └── flight.ts
+│   └── data/
+│       └── flights.ts
+└── package.json</code></pre>
+        </div>
+
+        <h3>app.json &ndash; Expo-Konfiguration</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">app.json</span>
+            <span class="code-lang">JSON</span>
+          </div>
+          <pre><code class="language-json">{
+  "expo": {
+    "name": "FlugBoard",
+    "slug": "flugboard-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0d1117"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "at.flugboard.mobile"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0d1117"
+      },
+      "package": "at.flugboard.mobile"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}</code></pre>
+        </div>
+      </section>
+
+      <!-- Section 4: Core Components -->
+      <section>
+        <h2>4 &mdash; Core Components: View, Text, StyleSheet</h2>
+        <p>
+          Die drei wichtigsten Grundbausteine in React Native sind <code>View</code>,
+          <code>Text</code> und <code>StyleSheet</code>. Jede React-Native-App besteht im
+          Kern aus diesen Bausteinen.
+        </p>
+
+        <h3>View &mdash; Der universelle Container</h3>
+        <p>
+          <code>View</code> ist das &Auml;quivalent zu <code>div</code> im Web. Es ist ein
+          rechteckiger Container, der andere Views und Komponenten aufnehmen kann. Views
+          unterst&uuml;tzen Flexbox-Layout, Styling und Touch-Events.
+        </p>
+
+        <h3>Text &mdash; Pflicht f&uuml;r jeden String</h3>
+        <p>
+          Anders als im Web muss <strong>jeder</strong> angezeigte Text in einer
+          <code>Text</code>-Komponente stehen. Strings direkt in einer <code>View</code>
+          zu platzieren f&uuml;hrt zu einem Laufzeitfehler. Text-Komponenten k&ouml;nnen
+          verschachtelt werden und erben dann den Stil der &auml;u&szlig;eren
+          <code>Text</code>-Komponente.
+        </p>
+
+        <h3>StyleSheet.create() &mdash; Styling in React Native</h3>
+        <p>
+          In React Native gibt es kein CSS. Styling erfolgt &uuml;ber JavaScript-Objekte.
+          Dabei gelten wichtige Unterschiede zum Web:
+        </p>
+        <ul>
+          <li>Alle Zahlenwerte sind einheitenlos &ndash; <code>fontSize: 16</code> statt <code>'16px'</code></li>
+          <li>Eigenschaftsnamen sind camelCase &ndash; <code>backgroundColor</code> statt <code>background-color</code>
+          </li>
+          <li>Es gibt <strong>keine</strong> Kaskade oder Vererbung (au&szlig;er bei verschachtelten
+            <code>Text</code>-Komponenten)</li>
+          <li><code>flexDirection</code> ist standardm&auml;&szlig;ig <code>'column'</code>, nicht <code>'row'</code>
+          </li>
+          <li>Maße werden in &bdquo;density-independent pixels&ldquo; (dp/pt) angegeben, nicht in physischen Pixeln</li>
+        </ul>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">App.tsx</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">import { View, Text, StyleSheet, StatusBar } from 'react-native';
+
+export default function App() {
+  return (
+    // View mit flex: 1 = nimmt den gesamten verfügbaren Platz ein
+    &lt;View style={styles.container}&gt;
+      {/*
+        StatusBar steuert die Systemleiste (Uhrzeit, Akku etc.)
+        barStyle="light-content" = weißer Text auf dunklem Hintergrund
+      */}
+      &lt;StatusBar barStyle="light-content" backgroundColor="#0d1117" /&gt;
+
+      &lt;Text style={styles.title}&gt;&#9992; FlugBoard&lt;/Text&gt;
+      &lt;Text style={styles.subtitle}&gt;Flughafen Wien-Schwechat&lt;/Text&gt;
+      &lt;Text style={styles.version}&gt;Version 1.0.0&lt;/Text&gt;
+    &lt;/View&gt;
+  );
+}
+
+// StyleSheet.create() validiert die Styles zur Laufzeit und
+// optimiert die Performance durch Caching der Style-Objekte.
+// WICHTIG: StyleSheet.create() außerhalb der Komponente definieren!
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,                      // nimmt die gesamte Bildschirmhöhe ein
+    backgroundColor: '#0d1117',   // dunkles Hintergrundthema
+    alignItems: 'center',         // horizontal zentrieren (Hauptachse = column)
+    justifyContent: 'center',     // vertikal zentrieren
+    paddingHorizontal: 24,
+  },
+  title: {
+    fontSize: 28,                 // Zahlenwert ohne Einheit!
+    fontWeight: 'bold',
+    color: '#61dafb',             // React-Blau
+    marginBottom: 8,
+    letterSpacing: 1,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#8b949e',
+    marginBottom: 4,
+  },
+  version: {
+    fontSize: 12,
+    color: '#484f58',
+    marginTop: 32,
+  },
+});</code></pre>
+        </div>
+
+        <div class="callout callout-info">
+          <div class="callout-icon">&#8505;</div>
+          <div class="callout-body">
+            <div class="callout-title">flex: 1 &ndash; Die h&auml;ufigste Falle</div>
+            <p>
+              Ohne <code>flex: 1</code> auf dem Wurzel-<code>View</code> hat die App keine
+              definierte H&ouml;he und zeigt m&ouml;glicherweise gar nichts an. Immer
+              sicherstellen, dass der Root-Container <code>flex: 1</code> hat.
+            </p>
+          </div>
+        </div>
+
+        <h3>Styling-Regeln auf einen Blick</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">styling-vergleich.ts</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">// ❌ Falsch – CSS-Syntax funktioniert NICHT in React Native
+const wrongStyle = {
+  'font-size': '16px',          // Bindestriche verboten
+  'background-color': '#fff',   // camelCase erforderlich
+  width: '100%',                // Prozentwerte teilweise nicht unterstützt
+  border: '1px solid red',      // Shorthand-Properties existieren nicht
+};
+
+// ✅ Richtig – React Native StyleSheet-Syntax
+const correctStyle = StyleSheet.create({
+  box: {
+    fontSize: 16,               // Zahl, keine Einheit
+    backgroundColor: '#fff',    // camelCase
+    width: '100%',              // Prozent funktioniert für width/height
+    borderWidth: 1,             // Kein Shorthand, einzelne Properties
+    borderColor: 'red',
+    borderStyle: 'solid',
+  },
+});</code></pre>
+        </div>
+      </section>
+
+      <!-- Section 5: TouchableOpacity -->
+      <section>
+        <h2>5 &mdash; TouchableOpacity &ndash; Buttons in React Native</h2>
+        <p>
+          In React Native gibt es keinen <code>button</code>-Tag. F&uuml;r tippbare Elemente
+          verwendet man <code>TouchableOpacity</code>, das beim Dr&uuml;cken die Deckkraft
+          reduziert und so visuelles Feedback gibt. F&uuml;r komplexere Gesten-Szenarien
+          steht auch <code>Pressable</code> zur Verf&uuml;gung (ab React Native 0.63).
+        </p>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">components/RefreshButton.tsx</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">import {
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+  Alert,
+  View,
+} from 'react-native';
+
+interface RefreshButtonProps {
+  onRefresh: () => void;
+  isLoading: boolean;
+}
+
+export function RefreshButton({ onRefresh, isLoading }: RefreshButtonProps) {
+  const handlePress = () => {
+    // Alert.alert() zeigt einen nativen Dialog an
+    Alert.alert(
+      'Aktualisieren',                        // Titel
+      'Flugdaten wirklich neu laden?',        // Nachricht
+      [
+        {
+          text: 'Abbrechen',
+          style: 'cancel',                    // iOS: blaue Schrift
+        },
+        {
+          text: 'Aktualisieren',
+          style: 'default',
+          onPress: onRefresh,                 // Callback bei Bestätigung
+        },
+      ],
+      { cancelable: true }                    // Android: Tippen außerhalb schließt Dialog
+    );
+  };
+
+  return (
+    &lt;View style={styles.wrapper}&gt;
+      {/* activeOpacity: Wert zwischen 0 (unsichtbar) und 1 (kein Feedback) */}
+      &lt;TouchableOpacity
+        style={[
+          styles.button,
+          isLoading &amp;&amp; styles.buttonDisabled,  // Bedingtes Styling via Array
+        ]}
+        onPress={handlePress}
+        activeOpacity={0.7}
+        disabled={isLoading}                  // Deaktiviert Touch-Events
+        accessibilityLabel="Flugdaten aktualisieren"
+        accessibilityRole="button"
+      &gt;
+        &lt;Text style={[styles.label, isLoading &amp;&amp; styles.labelDisabled]}&gt;
+          {isLoading ? 'L&auml;dt...' : '&#8635; Aktualisieren'}
+        &lt;/Text&gt;
+      &lt;/TouchableOpacity&gt;
+    &lt;/View&gt;
+  );
+}
+
+const styles = StyleSheet.create({
+  wrapper: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  button: {
+    backgroundColor: '#21262d',
+    borderWidth: 1,
+    borderColor: '#30363d',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+  },
+  buttonDisabled: {
+    opacity: 0.5,
+  },
+  label: {
+    color: '#61dafb',
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  labelDisabled: {
+    color: '#8b949e',
+  },
+});</code></pre>
+        </div>
+
+        <h3>Bedingtes Styling &ndash; Style-Arrays</h3>
+        <p>
+          In React Native kann man mehrere Styles als Array &uuml;bergeben. Sp&auml;tere
+          Eintr&auml;ge im Array &uuml;berschreiben fr&uuml;here (wie CSS-Spezifizit&auml;t,
+          aber einfacher). <code>false</code>, <code>null</code> und <code>undefined</code>
+          werden ignoriert &ndash; ideal f&uuml;r bedingtes Styling.
+        </p>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">bedingtes-styling.tsx</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">// Style-Array: Basis-Style + optionaler Override-Style
+&lt;View style={[styles.card, isSelected &amp;&amp; styles.cardSelected]}&gt;
+
+// Mehrere bedingte Styles kombinieren
+&lt;Text
+  style={[
+    styles.statusText,
+    status === 'delayed' &amp;&amp; styles.statusDelayed,
+    status === 'cancelled' &amp;&amp; styles.statusCancelled,
+    status === 'boarding' &amp;&amp; styles.statusBoarding,
+  ]}
+&gt;
+  {statusLabel}
+&lt;/Text&gt;</code></pre>
+        </div>
+      </section>
+
+      <!-- Section 6: Platform.OS -->
+      <section>
+        <h2>6 &mdash; Platform.OS &ndash; Plattformspezifisches Verhalten</h2>
+        <p>
+          React Native l&auml;uft auf iOS und Android, und beide Plattformen haben
+          unterschiedliche Design-Konventionen und APIs. Das <code>Platform</code>-Modul
+          erlaubt es, plattformspezifischen Code zu schreiben.
+        </p>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">components/Card.tsx</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">import { Platform, StyleSheet, View } from 'react-native';
+
+// Platform.OS gibt 'ios', 'android' oder 'web' zurück
+const isIOS = Platform.OS === 'ios';
+const isAndroid = Platform.OS === 'android';
+
+export function Card({ children }: { children: React.ReactNode }) {
+  return &lt;View style={styles.card}&gt;{children}&lt;/View&gt;;
+}
+
+const styles = StyleSheet.create({
+  card: {
+    backgroundColor: '#161b22',
+    borderRadius: 12,
+    padding: 16,
+    // Platform.select() – eleganter als If/Else
+    // iOS: box-shadow über shadow*-Properties
+    // Android: Schatten über elevation
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 4,       // Android-Schatten (0–24)
+      },
+      default: {},          // Web / andere Plattformen
+    }),
+  },
+});
+
+// Platform.OS für bedingte Werte direkt im StyleSheet
+const statusBarHeight = StyleSheet.create({
+  header: {
+    paddingTop: Platform.OS === 'ios' ? 44 : 24,  // iOS Notch / Android Status Bar
+  },
+});</code></pre>
+        </div>
+
+        <div class="callout callout-info">
+          <div class="callout-icon">&#8505;</div>
+          <div class="callout-body">
+            <div class="callout-title">Plattformspezifische Dateien</div>
+            <p>
+              F&uuml;r gr&ouml;&szlig;ere Unterschiede kann man Dateien mit dem Suffix
+              <code>.ios.tsx</code> oder <code>.android.tsx</code> anlegen.
+              React Native l&auml;dt automatisch die richtige Datei:
+              <code>Button.ios.tsx</code> auf iOS, <code>Button.android.tsx</code> auf Android,
+              <code>Button.tsx</code> als Fallback. Ideal f&uuml;r komplett unterschiedliche
+              UI-Muster auf den Plattformen.
+            </p>
+          </div>
+        </div>
+
+        <h3>useColorScheme &ndash; Systemthema erkennen</h3>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">App.tsx (Dark Mode)</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">import { useColorScheme } from 'react-native';
+
+export default function App() {
+  // Gibt 'dark', 'light' oder null zurück
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === 'dark';
+
+  return (
+    &lt;View
+      style={[
+        styles.container,
+        { backgroundColor: isDark ? '#0d1117' : '#ffffff' },
+      ]}
+    &gt;
+      &lt;Text style={{ color: isDark ? '#e6edf3' : '#24292f' }}&gt;
+        Flughafen Wien-Schwechat
+      &lt;/Text&gt;
+    &lt;/View&gt;
+  );
+}</code></pre>
+        </div>
+      </section>
+
+      <!-- Projektschritt -->
+      <section class="section-projekt">
+        <h2>Projektschritt</h2>
+        <div class="projekt-box">
+          <div class="projekt-box-header">
+            <span class="projekt-step">Projektschritt 4.1</span>
+            <h3>FlugBoard Mobile &ndash; Grundger&uuml;st</h3>
+          </div>
+          <p>
+            In diesem Schritt legen wir das Fundament f&uuml;r die FlugBoard Mobile App.
+            Am Ende l&auml;uft eine einfache App auf deinem Smartphone, die drei Fl&uuml;ge
+            auf einem dunklen Hintergrund anzeigt.
+          </p>
+          <ol>
+            <li>
+              <strong>Expo-Projekt erstellen:</strong><br>
+              <code>npx create-expo-app@latest flugboard-mobile --template blank-typescript</code>
+            </li>
+            <li>
+              <strong>Typen &uuml;bernehmen:</strong> Kopiere <code>types/flight.ts</code>
+              aus dem Web-Projekt nach <code>src/types/flight.ts</code>. Die TypeScript-Typen
+              (<code>Flight</code>, <code>FlightStatus</code>) sind identisch.
+            </li>
+            <li>
+              <strong>Testdaten &uuml;bernehmen:</strong> Kopiere <code>data/flights.ts</code>
+              nach <code>Datenbank (SQLite via Drizzle)</code>.
+            </li>
+            <li>
+              <strong>App.tsx anpassen:</strong> Dunkler Hintergrund (<code>#0d1117</code>),
+              FlugBoard-Titel in React-Blau (<code>#61dafb</code>), Untertitel
+              &bdquo;Flughafen Wien-Schwechat&ldquo; in Grau (<code>#8b949e</code>).
+            </li>
+            <li>
+              <strong>3 Fl&uuml;ge hardcoded anzeigen:</strong> Zeige drei <code>Text</code>-Komponenten
+              mit Flugnummer, Ziel und Abflugzeit. Kein FlatList noch &ndash; das kommt in L17.
+            </li>
+            <li>
+              <strong>Testen:</strong> <code>npx expo start</code>, QR-Code mit Expo Go
+              scannen &rarr; App l&auml;uft auf dem Ger&auml;t.
+            </li>
+          </ol>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-filename">App.tsx (Projektschritt 4.1)</span>
+              <span class="code-lang">TypeScript</span>
+            </div>
+            <pre><code class="language-typescript">import { View, Text, StyleSheet, StatusBar, ScrollView } from 'react-native';
+
+// Vorläufige Testdaten (werden in L17 durch FlatList + echte Daten ersetzt)
+const TEST_FLIGHTS = [
+  { id: 1, flightNumber: 'OS123', destination: 'London Heathrow', departureTime: '08:15' },
+  { id: 2, flightNumber: 'LH456', destination: 'Frankfurt', departureTime: '09:30' },
+  { id: 3, flightNumber: 'FR789', destination: 'Barcelona', departureTime: '10:45' },
+];
+
+export default function App() {
+  return (
+    &lt;View style={styles.container}&gt;
+      &lt;StatusBar barStyle="light-content" backgroundColor="#0d1117" /&gt;
+
+      &lt;Text style={styles.title}&gt;&#9992; FlugBoard&lt;/Text&gt;
+      &lt;Text style={styles.subtitle}&gt;Flughafen Wien-Schwechat&lt;/Text&gt;
+
+      &lt;View style={styles.divider} /&gt;
+
+      &lt;Text style={styles.sectionLabel}&gt;ABFL&Uuml;GE&lt;/Text&gt;
+
+      {TEST_FLIGHTS.map((flight) =&gt; (
+        &lt;View key={flight.id} style={styles.flightRow}&gt;
+          &lt;Text style={styles.flightNumber}&gt;{flight.flightNumber}&lt;/Text&gt;
+          &lt;Text style={styles.destination}&gt;{flight.destination}&lt;/Text&gt;
+          &lt;Text style={styles.time}&gt;{flight.departureTime}&lt;/Text&gt;
+        &lt;/View&gt;
+      ))}
+    &lt;/View&gt;
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#0d1117',
+    paddingTop: 60,
+    paddingHorizontal: 16,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#61dafb',
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#8b949e',
+    marginBottom: 24,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#21262d',
+    marginBottom: 16,
+  },
+  sectionLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#8b949e',
+    letterSpacing: 1.5,
+    marginBottom: 12,
+  },
+  flightRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#21262d',
+  },
+  flightNumber: {
+    color: '#61dafb',
+    fontWeight: '600',
+    fontSize: 15,
+    flex: 1,
+  },
+  destination: {
+    color: '#e6edf3',
+    fontSize: 15,
+    flex: 2,
+  },
+  time: {
+    color: '#8b949e',
+    fontSize: 15,
+    flex: 1,
+    textAlign: 'right',
+  },
+});</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- Häufige Fehler -->
+      <section class="section-fehler">
+        <h2>H&auml;ufige Fehler</h2>
+
+        <div class="fehler-item">
+          <div class="fehler-title">Fehler: HTML-Elemente in React Native verwendet</div>
+          <p>
+            Der Fehler <em>&bdquo;div is not a valid React Native component&ldquo;</em>
+            tritt auf, wenn man HTML-Tags wie <code>div</code>, <code>p</code>,
+            <code>button</code>, <code>span</code> oder <code>ul</code> in React Native
+            verwendet. Diese existieren im nativen Kontext schlicht nicht.
+          </p>
+          <p class="fehler-fix">
+            <strong>Fix:</strong> Alle HTML-Elemente durch ihre React-Native-&Auml;quivalente
+            ersetzen: <code>div</code> &rarr; <code>View</code>, <code>p</code>/<code>span</code>
+            &rarr; <code>Text</code>, <code>button</code> &rarr; <code>TouchableOpacity</code>,
+            <code>ul</code>/<code>li</code> + <code>.map()</code> &rarr; <code>FlatList</code>,
+            <code>img</code> &rarr; <code>Image</code>.
+          </p>
+        </div>
+
+        <div class="fehler-item">
+          <div class="fehler-title">Fehler: Text-String au&szlig;erhalb einer Text-Komponente</div>
+          <p>
+            <em>&bdquo;Text strings must be rendered within a &lt;Text&gt; component&ldquo;</em>
+            &ndash; dieser Fehler erscheint, wenn ein String direkt in einem <code>View</code>
+            oder einer anderen Nicht-Text-Komponente steht, z.B.
+            <code>&lt;View&gt;{'Hallo'}&lt;/View&gt;</code>. React Native erzwingt
+            konsequent, dass jeder anzuzeigende Text in einer <code>Text</code>-Komponente
+            gekapselt ist.
+          </p>
+          <p class="fehler-fix">
+            <strong>Fix:</strong> Jeden anzuzeigenden String in <code>&lt;Text&gt;...&lt;/Text&gt;</code>
+            einschlie&szlig;en. Auch JSX-Ausdr&uuml;cke wie <code>{condition &amp;&amp; 'Text'}</code>
+            m&uuml;ssen innerhalb von <code>Text</code> stehen.
+          </p>
+        </div>
+
+        <div class="fehler-item">
+          <div class="fehler-title">Fehler: Einheitenwerte in StyleSheet-Properties</div>
+          <p>
+            <em>&bdquo;fontSize value must be a number, not a string&ldquo;</em>
+            oder &auml;hnliche Fehlermeldungen entstehen, wenn man CSS-Einheiten wie
+            <code>px</code>, <code>em</code>, <code>rem</code> oder <code>%</code>
+            verwendet: <code>fontSize: '16px'</code> ist in React Native ung&uuml;ltig.
+          </p>
+          <p class="fehler-fix">
+            <strong>Fix:</strong> Alle numerischen Style-Werte als reine Zahlen angeben:
+            <code>fontSize: 16</code>, <code>marginTop: 8</code>, <code>borderRadius: 4</code>.
+            Ausnahme: <code>width</code> und <code>height</code> akzeptieren auch Prozentstrings
+            wie <code>'100%'</code> oder <code>'50%'</code>.
+          </p>
+        </div>
+
+        <div class="fehler-item">
+          <div class="fehler-title">Fehler: flex: 1 auf dem Root-Container vergessen</div>
+          <p>
+            Die App zeigt einen wei&szlig;en Bildschirm oder nur einen winzigen Inhaltstreifen,
+            obwohl der Code korrekt aussieht. Das passiert, wenn der Wurzel-Container keinen
+            definierten Platz einnimmt. Ohne <code>flex: 1</code> (oder eine explizite
+            <code>height</code>) hat das Root-<code>View</code> keine H&ouml;he, weil React
+            Native &ndash; anders als der Browser &ndash; keine automatische Blockh&ouml;he
+            berechnet.
+          </p>
+          <p class="fehler-fix">
+            <strong>Fix:</strong> Den Root-Container immer mit <code>flex: 1</code> versehen:
+            <code>style={{ flex: 1, backgroundColor: '#0d1117' }}</code>. Zus&auml;tzlich
+            sollten auch <code>NavigationContainer</code> und Screen-Wrapper <code>flex: 1</code>
+            haben.
+          </p>
+        </div>
+      </section>
+
+      <!-- Aufgaben -->
+      <section class="section-aufgaben">
+        <h2>Aufgaben</h2>
+        <div class="aufgaben-list">
+
+          <div class="aufgabe">
+            <div class="aufgabe-header">
+              <span class="aufgabe-num">Aufgabe 1</span>
+              <span class="aufgabe-title">Projekt einrichten &amp; Grundlayout</span>
+            </div>
+            <p>
+              Erstelle das <code>flugboard-mobile</code> Expo-Projekt und passe die
+              <code>App.tsx</code> an das FlugBoard-Design an.
+            </p>
+            <ul>
+              <li>Hintergrundfarbe: <code>#0d1117</code></li>
+              <li>Titel &bdquo;&#9992; FlugBoard&ldquo; in <code>#61dafb</code>, FontSize 28, bold</li>
+              <li>Untertitel &bdquo;Flughafen Wien-Schwechat&ldquo; in <code>#8b949e</code>, FontSize 16</li>
+              <li><code>StatusBar</code> mit <code>barStyle="light-content"</code></li>
+              <li>Alle Elemente vertikal und horizontal zentriert</li>
+            </ul>
+          </div>
+
+          <div class="aufgabe">
+            <div class="aufgabe-header">
+              <span class="aufgabe-num">Aufgabe 2</span>
+              <span class="aufgabe-title">FlightCard-Komponente (einfach)</span>
+            </div>
+            <p>
+              Erstelle eine <code>FlightCard</code>-Komponente in
+              <code>src/components/FlightCard.tsx</code>, die eine Fluginformation anzeigt.
+            </p>
+            <ul>
+              <li>Props: <code>flightNumber: string</code>, <code>destination: string</code>,
+                <code>departureTime: string</code></li>
+              <li>Layout: <code>flexDirection: 'row'</code>, drei Spalten</li>
+              <li>Flugnummer in <code>#61dafb</code>, Ziel in <code>#e6edf3</code>, Zeit rechts in <code>#8b949e</code>
+              </li>
+              <li>Dunkler Karten-Hintergrund (<code>#161b22</code>), <code>borderRadius: 8</code></li>
+              <li>Zeige in <code>App.tsx</code> drei <code>FlightCard</code>-Instanzen mit Testdaten an</li>
+            </ul>
+          </div>
+
+          <div class="aufgabe">
+            <div class="aufgabe-header">
+              <span class="aufgabe-num">Aufgabe 3</span>
+              <span class="aufgabe-title">Aktualisieren-Button mit Alert</span>
+            </div>
+            <p>
+              F&uuml;ge einen &bdquo;Aktualisieren&ldquo;-Button unterhalb der FlightCards ein,
+              der beim Dr&uuml;cken einen nativen Dialog anzeigt.
+            </p>
+            <ul>
+              <li>Verwende <code>TouchableOpacity</code> (kein HTML <code>button</code>!)</li>
+              <li><code>activeOpacity={0.7}</code> f&uuml;r visuelles Feedback</li>
+              <li><code>Alert.alert()</code> mit Titel, Nachricht und zwei Buttons (Abbrechen + Best&auml;tigen)</li>
+              <li>Nach Best&auml;tigung: Zeige eine zweite Alert-Meldung &bdquo;Daten werden aktualisiert...&ldquo;</li>
+              <li>Button-Style: <code>borderRadius: 8</code>, Hintergrund <code>#21262d</code>, Textfarbe
+                <code>#61dafb</code></li>
+            </ul>
+          </div>
+
+          <div class="aufgabe aufgabe-bonus">
+            <div class="aufgabe-header">
+              <span class="aufgabe-num">Aufgabe 4 &mdash; Bonus</span>
+              <span class="aufgabe-title">Plattformspezifische Shadows</span>
+            </div>
+            <p>
+              Erweitere die <code>FlightCard</code> um plattformspezifische Schatten mithilfe
+              von <code>Platform.select()</code>.
+            </p>
+            <ul>
+              <li>iOS: <code>shadowColor</code>, <code>shadowOffset</code>, <code>shadowOpacity</code>,
+                <code>shadowRadius</code></li>
+              <li>Android: <code>elevation: 4</code></li>
+              <li>Passe zus&auml;tzlich den <code>paddingTop</code> des Root-Containers an:
+                iOS 44 dp, Android 24 dp, um den Statusbereich korrekt zu ber&uuml;cksichtigen</li>
+              <li>Zeige mit <code>Text</code> die aktuelle Plattform an:
+                <code>Platform.OS === 'ios' ? 'iOS' : 'Android'</code>
+              </li>
+            </ul>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Lesson Navigation -->
+
+    </div><!-- /content-area -->
+
+    <nav class="lesson-nav">
+      <a class="nav-btn" href="3.6-deployment.html">&larr; Lektion 3.6: Deployment</a>
+      <span class="nav-center-info">Lektion 4.1</span>
+      <a class="nav-btn primary" href="4.2-rn-komponenten.html">Lektion 4.2: Native Komponenten &amp; Styling &rarr;</a>
+    </nav>
+
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+  <script>
+    // Hamburger menu
+    const ham = document.getElementById('hamburger');
+    const sb = document.getElementById('sidebar');
+    const ov = document.getElementById('overlay');
+    ham.addEventListener('click', () => { sb.classList.toggle('open'); ov.classList.toggle('visible'); });
+    ov.addEventListener('click', () => { sb.classList.remove('open'); ov.classList.remove('visible'); });
+    // Active nav link
+    const cur = window.location.pathname.split('/').pop() || 'index.html';
+    document.querySelectorAll('.nav-link').forEach(l => {
+      if (l.getAttribute('href') === cur) l.classList.add('active');
+    });
+    // Theme toggle — einfach & robust (kein CSS-Swap nötig)
+    const themeBtn = document.getElementById('theme-toggle');
+    const applyTheme = (t) => {
+      document.documentElement.setAttribute('data-theme', t);
+      if (themeBtn) themeBtn.innerHTML = t === 'dark' ? '&#9728;' : '&#9790;';
+    };
+    // Theme aus localStorage laden (alle Seiten teilen denselben Key)
+    applyTheme(localStorage.getItem('kurs-theme') || 'dark');
+    // Transitions erst nach dem initialen Render aktivieren (verhindert Flash)
+    setTimeout(() => document.documentElement.classList.add('theme-transitions'), 50);
+    if (themeBtn) themeBtn.addEventListener('click', () => {
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('kurs-theme', next);
+      applyTheme(next);
+    });
+    hljs.highlightAll();
+  </script>
+</body>
+
+</html>

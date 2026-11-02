@@ -1,0 +1,39 @@
+.flight-row {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.flight-row.is-selected {
+  background: #1f3a4a;
+  border-left-color: #61dafb;
+}
+
+.flight-row.is-cancelled {
+  opacity: 0.6;
+}
+
+.flight-cell {
+  border-bottom: 1px solid #30363d;
+  color: #e6edf3;
+  padding: 0.7rem 1rem;
+}
+
+.flight-number.is-cancelled {
+  color: #8b949e;
+  text-decoration: line-through;
+}
+
+.flight-time-original {
+  color: #8b949e;
+  margin-right: 4px;
+  text-decoration: line-through;
+}
+
+.flight-time-delayed {
+  color: #d29922;
+}
+
+.flight-time-boarding {
+  color: #61dafb;
+}

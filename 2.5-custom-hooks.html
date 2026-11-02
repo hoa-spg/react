@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2.5 &ndash; Custom Hooks | React Kurs</title>
+  <script>(function(){var t=localStorage.getItem('kurs-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
+  <link rel="stylesheet" href="assets/kurs.css">
+  <link rel="stylesheet" id="hljs-theme" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+<body>
+
+<button class="hamburger" id="hamburger" aria-label="Navigation &ouml;ffnen">&#9776;</button>
+<div class="sidebar-overlay" id="overlay"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html">
+      <span class="brand-icon">&#9992;</span>
+      <div>
+        <div class="brand-name">React Kurs</div>
+        <div class="brand-sub">Web &amp; Mobile</div>
+      </div>
+    </a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Dark/Light Mode" title="Theme wechseln">&#9728;</button>
+  </div>
+        <nav class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-label react-label">Teil 1 &mdash; React Einführung</div>
+      <a class="nav-link" href="1.1-einfuehrung-spa.html"><span class="ln">1.1</span>Motivation &amp; SPA</a>
+      <a class="nav-link" href="1.2-einfuehrung.html"><span class="ln">1.2</span>Einführung &amp; Umgebung</a>
+      <a class="nav-link" href="1.3-komponenten-props-einfach.html"><span class="ln">1.3</span>Komponenten &amp; Props (einfach)</a>
+      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten &amp; Props (Vertiefung)</a>
+      <a class="nav-link" href="1.5-state-events.html"><span class="ln">1.5</span>State &amp; Events</a>
+      <a class="nav-link" href="1.6-listen-conditional.html"><span class="ln">1.6</span>Listen &amp; Conditional Rendering</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label react-label">Teil 2 &mdash; React Praxis</div>
+      <a class="nav-link" href="2.1-formulare.html"><span class="ln">2.1</span>Formulare &amp; Inputs</a>
+      <a class="nav-link" href="2.2-useeffect-api.html"><span class="ln">2.2</span>useEffect &amp; API</a>
+      <a class="nav-link" href="2.3-kommunikation.html"><span class="ln">2.3</span>Komponentenkommunikation</a>
+      <a class="nav-link" href="2.4-context.html"><span class="ln">2.4</span>Context API</a>
+      <a class="nav-link" href="2.5-custom-hooks.html"><span class="ln">2.5</span>Custom Hooks</a>
+      <a class="nav-link" href="2.6-testen-vitest-rtl.html"><span class="ln">2.6</span>Testen mit Vitest + RTL</a>
+      <a class="nav-link" href="2.7-react-router.html"><span class="ln">2.7</span>React Router</a>
+      <a class="nav-link" href="2.8-datenbank-drizzle-sqlite.html"><span class="ln">2.8</span>Datenbankzugriff mit Drizzle + SQLite</a>
+      <a class="nav-link" href="2.9-redux-state-management.html"><span class="ln">2.9</span>State Management mit Redux (Überblick)</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label next-label">Teil 3 &mdash; Next.js</div>
+      <a class="nav-link" href="3.1-nextjs-einfuehrung.html"><span class="ln">3.1</span>Einführung Next.js</a>
+      <a class="nav-link" href="3.2-nextjs-routing.html"><span class="ln">3.2</span>Routing &amp; Layouts</a>
+      <a class="nav-link" href="3.3-server-client.html"><span class="ln">3.3</span>Server &amp; Client Components</a>
+      <a class="nav-link" href="3.4-api-routes.html"><span class="ln">3.4</span>API Routes &amp; Datenabruf</a>
+      <a class="nav-link" href="3.5-playwright-e2e.html"><span class="ln">3.5</span>Playwright E2E</a>
+      <a class="nav-link" href="3.6-deployment.html"><span class="ln">3.6</span>Deployment</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label rn-label">Teil 4 &mdash; React Native</div>
+      <a class="nav-link" href="4.1-rn-einfuehrung.html"><span class="ln">4.1</span>Einführung React Native</a>
+      <a class="nav-link" href="4.2-rn-komponenten.html"><span class="ln">4.2</span>Native Komponenten &amp; Styling</a>
+      <a class="nav-link" href="4.3-rn-navigation.html"><span class="ln">4.3</span>Navigation &amp; State</a>
+    </div>
+  </nav>
+</aside>
+
+<main class="main-content">
+  <header class="lesson-header">
+    <p class="lesson-eyebrow">Lektion 2.5 &mdash; Teil 2: React Praxis</p>
+    <h1>Custom Hooks</h1>
+    <div class="lesson-tags">
+      <span class="tag tag-react">React</span>
+      <span class="tag tag-time">ca. 90 min</span>
+    </div>
+  </header>
+
+  <div class="content-area">
+
+    <!-- LERNZIELE -->
+    <section class="section section-lernziele">
+      <h2>Lernziele</h2>
+      <ul>
+        <li>Verstehen, was Custom Hooks sind und wann man sie einsetzt</li>
+        <li>Eigene Hooks mit dem <code>use</code>-Prefix erstellen</li>
+        <li>Logik aus Komponenten in wiederverwendbare Hooks extrahieren</li>
+        <li><code>useFlights</code>-Hook f&uuml;r den Datenabruf bauen</li>
+        <li><code>useLocalStorage</code>-Hook f&uuml;r persistente Einstellungen bauen</li>
+        <li>Die Hook-Regeln auf Custom Hooks anwenden</li>
+      </ul>
+    </section>
+
+    <!-- SECTION 1: WAS SIND CUSTOM HOOKS -->
+    <section class="section">
+      <h2>1. Was sind Custom Hooks?</h2>
+      <p>
+        Custom Hooks sind gew&ouml;hnliche JavaScript-Funktionen, deren Name mit <code>use</code> beginnt
+        und die andere Hooks aufrufen d&uuml;rfen. Sie erlauben es, zustandsbehaftete Logik aus einer
+        Komponente herauszul&ouml;sen und in eine wiederverwendbare Funktion zu verpacken.
+      </p>
+      <p>
+        Wichtig: Die Logik eines Custom Hooks l&auml;uft <em>innerhalb</em> der Komponente, die ihn aufruft.
+        Jede Komponente, die denselben Hook aufruft, hat ihre <em>eigene, separate</em> Instanz des States.
+        Custom Hooks teilen Logik &ndash; nicht State.
+      </p>
+
+      <p>Custom Hooks einsetzen, wenn:</p>
+      <ul>
+        <li>Dieselbe Logik in mehreren Komponenten dupliziert wird (DRY-Prinzip)</li>
+        <li>Komplexe Effekte mit State zusammengeh&ouml;ren (z.B. Datenabruf, Event-Listener)</li>
+        <li>Eine Komponente unlesbar wird, weil Implementierungsdetails den eigentlichen Zweck verbergen</li>
+      </ul>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">&#8505;</div>
+        <div class="callout-body">
+          <div class="callout-title">Vorher &amp; Nachher</div>
+          <p>
+            <strong>Vorher:</strong> <code>App.tsx</code> hat 80 Zeilen, davon 50 f&uuml;r Fetch-Logik,
+            Polling-Interval, AbortController, Error-Handling und Loading-State.<br>
+            <strong>Nachher:</strong> <code>App.tsx</code> hat 30 Zeilen. Die Fetch-Logik lebt in
+            <code>useFlights.ts</code> &ndash; isoliert, testbar, wiederverwendbar.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: EINFACHER HOOK -->
+    <section class="section">
+      <h2>2. Einfacher Custom Hook: useWindowSize</h2>
+      <p>
+        Beginnen wir mit einem &uuml;berschaubaren Beispiel: ein Hook, der die aktuelle Fenstergr&ouml;&szlig;e
+        zur&uuml;ckgibt und sich bei <code>resize</code>-Events automatisch aktualisiert.
+        Dieses Muster &ndash; Event-Listener registrieren und bei Cleanup abmelden &ndash; taucht
+        in der Praxis sehr h&auml;ufig auf.
+      </p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">src/hooks/useWindowSize.ts</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import { useState, useEffect } from 'react';
+
+interface WindowSize {
+  width: number;
+  height: number;
+}
+
+/**
+ * Gibt die aktuelle Fenstergr&ouml;&szlig;e zur&uuml;ck.
+ * Aktualisiert sich automatisch bei Resize-Events.
+ *
+ * @returns {WindowSize} Aktuelle Breite und H&ouml;he des Browser-Fensters
+ */
+const useWindowSize = (): WindowSize =&gt; {
+  const [size, setSize] = useState&lt;WindowSize&gt;({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+
+  useEffect(() =&gt; {
+    const handleResize = () =&gt; {
+      setSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    // Event-Listener registrieren
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup-Funktion: Listener beim Unmount abmelden
+    return () =&gt; window.removeEventListener('resize', handleResize);
+  }, []); // Leeres Array: Effekt nur einmal beim Mount ausf&uuml;hren
+
+  return size;
+};
+
+export default useWindowSize;</code></pre>
+      </div>
+
+      <p>Verwendung in einer Komponente &ndash; denkbar einfach:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Verwendung in einer Komponente</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import useWindowSize from '../hooks/useWindowSize';
+
+const FlightBoard = ({ flights }: FlightBoardProps) =&gt; {
+  const { width } = useWindowSize();
+
+  // Kompakte Ansicht auf kleinen Bildschirmen
+  const isCompact = width &lt; 768;
+
+  return (
+    &lt;section&gt;
+      {isCompact ? (
+        &lt;FlightListMobile flights={flights} /&gt;
+      ) : (
+        &lt;FlightTable flights={flights} /&gt;
+      )}
+    &lt;/section&gt;
+  );
+};</code></pre>
+      </div>
+
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#128161;</div>
+        <div class="callout-body">
+          <div class="callout-title">Cleanup ist Pflicht</div>
+          <p>
+            Ohne die Cleanup-Funktion (<code>return () =&gt; removeEventListener(...)</code>) bleibt der
+            Event-Listener aktiv, auch nachdem die Komponente aus dem DOM entfernt wurde.
+            Das f&uuml;hrt zu Memory Leaks und dem Fehler
+            &bdquo;Can't perform a React state update on an unmounted component&ldquo;.
+            Immer aufr&auml;umen!
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: USEFLIGHTS -->
+    <section class="section">
+      <h2>3. useFlights &ndash; Datenabruf-Hook</h2>
+      <p>
+        In Lektion 2.2 haben wir die Fetch-Logik direkt in <code>App.tsx</code> geschrieben. Mit
+        zunehmendem Umfang (Polling, AbortController, Fehlerbehandlung, manuelles Refetch) wird
+        diese Logik unhandlich. Wir extrahieren sie in einen dedizierten Hook.
+      </p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">src/hooks/useFlights.ts</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import { useState, useEffect } from 'react';
+import { Flight } from '../types/flight';
+
+interface UseFlightsReturn {
+  flights: Flight[];
+  isLoading: boolean;
+  error: string | null;
+  refetch: () =&gt; void;
+  lastUpdated: Date | null;
+}
+
+const API_URL = 'http://localhost:8000';
+
+/**
+ * L&auml;dt alle Fl&uuml;ge vom Backend und aktualisiert sie alle 30 Sekunden.
+ * Gibt Ladevorgangsstatus, Fehler und eine manuelle Aktualisierungsfunktion zur&uuml;ck.
+ */
+const useFlights = (): UseFlightsReturn =&gt; {
+  const [flights, setFlights]         = useState&lt;Flight[]&gt;([]);
+  const [isLoading, setIsLoading]     = useState&lt;boolean&gt;(true);
+  const [error, setError]             = useState&lt;string | null&gt;(null);
+  const [lastUpdated, setLastUpdated] = useState&lt;Date | null&gt;(null);
+
+  // Trick f&uuml;r manuelles Refetch: refreshKey &auml;ndern triggert den Effekt erneut
+  const [refreshKey, setRefreshKey]   = useState(0);
+
+  useEffect(() =&gt; {
+    // AbortController: bricht den laufenden Fetch beim Cleanup ab
+    const controller = new AbortController();
+
+    const fetchData = async () =&gt; {
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const response = await fetch(`${API_URL}/api/flights`, {
+          signal: controller.signal,
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP-Fehler: ${response.status} ${response.statusText}`);
+        }
+
+        const data: Flight[] = await response.json();
+        setFlights(data);
+        setLastUpdated(new Date());
+      } catch (err) {
+        // AbortError ignorieren: Das ist kein echter Fehler, sondern unser Cleanup
+        if (err instanceof Error &amp;&amp; err.name === 'AbortError') return;
+        setError(err instanceof Error ? err.message : 'Unbekannter Fehler');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    // Sofortiger erster Fetch
+    fetchData();
+
+    // Automatische Aktualisierung alle 30 Sekunden
+    const intervalId = setInterval(fetchData, 30_000);
+
+    return () =&gt; {
+      controller.abort();        // Laufenden Fetch abbrechen
+      clearInterval(intervalId); // Polling stoppen
+    };
+  }, [refreshKey]); // refreshKey als Abh&auml;ngigkeit: &Auml;nderung triggert Effekt
+
+  const refetch = () =&gt; setRefreshKey(k =&gt; k + 1);
+
+  return { flights, isLoading, error, refetch, lastUpdated };
+};
+
+export default useFlights;</code></pre>
+      </div>
+
+      <p>Das Ergebnis in <code>App.tsx</code> spricht f&uuml;r sich:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">src/App.tsx (nach Extraktion)</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import useFlights from './hooks/useFlights';
+
+function App() {
+  // Vorher: ~40 Zeilen useState, useEffect, fetch-Logik
+  // Nachher: eine Zeile
+  const { flights, isLoading, error, refetch, lastUpdated } = useFlights();
+
+  if (error)     return &lt;ErrorMessage message={error} onRetry={refetch} /&gt;;
+
+  return (
+    &lt;div className="app"&gt;
+      &lt;AirportHeader lastUpdated={lastUpdated} onRefresh={refetch} /&gt;
+      {isLoading ? (
+        &lt;BoardLoading /&gt;
+      ) : (
+        &lt;&gt;
+          &lt;FlightBoard flights={flights.filter(f =&gt; f.type === 'departure')} /&gt;
+          &lt;FlightBoard flights={flights.filter(f =&gt; f.type === 'arrival')}   /&gt;
+        &lt;/&gt;
+      )}
+    &lt;/div&gt;
+  );
+}</code></pre>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">&#8505;</div>
+        <div class="callout-body">
+          <div class="callout-title">Der refreshKey-Trick</div>
+          <p>
+            <code>setRefreshKey(k =&gt; k + 1)</code> &auml;ndert eine Zahl in der
+            <code>useEffect</code>-Abh&auml;ngigkeitsliste. Da React &auml;nderungen in der
+            Abh&auml;ngigkeitsliste erkennt, wird der Effekt neu ausgef&uuml;hrt.
+            Der Trick funktioniert immer, wenn man einen Effekt manuell neu triggern m&ouml;chte,
+            ohne dessen eigentliche Abh&auml;ngigkeiten zu ver&auml;ndern.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: USELOCALSTORAGE -->
+    <section class="section">
+      <h2>4. useLocalStorage &ndash; Persistenz-Hook</h2>
+      <p>
+        Ein weiterer klassischer Custom Hook ist <code>useLocalStorage</code>: Er verh&auml;lt sich wie
+        <code>useState</code>, speichert den Wert aber zus&auml;tzlich im <code>localStorage</code> des
+        Browsers. So bleiben Einstellungen auch nach einem Seitenneuladen erhalten.
+      </p>
+      <p>
+        Durch den Einsatz von TypeScript-Generics (<code>&lt;T&gt;</code>) ist der Hook typagnostisch
+        und kann f&uuml;r beliebige serialisierbare Werte verwendet werden.
+      </p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">src/hooks/useLocalStorage.ts</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import { useState } from 'react';
+
+/**
+ * useState-Ersatz mit localStorage-Persistenz.
+ * Der Wert wird unter dem angegebenen Key gespeichert und
+ * bleibt auch nach einem Seitenneuladen erhalten.
+ *
+ * @template T - Typ des gespeicherten Werts (muss JSON-serialisierbar sein)
+ * @param key - Der localStorage-Key
+ * @param initialValue - Standardwert, falls kein gespeicherter Wert vorhanden ist
+ * @returns [gespeicherter Wert, Setter-Funktion] - wie useState
+ */
+const useLocalStorage = &lt;T&gt;(
+  key: string,
+  initialValue: T
+): [T, (value: T) =&gt; void] =&gt; {
+
+  const [storedValue, setStoredValue] = useState&lt;T&gt;(() =&gt; {
+    try {
+      const item = localStorage.getItem(key);
+      // Gespeicherten Wert parsen, oder initialValue zur&uuml;ckgeben
+      return item ? (JSON.parse(item) as T) : initialValue;
+    } catch {
+      // Bei Parse-Fehlern (z.B. korrumpierte Daten) initialValue verwenden
+      console.warn(`useLocalStorage: Fehler beim Lesen von "${key}"`);
+      return initialValue;
+    }
+  });
+
+  const setValue = (value: T) =&gt; {
+    try {
+      setStoredValue(value);
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch (error) {
+      // localStorage kann voll sein (QuotaExceededError)
+      console.error(`useLocalStorage: Fehler beim Schreiben von "${key}":`, error);
+    }
+  };
+
+  return [storedValue, setValue];
+};
+
+export default useLocalStorage;</code></pre>
+      </div>
+
+      <p>Verwendung &ndash; als direkter Ersatz f&uuml;r <code>useState</code>:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Verwendungsbeispiele</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import useLocalStorage from '../hooks/useLocalStorage';
+
+// Theme persistieren
+const [theme, setTheme] = useLocalStorage&lt;'dark' | 'light'&gt;('theme', 'dark');
+
+// Sprache persistieren
+const [lang, setLang] = useLocalStorage&lt;'de' | 'en'&gt;('language', 'de');
+
+// Filter-Einstellungen persistieren (komplexes Objekt)
+const [filters, setFilters] = useLocalStorage&lt;FilterState&gt;(
+  'flugboard-filters',
+  DEFAULT_FILTERS
+);
+
+// Identischer Verwendungsstil wie useState:
+setTheme('light');            // einfacher Wert
+setFilters(prev =&gt; ({        // ABER: Vorsicht! Kein Setter-Callback wie bei useState
+  ...prev,
+  searchQuery: 'LH',
+}));</code></pre>
+      </div>
+
+      <div class="callout callout-warning">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">Kein Setter-Callback!</div>
+          <p>
+            Unser <code>useLocalStorage</code>-Hook akzeptiert im Setter keinen Callback wie
+            <code>setCount(prev =&gt; prev + 1)</code>. Um ein Objekt zu aktualisieren, muss der
+            aktuelle Wert zuerst gelesen werden:
+            <code>setFilters({ ...filters, searchQuery: 'LH' })</code>.
+            F&uuml;r eine robuste Implementierung k&ouml;nnte der Setter auf Callbacks erweitert werden
+            (<code>value: T | ((prev: T) =&gt; T)</code>).
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5: HOOK-REGELN -->
+    <section class="section">
+      <h2>5. Hook-Regeln (Wiederholung &amp; Custom Hooks)</h2>
+      <p>
+        Die zwei grundlegenden Regeln f&uuml;r Hooks gelten genauso f&uuml;r Custom Hooks:
+      </p>
+
+      <div class="callout callout-error">
+        <div class="callout-icon">&#10006;</div>
+        <div class="callout-body">
+          <div class="callout-title">Regel 1: Hooks nur auf oberster Ebene aufrufen</div>
+          <p>
+            Niemals Hooks in Schleifen, Bedingungen oder verschachtelten Funktionen aufrufen.
+            React verl&auml;sst sich auf die Reihenfolge der Hook-Aufrufe, um den State korrekt
+            zuzuordnen. Eine ver&auml;nderliche Reihenfolge (durch <code>if</code>/<code>for</code>)
+            f&uuml;hrt zu inkonsistentem State.
+          </p>
+        </div>
+      </div>
+
+      <div class="callout callout-error">
+        <div class="callout-icon">&#10006;</div>
+        <div class="callout-body">
+          <div class="callout-title">Regel 2: Hooks nur in React-Funktionskomponenten oder Custom Hooks aufrufen</div>
+          <p>
+            Hooks d&uuml;rfen nicht in gew&ouml;hnlichen JavaScript-Funktionen, Klassen oder
+            asynchronen Funktionen aufgerufen werden.
+          </p>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Richtig vs. Falsch</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">// ✅ RICHTIG: Hook auf oberster Ebene
+const useFlightFilters = () =&gt; {
+  const [query, setQuery] = useLocalStorage('query', '');  // OK
+  return { query, setQuery };
+};
+
+// ❌ FALSCH: Hook in Bedingung
+const useBadHook = (enabled: boolean) =&gt; {
+  if (enabled) {
+    const [data, setData] = useState(null);  // FEHLER!
+  }
+};
+
+// ❌ FALSCH: Hook in Schleife
+const useAnotherBadHook = (ids: number[]) =&gt; {
+  return ids.map(id =&gt; {
+    const [data] = useState(null);  // FEHLER!
+    return data;
+  });
+};
+
+// ✅ RICHTIG: Custom Hook, der andere Hooks aufruft
+const useFlightFilters = () =&gt; {
+  const [searchQuery, setSearchQuery] = useLocalStorage('search', '');
+  const [statusFilter, setStatusFilter] = useLocalStorage('status', 'all');
+  // useMemo, useEffect etc. sind hier ebenfalls erlaubt
+  return { searchQuery, setSearchQuery, statusFilter, setStatusFilter };
+};</code></pre>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">&#8505;</div>
+        <div class="callout-body">
+          <div class="callout-title">ESLint-Plugin erzwingt die Regeln</div>
+          <p>
+            <code>eslint-plugin-react-hooks</code> ist im Vite-React-Template bereits enthalten und
+            pr&uuml;ft bei jedem Speichern, ob die Hook-Regeln eingehalten werden. Funktionen mit
+            <code>use</code>-Prefix werden automatisch als Hooks erkannt und entsprechend gepr&uuml;ft.
+            Das ist einer der Gr&uuml;nde, warum das Prefix so wichtig ist.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROJEKTSCHRITT -->
+    <section class="section section-projekt">
+      <h2>Projektschritt</h2>
+      <div class="projekt-box">
+        <div class="projekt-box-header">
+          <span class="projekt-step">Projektschritt 2.5</span>
+          <h3>App.tsx durch Custom Hooks entschlacken</h3>
+        </div>
+
+        <p>
+          Wir refaktorieren <code>App.tsx</code> grundlegend. Die gesamte Fetch-Logik wandert in
+          <code>useFlights</code>, die Filter-Logik in <code>useFlightFilters</code>.
+          Das Ergebnis: Eine sehr schlanke <code>App.tsx</code>, die nur noch die Hooks aufruft
+          und die Ergebnisse an Komponenten verteilt.
+        </p>
+
+        <h4>Schritt 1: useFlights.ts erstellen</h4>
+        <p>Siehe den vollst&auml;ndigen Code in Abschnitt 3 dieser Lektion. Die Datei geh&ouml;rt nach <code>src/hooks/useFlights.ts</code>.</p>
+
+        <h4>Schritt 2: useFlightFilters.ts erstellen</h4>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">src/hooks/useFlightFilters.ts</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">import { useMemo } from 'react';
+import { Flight, FlightStatus } from '../types/flight';
+import useLocalStorage from './useLocalStorage';
+
+interface UseFlightFiltersReturn {
+  searchQuery: string;
+  setSearchQuery: (q: string) =&gt; void;
+  statusFilter: FlightStatus | 'all';
+  setStatusFilter: (s: FlightStatus | 'all') =&gt; void;
+  typeFilter: 'all' | 'departure' | 'arrival';
+  setTypeFilter: (t: 'all' | 'departure' | 'arrival') =&gt; void;
+  filteredDepartures: Flight[];
+  filteredArrivals: Flight[];
+}
+
+/**
+ * Verwaltet alle Filter-Einstellungen f&uuml;r die Flugsuche.
+ * Filterzustand wird in localStorage persistiert.
+ *
+ * @param flights - Das ungefilterte Flug-Array
+ */
+const useFlightFilters = (flights: Flight[]): UseFlightFiltersReturn =&gt; {
+  // Filter-State mit localStorage-Persistenz
+  const [searchQuery, setSearchQuery] =
+    useLocalStorage&lt;string&gt;('fb-search', '');
+
+  const [statusFilter, setStatusFilter] =
+    useLocalStorage&lt;FlightStatus | 'all'&gt;('fb-status', 'all');
+
+  const [typeFilter, setTypeFilter] =
+    useLocalStorage&lt;'all' | 'departure' | 'arrival'&gt;('fb-type', 'all');
+
+  // useMemo: Gefilterte Listen nur neu berechnen, wenn sich
+  // flights oder Filter-Werte &auml;ndern
+  const filteredFlights = useMemo(() =&gt; {
+    return flights.filter(flight =&gt; {
+      const q = searchQuery.toLowerCase();
+      const matchesSearch =
+        !q ||
+        flight.flightNumber.toLowerCase().includes(q) ||
+        flight.airline.toLowerCase().includes(q) ||
+        flight.airport.toLowerCase().includes(q);
+
+      const matchesStatus =
+        statusFilter === 'all' || flight.status === statusFilter;
+
+      const matchesType =
+        typeFilter === 'all' || flight.type === typeFilter;
+
+      return matchesSearch &amp;&amp; matchesStatus &amp;&amp; matchesType;
+    });
+  }, [flights, searchQuery, statusFilter, typeFilter]);
+
+  const filteredDepartures = useMemo(
+    () =&gt; filteredFlights.filter(f =&gt; f.type === 'departure'),
+    [filteredFlights]
+  );
+
+  const filteredArrivals = useMemo(
+    () =&gt; filteredFlights.filter(f =&gt; f.type === 'arrival'),
+    [filteredFlights]
+  );
+
+  return {
+    searchQuery,    setSearchQuery,
+    statusFilter,   setStatusFilter,
+    typeFilter,     setTypeFilter,
+    filteredDepartures,
+    filteredArrivals,
+  };
+};
+
+export default useFlightFilters;</code></pre>
+        </div>
+
+        <h4>Schritt 3: App.tsx &ndash; Vorher / Nachher</h4>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">src/App.tsx (nach Refactoring)</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">import { useState } from 'react';
+import { Flight, FlightStatus } from './types/flight';
+import useFlights from './hooks/useFlights';
+import useFlightFilters from './hooks/useFlightFilters';
+import { useTheme } from './context/ThemeContext';
+
+import AirportHeader from './components/AirportHeader';
+import FlightBoard from './components/FlightBoard';
+import FlightDetail from './components/FlightDetail';
+import SearchBar from './components/SearchBar';
+import FilterBar from './components/FilterBar';
+
+// App.tsx ist jetzt deutlich &uuml;bersichtlicher:
+// Keine direkte useState/useEffect-Logik mehr f&uuml;r Daten &amp; Filter.
+function App() {
+  const { theme } = useTheme();
+
+  // Datenabruf-Logik komplett im Hook
+  const { flights, isLoading, error, refetch, lastUpdated } = useFlights();
+
+  // Filter-Logik komplett im Hook (inkl. localStorage-Persistenz)
+  const {
+    searchQuery, setSearchQuery,
+    statusFilter, setStatusFilter,
+    filteredDepartures, filteredArrivals,
+  } = useFlightFilters(flights);
+
+  // Nur App-spezifischer State bleibt hier
+  const [selectedFlight, setSelectedFlight] = useState&lt;Flight | null&gt;(null);
+
+  const handleStatusChange = (id: number, status: FlightStatus) =&gt; {
+    // Direkte Mutation nicht m&ouml;glich, da flights aus dem Hook kommt.
+    // In der Praxis: API-Call + refetch(). F&uuml;r lokale Demo: eigener State.
+    console.log(`Status &auml;ndern: Flug ${id} -&gt; ${status}`);
+    refetch();
+  };
+
+  if (error)     return &lt;div className="error"&gt;Fehler: {error}&lt;/div&gt;;
+
+  return (
+    &lt;div style={{ minHeight: '100vh', background: theme === 'dark' ? '#0d1117' : '#f6f8fa' }}&gt;
+      &lt;AirportHeader lastUpdated={lastUpdated} onRefresh={refetch} /&gt;
+      &lt;main style={{ padding: '1.5rem' }}&gt;
+        &lt;SearchBar value={searchQuery} onChange={setSearchQuery} /&gt;
+        &lt;FilterBar currentStatus={statusFilter} onStatusChange={setStatusFilter} /&gt;
+        {isLoading ? (
+          &lt;div className="board-loading"&gt;Fl&uuml;ge werden geladen...&lt;/div&gt;
+        ) : (
+          &lt;&gt;
+            &lt;FlightBoard
+              title="Abfl&uuml;ge"
+              flights={filteredDepartures}
+              onFlightSelect={setSelectedFlight}
+              selectedFlightId={selectedFlight?.id}
+            /&gt;
+            &lt;FlightBoard
+              title="Ank&uuml;nfte"
+              flights={filteredArrivals}
+              onFlightSelect={setSelectedFlight}
+              selectedFlightId={selectedFlight?.id}
+            /&gt;
+          &lt;/&gt;
+        )}
+        {selectedFlight &amp;&amp; (
+          &lt;FlightDetail
+            flight={selectedFlight}
+            onClose={() =&gt; setSelectedFlight(null)}
+          /&gt;
+        )}
+      &lt;/main&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- H&Auml;UFIGE FEHLER -->
+    <section class="section section-fehler">
+      <h2>H&auml;ufige Fehler</h2>
+
+      <div class="fehler-item">
+        <div class="fehler-title">Fehler: Hook ohne <code>use</code>-Prefix</div>
+        <p>
+          Eine Funktion wie <code>fetchFlights()</code> ruft <code>useState</code> intern auf.
+          React erkennt sie nicht als Hook und kann keine Verletzung der Hook-Regeln melden.
+          Das ESLint-Plugin springt ebenfalls nicht an. Fehler entstehen still.
+        </p>
+        <p class="fehler-fix">
+          Fix: Immer das <code>use</code>-Prefix verwenden: <code>useFetchFlights()</code>.
+          Das Prefix ist keine reine Konvention, sondern ein Signal an React und Linting-Tools.
+        </p>
+      </div>
+
+      <div class="fehler-item">
+        <div class="fehler-title">Fehler: Hook in Bedingung aufrufen</div>
+        <p>
+          <code>if (isAdmin) { const [data] = useState(null); }</code> bricht die Hook-Reihenfolge.
+          React nummeriert Hooks intern in der Reihenfolge, in der sie aufgerufen werden.
+          Wird ein Hook manchmal &uuml;bersprungen, verschieben sich alle nachfolgenden Nummern &ndash;
+          State wird falsch zugeordnet, Fehler sind schwer zu debuggen.
+        </p>
+        <p class="fehler-fix">
+          Fix: Hooks immer bedingungslos aufrufen. Die Bedingung in den Hook selbst verlagern:
+          <code>useEffect(() =&gt; { if (!isAdmin) return; ... }, [isAdmin]);</code>
+        </p>
+      </div>
+
+      <div class="fehler-item">
+        <div class="fehler-title">Fehler: Geteilter State aus Custom Hook erwartet</div>
+        <p>
+          Zwei Komponenten rufen beide <code>useFlights()</code> auf und erwarten, dass sie
+          die gleichen Daten teilen. Tats&auml;chlich haben sie <em>separate State-Instanzen</em>.
+          Jede Komponente l&auml;dt die Daten unabh&auml;ngig vom Backend.
+        </p>
+        <p class="fehler-fix">
+          Fix: F&uuml;r geteilten State den Context API verwenden (Lektion 2.4) oder den Hook nur
+          in der gemeinsamen Elternkomponente aufrufen und die Daten als Props weitergeben.
+        </p>
+      </div>
+
+      <div class="fehler-item">
+        <div class="fehler-title">Fehler: Zu komplexe Hooks ohne klare Verantwortung</div>
+        <p>
+          Ein <code>useApp()</code>-Hook verwaltet Flights, Filter, Theme, Navigation und
+          Nutzereinstellungen in einer Funktion. Der Hook wird unlesbar und schwer zu testen.
+          Jede &Auml;nderung riskiert unbeabsichtigte Nebenwirkungen.
+        </p>
+        <p class="fehler-fix">
+          Fix: Jeder Hook sollte <em>eine</em> klar abgegrenzte Aufgabe haben. Lieber drei
+          kleine Hooks (<code>useFlights</code>, <code>useFilters</code>, <code>useTheme</code>)
+          als ein gro&szlig;er. Das Single-Responsibility-Prinzip gilt auch f&uuml;r Hooks.
+        </p>
+      </div>
+    </section>
+
+    <!-- AUFGABEN -->
+    <section class="section section-aufgaben">
+      <h2>Aufgaben</h2>
+
+      <div class="aufgabe">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">Aufgabe 1</span>
+          <span class="aufgabe-title">useFlights implementieren</span>
+        </div>
+        <p>
+          Extrahiere die gesamte Fetch-Logik aus <code>App.tsx</code> in einen Custom Hook.
+        </p>
+        <ul>
+          <li>Erstelle <code>src/hooks/useFlights.ts</code> wie im Theorieteil gezeigt</li>
+          <li>
+            Der Hook soll zur&uuml;ckgeben:
+            <code>flights</code>, <code>isLoading</code>, <code>error</code>,
+            <code>refetch()</code>, <code>lastUpdated</code>
+          </li>
+          <li>Verwende einen <code>AbortController</code> im Cleanup, um laufende Requests abzubrechen</li>
+          <li>Implementiere automatisches Polling alle 30 Sekunden mit <code>setInterval</code></li>
+          <li>
+            Z&auml;hle die Zeilen von <code>App.tsx</code> vorher und nachher &ndash;
+            die Reduktion sollte sp&uuml;rbar sein
+          </li>
+        </ul>
+      </div>
+
+      <div class="aufgabe">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">Aufgabe 2</span>
+          <span class="aufgabe-title">useFlightFilters mit localStorage-Persistenz</span>
+        </div>
+        <p>
+          Extrahiere die Filter-Logik in einen eigenen Hook und persistiere die Einstellungen.
+        </p>
+        <ul>
+          <li>Erstelle <code>src/hooks/useLocalStorage.ts</code> (generischer Hook)</li>
+          <li>Erstelle <code>src/hooks/useFlightFilters.ts</code>, der <code>useLocalStorage</code> nutzt</li>
+          <li>
+            Der Filter-State (searchQuery, statusFilter, typeFilter) soll im localStorage gespeichert
+            werden &ndash; beim Neuladen der Seite sind die letzten Einstellungen noch aktiv
+          </li>
+          <li>
+            Berechne <code>filteredDepartures</code> und <code>filteredArrivals</code> mit
+            <code>useMemo</code> im Hook
+          </li>
+        </ul>
+      </div>
+
+      <div class="aufgabe">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">Aufgabe 3</span>
+          <span class="aufgabe-title">useDebounce-Hook</span>
+        </div>
+        <p>
+          Implementiere einen <code>useDebounce</code>-Hook, der eine Suchanfrage erst nach einer
+          kurzen Pause weitergibt. So werden bei schnellem Tippen keine unn&ouml;tigen API-Anfragen
+          ausgel&ouml;st.
+        </p>
+        <ul>
+          <li>
+            Signatur: <code>useDebounce&lt;T&gt;(value: T, delay: number): T</code>
+          </li>
+          <li>
+            Implementierung: <code>useEffect</code> mit <code>setTimeout</code> und Cleanup per
+            <code>clearTimeout</code>
+          </li>
+          <li>
+            Verwende ihn in <code>SearchBar</code>:
+            <code>const debouncedQuery = useDebounce(inputValue, 300)</code> &ndash;
+            <code>debouncedQuery</code> wird erst 300ms nach dem letzten Tastendruck aktualisiert
+          </li>
+          <li>
+            Teste: Tippe schnell &bdquo;LH7&ldquo; &ndash; es sollte nur eine Filter-Berechnung ausgel&ouml;st werden, nicht drei
+          </li>
+        </ul>
+      </div>
+
+      <div class="aufgabe aufgabe-bonus">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">Bonus</span>
+          <span class="aufgabe-title">usePreviousValue-Hook mit useRef</span>
+        </div>
+        <p>
+          Implementiere <code>usePreviousValue&lt;T&gt;(value: T): T | undefined</code>, der den
+          vorherigen Wert einer Variable zur&uuml;ckgibt.
+        </p>
+        <ul>
+          <li>
+            Verwende <code>useRef</code>: Ein Ref-Objekt beh&auml;lt seinen Wert zwischen Renders,
+            l&ouml;st aber kein Re-Render aus. Perfekt f&uuml;r &bdquo;Ged&auml;chtnis&ldquo;-Logik.
+          </li>
+          <li>
+            Schema: <code>const ref = useRef&lt;T&gt;(undefined); useEffect(() =&gt; { ref.current = value; });</code>
+            Der Effekt ohne Abh&auml;ngigkeiten l&auml;uft <em>nach</em> jedem Render &ndash;
+            daher ist <code>ref.current</code> w&auml;hrend des Renders noch der <em>alte</em> Wert.
+          </li>
+          <li>
+            Nutze den Hook in <code>FlightBoard</code>: Vergleiche die aktuelle Fluganzahl mit
+            der vorherigen und zeige einen Pfeil nach oben (&#8593;) oder unten (&#8595;) an
+          </li>
+        </ul>
+      </div>
+    </section>
+
+  </div><!-- /.content-area -->
+
+        <nav class="lesson-nav">
+    <a class="nav-btn" href="2.4-context.html">&larr; Lektion 2.4: Context API</a>
+    <span class="nav-center-info">Lektion 2.5</span>
+    <a class="nav-btn primary" href="2.6-testen-vitest-rtl.html">Lektion 2.6: Testen mit Vitest + RTL &rarr;</a>
+  </nav>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+<script>
+  // Hamburger menu
+  const ham = document.getElementById('hamburger');
+  const sb  = document.getElementById('sidebar');
+  const ov  = document.getElementById('overlay');
+  ham.addEventListener('click', () => { sb.classList.toggle('open'); ov.classList.toggle('visible'); });
+  ov.addEventListener('click',  () => { sb.classList.remove('open'); ov.classList.remove('visible'); });
+  // Active nav link
+  const cur = window.location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.nav-link').forEach(l => {
+    if (l.getAttribute('href') === cur) l.classList.add('active');
+  });
+  // Theme toggle — einfach & robust (kein CSS-Swap nötig)
+  const themeBtn = document.getElementById('theme-toggle');
+  const applyTheme = (t) => {
+    document.documentElement.setAttribute('data-theme', t);
+    if (themeBtn) themeBtn.innerHTML = t === 'dark' ? '&#9728;' : '&#9790;';
+  };
+  // Theme aus localStorage laden (alle Seiten teilen denselben Key)
+  applyTheme(localStorage.getItem('kurs-theme') || 'dark');
+  // Transitions erst nach dem initialen Render aktivieren (verhindert Flash)
+  setTimeout(() => document.documentElement.classList.add('theme-transitions'), 50);
+  if (themeBtn) themeBtn.addEventListener('click', () => {
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('kurs-theme', next);
+    applyTheme(next);
+  });
+  hljs.highlightAll();
+</script>
+</body>
+</html>

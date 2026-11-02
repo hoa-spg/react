@@ -1,0 +1,59 @@
+.flight-detail-overlay {
+  align-items: center;
+  background: rgb(0 0 0 / 60%);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  position: fixed;
+  z-index: 100;
+}
+
+.flight-detail-panel {
+  background: #1c2128;
+  border: 1px solid #30363d;
+  border-radius: 12px;
+  max-width: 460px;
+  min-width: 320px;
+  padding: 1.5rem 2rem;
+  position: relative;
+  width: 100%;
+}
+
+.flight-detail-close-btn {
+  background: #21262d;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #e6edf3;
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 4px 10px;
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+}
+
+.flight-detail-number {
+  color: #61dafb;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.flight-detail-row {
+  border-bottom: 1px solid #30363d;
+  display: flex;
+  justify-content: space-between;
+  padding: 0.4rem 0;
+}
+
+.flight-detail-label {
+  color: #8b949e;
+}
+
+.flight-detail-value {
+  color: #e6edf3;
+}
+
+.flight-detail-time-delayed {
+  color: #d29922;
+}

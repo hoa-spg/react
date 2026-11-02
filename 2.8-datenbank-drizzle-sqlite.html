@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2.8 &ndash; Datenbankzugriff mit Drizzle + SQLite | React Kurs</title>
+  <script>(function(){var t=localStorage.getItem('kurs-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
+  <link rel="stylesheet" href="assets/kurs.css">
+  <link rel="stylesheet" id="hljs-theme" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+<body>
+
+<button class="hamburger" id="hamburger" aria-label="Navigation &ouml;ffnen">&#9776;</button>
+<div class="sidebar-overlay" id="overlay"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html">
+      <span class="brand-icon">&#9992;</span>
+      <div>
+        <div class="brand-name">React Kurs</div>
+        <div class="brand-sub">Web &amp; Mobile</div>
+      </div>
+    </a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Dark/Light Mode" title="Theme wechseln">&#9728;</button>
+  </div>
+      <nav class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-label react-label">Teil 1 &mdash; React Einführung</div>
+      <a class="nav-link" href="1.1-einfuehrung-spa.html"><span class="ln">1.1</span>Motivation &amp; SPA</a>
+      <a class="nav-link" href="1.2-einfuehrung.html"><span class="ln">1.2</span>Einführung &amp; Umgebung</a>
+      <a class="nav-link" href="1.3-komponenten-props-einfach.html"><span class="ln">1.3</span>Komponenten &amp; Props (einfach)</a>
+      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten &amp; Props (Vertiefung)</a>
+      <a class="nav-link" href="1.5-state-events.html"><span class="ln">1.5</span>State &amp; Events</a>
+      <a class="nav-link" href="1.6-listen-conditional.html"><span class="ln">1.6</span>Listen &amp; Conditional Rendering</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label react-label">Teil 2 &mdash; React Praxis</div>
+      <a class="nav-link" href="2.1-formulare.html"><span class="ln">2.1</span>Formulare &amp; Inputs</a>
+      <a class="nav-link" href="2.2-useeffect-api.html"><span class="ln">2.2</span>useEffect &amp; API</a>
+      <a class="nav-link" href="2.3-kommunikation.html"><span class="ln">2.3</span>Komponentenkommunikation</a>
+      <a class="nav-link" href="2.4-context.html"><span class="ln">2.4</span>Context API</a>
+      <a class="nav-link" href="2.5-custom-hooks.html"><span class="ln">2.5</span>Custom Hooks</a>
+      <a class="nav-link" href="2.6-testen-vitest-rtl.html"><span class="ln">2.6</span>Testen mit Vitest + RTL</a>
+      <a class="nav-link" href="2.7-react-router.html"><span class="ln">2.7</span>React Router</a>
+      <a class="nav-link" href="2.8-datenbank-drizzle-sqlite.html"><span class="ln">2.8</span>Datenbankzugriff mit Drizzle + SQLite</a>
+      <a class="nav-link" href="2.9-redux-state-management.html"><span class="ln">2.9</span>State Management mit Redux (Überblick)</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label next-label">Teil 3 &mdash; Next.js</div>
+      <a class="nav-link" href="3.1-nextjs-einfuehrung.html"><span class="ln">3.1</span>Einführung Next.js</a>
+      <a class="nav-link" href="3.2-nextjs-routing.html"><span class="ln">3.2</span>Routing &amp; Layouts</a>
+      <a class="nav-link" href="3.3-server-client.html"><span class="ln">3.3</span>Server &amp; Client Components</a>
+      <a class="nav-link" href="3.4-api-routes.html"><span class="ln">3.4</span>API Routes &amp; Datenabruf</a>
+      <a class="nav-link" href="3.5-playwright-e2e.html"><span class="ln">3.5</span>Playwright E2E</a>
+      <a class="nav-link" href="3.6-deployment.html"><span class="ln">3.6</span>Deployment</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label rn-label">Teil 4 &mdash; React Native</div>
+      <a class="nav-link" href="4.1-rn-einfuehrung.html"><span class="ln">4.1</span>Einführung React Native</a>
+      <a class="nav-link" href="4.2-rn-komponenten.html"><span class="ln">4.2</span>Native Komponenten &amp; Styling</a>
+      <a class="nav-link" href="4.3-rn-navigation.html"><span class="ln">4.3</span>Navigation &amp; State</a>
+    </div>
+  </nav>
+</aside>
+
+<main class="main-content">
+  <header class="lesson-header">
+    <p class="lesson-eyebrow">Lektion 2.8 &mdash; Teil 2: React Praxis</p>
+    <h1>Datenbankzugriff mit Drizzle + SQLite</h1>
+    <div class="lesson-tags">
+      <span class="tag tag-react">Backend</span>
+      <span class="tag tag-time">ca. 90 min</span>
+    </div>
+  </header>
+
+  <div class="content-area">
+    <section class="section section-lernziele">
+      <h2>Lernziele</h2>
+      <ul class="lernziele-list">
+        <li>Verstehen, warum In-Memory-Daten f&uuml;r echte Apps nicht ausreichen</li>
+        <li>Ein Deno+Hono-Backend auf Drizzle ORM und SQLite umstellen</li>
+        <li>Seed-Daten einmalig in die Datenbank schreiben</li>
+        <li>GET/POST/DELETE-Endpunkte gegen die Datenbank ausf&uuml;hren</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>Warum jetzt eine Datenbank?</h2>
+      <p>
+        Bis Lektion 2.7 haben wir die Flugdaten im RAM gehalten. Das ist f&uuml;r den Einstieg perfekt,
+        aber nach jedem Server-Neustart sind alle &Auml;nderungen weg. In dieser Lektion wechseln wir
+        auf eine echte Persistenzschicht mit <strong>SQLite</strong> und <strong>Drizzle</strong>.
+      </p>
+      <div class="callout callout-info">
+        <div class="callout-icon">&#8505;</div>
+        <div class="callout-body">
+          <div class="callout-title">Didaktischer Fokus</div>
+          <p>
+            Wir behalten die API-Struktur aus den vorherigen Lektionen bei. Nur die Datenquelle
+            &auml;ndert sich von Array-Operationen auf SQL-Operationen.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Drizzle + SQLite im Deno-Backend</h2>
+      <p>
+        Das Beispielprojekt liegt unter <code>beispiele/2.8</code>. Der Backend-Teil nutzt
+        Drizzle mit einer lokalen SQLite-Datei <code>flugboard.db</code>.
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">backend/db.ts (Auszug)</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import { createClient } from 'npm:@libsql/client';
+import { drizzle } from 'npm:drizzle-orm/libsql';
+import { sqliteTable, integer, text } from 'npm:drizzle-orm/sqlite-core';
+
+const client = createClient({ url: 'file:./flugboard.db' });
+const db = drizzle(client);
+
+export const flightsTable = sqliteTable('flights', {
+  id: integer('id').primaryKey(),
+  flightNumber: text('flight_number').notNull(),
+  airline: text('airline').notNull(),
+  type: text('type').notNull(),
+  scheduledTime: text('scheduled_time').notNull(),
+  expectedTime: text('expected_time'),
+  status: text('status').notNull(),
+  airport: text('airport').notNull(),
+  terminal: text('terminal').notNull(),
+  gate: text('gate'),
+});</code></pre>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Initialisierung und Seed</h2>
+      <p>
+        Beim Start wird die Tabelle erzeugt (falls sie noch nicht existiert). Wenn die Tabelle leer ist,
+        werden die Seed-Fl&uuml;ge eingef&uuml;gt.
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">backend/db.ts &ndash; initializeDatabase</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">export const initializeDatabase = async () => {
+  await client.execute(`
+    CREATE TABLE IF NOT EXISTS flights (
+      id INTEGER PRIMARY KEY,
+      flight_number TEXT NOT NULL,
+      airline TEXT NOT NULL,
+      type TEXT NOT NULL,
+      scheduled_time TEXT NOT NULL,
+      expected_time TEXT,
+      status TEXT NOT NULL,
+      airport TEXT NOT NULL,
+      terminal TEXT NOT NULL,
+      gate TEXT
+    )
+  `);
+
+  const countResult = await client.execute('SELECT COUNT(*) as count FROM flights');
+  const count = Number(countResult.rows[0]?.count ?? 0);
+  if (count === 0) {
+    // seedFlights in DB schreiben
+  }
+};</code></pre>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Routen bleiben gleich</h2>
+      <p>
+        Die API-Endpunkte bleiben identisch. Dadurch muss das React-Frontend nicht umgebaut werden.
+        Die in 2.7 eingeführte Router-Struktur bleibt ebenfalls: separate Seiten für Abflüge und
+        Ankünfte, mit Suche + Statusfilter (kein zusätzlicher Typ-Filter).
+      </p>
+      <ul>
+        <li><code>GET /api/flights</code> mit optionalen Query-Parametern</li>
+        <li><code>GET /api/flights/:id</code></li>
+        <li><code>POST /api/flights</code></li>
+        <li><code>DELETE /api/flights/:id</code></li>
+      </ul>
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#10003;</div>
+        <div class="callout-body">
+          <div class="callout-title">Wichtiger Architekturpunkt</div>
+          <p>
+            Erst die API stabilisieren, dann die Datenquelle austauschen. So bleibt die Frontend-
+            Integration robust und testbar.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-projekt">
+      <h2>Projektschritt 2.8</h2>
+      <div class="projekt-box">
+        <div class="projekt-box-header">
+          <span class="projekt-step">Persistenz aktivieren</span>
+          <h3>FlugBoard auf Drizzle + SQLite umstellen</h3>
+        </div>
+        <ol>
+          <li>Starte das Backend: <code>cd beispiele/2.8/backend &amp;&amp; deno task dev</code></li>
+          <li>Teste die API: <code>http://localhost:8000/api/flights</code></li>
+          <li>Lege einen neuen Flug per POST an und starte den Server neu</li>
+          <li>Pr&uuml;fe: der neue Flug bleibt in der Liste erhalten</li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section section-fehler">
+      <h2>H&auml;ufige Fehler</h2>
+      <div class="fehler-item">
+        <h3>Keine Schreibrechte auf DB-Datei</h3>
+        <p class="fehler-fix">
+          Starte Deno mit <code>--allow-read --allow-write</code>. In dieser Lektion sind die Rechte
+          bereits in <code>backend/deno.json</code> eingetragen.
+        </p>
+      </div>
+      <div class="fehler-item">
+        <h3>Tabelle wird immer wieder neu angelegt</h3>
+        <p class="fehler-fix">
+          Achte auf den konstanten DB-Pfad <code>file:./flugboard.db</code> im Backend-Ordner.
+        </p>
+      </div>
+    </section>
+
+    <section class="section section-aufgaben">
+      <h2>Aufgaben</h2>
+      <div class="aufgabe">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">1</span>
+          <span class="aufgabe-title">Filter mit SQL testen</span>
+        </div>
+        <p>Teste <code>?type=departure</code> und <code>?status=delayed</code> gegen die DB.</p>
+      </div>
+      <div class="aufgabe">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">2</span>
+          <span class="aufgabe-title">Neuen Flug speichern</span>
+        </div>
+        <p>Lege einen Flug an und verifiziere, dass er nach Neustart weiterhin existiert.</p>
+      </div>
+      <div class="aufgabe aufgabe-bonus">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">★</span>
+          <span class="aufgabe-title">PATCH-Endpunkt bauen</span>
+        </div>
+        <p>Erweitere das Backend um <code>PATCH /api/flights/:id</code> f&uuml;r Status-&Auml;nderungen.</p>
+      </div>
+    </section>
+  </div><!-- /content-area -->
+
+      <nav class="lesson-nav">
+    <a class="nav-btn" href="2.7-react-router.html">&larr; Lektion 2.7: React Router</a>
+    <span class="nav-center-info">Lektion 2.8</span>
+    <a class="nav-btn primary" href="2.9-redux-state-management.html">Lektion 2.9: State Management mit Redux (Überblick) &rarr;</a>
+  </nav>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+<script>
+  const ham = document.getElementById('hamburger');
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('overlay');
+  ham.addEventListener('click', () => {
+    sb.classList.toggle('open');
+    ov.classList.toggle('visible');
+  });
+  ov.addEventListener('click', () => {
+    sb.classList.remove('open');
+    ov.classList.remove('visible');
+  });
+
+  const cur = window.location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.nav-link').forEach((l) => {
+    if (l.getAttribute('href') === cur) l.classList.add('active');
+  });
+
+  const root = document.documentElement;
+  const btn = document.getElementById('theme-toggle');
+  const icon = { dark: '&#9728;', light: '&#9790;' };
+  const apply = (mode) => {
+    root.setAttribute('data-theme', mode);
+    localStorage.setItem('kurs-theme', mode);
+    btn.innerHTML = icon[mode] || icon.dark;
+  };
+  const initial = localStorage.getItem('kurs-theme') || 'dark';
+  apply(initial);
+  btn.addEventListener('click', () => {
+    const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    apply(next);
+  });
+
+  hljs.highlightAll();
+</script>
+</body>
+</html>

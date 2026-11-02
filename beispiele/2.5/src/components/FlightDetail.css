@@ -1,0 +1,59 @@
+.detail-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(0 0 0 / 60%);
+}
+
+.detail-panel {
+  position: relative;
+  width: 100%;
+  min-width: 320px;
+  max-width: 460px;
+  padding: 1.5rem 2rem;
+  border: 1px solid var(--app-border);
+  border-radius: 12px;
+  background: var(--app-card-bg);
+}
+
+.detail-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 4px 10px;
+  border: 1px solid var(--app-border);
+  border-radius: 6px;
+  background: var(--app-sidebar-bg);
+  color: var(--app-text);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.detail-number {
+  margin-bottom: 1rem;
+  color: var(--app-accent);
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.detail-label {
+  color: var(--app-muted);
+}
+
+.detail-value {
+  color: var(--app-text);
+}
+
+.detail-value--warning {
+  color: #d29922;
+}

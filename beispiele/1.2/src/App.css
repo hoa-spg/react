@@ -1,0 +1,76 @@
+.app-page {
+  background: #0d1117;
+  color: #e6edf3;
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.app-heading {
+  color: #61dafb;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.app-subheading {
+  color: #8b949e;
+  font-size: 1rem;
+  margin-bottom: 2rem;
+}
+
+.section-heading {
+  color: #e6edf3;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.flight-table {
+  background: #1c2128;
+  border-collapse: collapse;
+  border-radius: 8px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.flight-table th {
+  background: #161b22;
+  border-bottom: 1px solid #30363d;
+  color: #8b949e;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 0.6rem 1rem;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.flight-table td {
+  border-bottom: 1px solid #30363d;
+  color: #e6edf3;
+  padding: 0.7rem 1rem;
+}
+
+.status-badge {
+  border-radius: 4px;
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+
+.status-boarding {
+  background: #0a2a3a;
+  color: #61dafb;
+}
+
+.status-delayed {
+  background: #3a2a0a;
+  color: #d29922;
+}
+
+.status-on-time {
+  background: #1a3a1a;
+  color: #3fb950;
+}

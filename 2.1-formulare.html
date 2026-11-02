@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2.2 &ndash; Formulare &amp; Inputs | React Kurs</title>
+  <script>(function(){var t=localStorage.getItem('kurs-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
+  <link rel="stylesheet" href="assets/kurs.css">
+  <link rel="stylesheet" id="hljs-theme" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+<body>
+
+<button class="hamburger" id="hamburger" aria-label="Navigation &ouml;ffnen">&#9776;</button>
+<div class="sidebar-overlay" id="overlay"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html">
+      <span class="brand-icon">&#9992;</span>
+      <div>
+        <div class="brand-name">React Kurs</div>
+        <div class="brand-sub">Web &amp; Mobile</div>
+      </div>
+    </a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Dark/Light Mode" title="Theme wechseln">&#9728;</button>
+  </div>
+        <nav class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-label react-label">Teil 1 &mdash; React Einführung</div>
+      <a class="nav-link" href="1.1-einfuehrung-spa.html"><span class="ln">1.1</span>Motivation &amp; SPA</a>
+      <a class="nav-link" href="1.2-einfuehrung.html"><span class="ln">1.2</span>Einführung &amp; Umgebung</a>
+      <a class="nav-link" href="1.3-komponenten-props-einfach.html"><span class="ln">1.3</span>Komponenten &amp; Props (einfach)</a>
+      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten &amp; Props (Vertiefung)</a>
+      <a class="nav-link" href="1.5-state-events.html"><span class="ln">1.5</span>State &amp; Events</a>
+      <a class="nav-link" href="1.6-listen-conditional.html"><span class="ln">1.6</span>Listen &amp; Conditional Rendering</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label react-label">Teil 2 &mdash; React Praxis</div>
+      <a class="nav-link" href="2.1-formulare.html"><span class="ln">2.1</span>Formulare &amp; Inputs</a>
+      <a class="nav-link" href="2.2-useeffect-api.html"><span class="ln">2.2</span>useEffect &amp; API</a>
+      <a class="nav-link" href="2.3-kommunikation.html"><span class="ln">2.3</span>Komponentenkommunikation</a>
+      <a class="nav-link" href="2.4-context.html"><span class="ln">2.4</span>Context API</a>
+      <a class="nav-link" href="2.5-custom-hooks.html"><span class="ln">2.5</span>Custom Hooks</a>
+      <a class="nav-link" href="2.6-testen-vitest-rtl.html"><span class="ln">2.6</span>Testen mit Vitest + RTL</a>
+      <a class="nav-link" href="2.7-react-router.html"><span class="ln">2.7</span>React Router</a>
+      <a class="nav-link" href="2.8-datenbank-drizzle-sqlite.html"><span class="ln">2.8</span>Datenbankzugriff mit Drizzle + SQLite</a>
+      <a class="nav-link" href="2.9-redux-state-management.html"><span class="ln">2.9</span>State Management mit Redux (Überblick)</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label next-label">Teil 3 &mdash; Next.js</div>
+      <a class="nav-link" href="3.1-nextjs-einfuehrung.html"><span class="ln">3.1</span>Einführung Next.js</a>
+      <a class="nav-link" href="3.2-nextjs-routing.html"><span class="ln">3.2</span>Routing &amp; Layouts</a>
+      <a class="nav-link" href="3.3-server-client.html"><span class="ln">3.3</span>Server &amp; Client Components</a>
+      <a class="nav-link" href="3.4-api-routes.html"><span class="ln">3.4</span>API Routes &amp; Datenabruf</a>
+      <a class="nav-link" href="3.5-playwright-e2e.html"><span class="ln">3.5</span>Playwright E2E</a>
+      <a class="nav-link" href="3.6-deployment.html"><span class="ln">3.6</span>Deployment</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label rn-label">Teil 4 &mdash; React Native</div>
+      <a class="nav-link" href="4.1-rn-einfuehrung.html"><span class="ln">4.1</span>Einführung React Native</a>
+      <a class="nav-link" href="4.2-rn-komponenten.html"><span class="ln">4.2</span>Native Komponenten &amp; Styling</a>
+      <a class="nav-link" href="4.3-rn-navigation.html"><span class="ln">4.3</span>Navigation &amp; State</a>
+    </div>
+  </nav>
+</aside>
+
+<main class="main-content">
+  <header class="lesson-header">
+    <p class="lesson-eyebrow">Lektion 2.1 &mdash; Teil 2: React Praxis</p>
+    <h1>Formulare &amp; Inputs</h1>
+    <div class="lesson-tags">
+      <span class="tag tag-react">React</span>
+      <span class="tag tag-time">ca. 90 min</span>
+    </div>
+  </header>
+
+  <div class="content-area">
+
+    <section class="section section-lernziele">
+      <h2>Lernziele</h2>
+      <ul class="lernziele-list">
+        <li>Controlled Components vs. Uncontrolled Components verstehen</li>
+        <li>Texteingaben mit <code>useState</code> verwalten</li>
+        <li><code>onChange</code> und <code>onSubmit</code> Events korrekt typisieren</li>
+        <li>Selects, Checkboxen und Radio-Buttons in React</li>
+        <li>Einfache Formularvalidierung implementieren</li>
+        <li>Neuen Flug per Formular hinzuf&uuml;gen</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>Controlled vs. Uncontrolled Components</h2>
+      <p>
+        In React gibt es zwei Paradigmen f&uuml;r Formulareingaben: <strong>Controlled Components</strong> werden
+        durch React-State gesteuert &ndash; React ist der einzige Wahrheitsspeicher (<em>Single Source of Truth</em>).
+        <strong>Uncontrolled Components</strong> verwalten ihren eigenen Wert im DOM; React greift nur bei
+        Bedarf per Ref darauf zu.
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Controlled vs. Uncontrolled</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import { useState, useRef } from 'react';
+
+// --- CONTROLLED (empfohlen f&uuml;r die meisten F&auml;lle) ---
+// React steuert den Wert &uuml;ber State. Jede &Auml;nderung l&auml;uft &uuml;ber den State-Setter.
+const ControlledBeispiel = () => {
+  const [suchtext, setSuchtext] = useState('');
+
+  return (
+    &lt;input
+      type="text"
+      value={suchtext}           // Wert aus State
+      onChange={e =&gt; setSuchtext(e.target.value)}  // State bei &Auml;nderung aktualisieren
+      placeholder="Flugnummer suchen..."
+    /&gt;
+  );
+};
+
+// --- UNCONTROLLED (f&uuml;r spezielle F&auml;lle, z.B. Datei-Uploads) ---
+// Das DOM verwaltet den Wert. React liest ihn nur bei Bedarf via Ref.
+const UncontrolledBeispiel = () => {
+  const inputRef = useRef&lt;HTMLInputElement&gt;(null);
+
+  const handleSubmit = () => {
+    // Wert aus dem DOM lesen
+    const wert = inputRef.current?.value;
+    console.log('Eingegebener Wert:', wert);
+  };
+
+  return (
+    &lt;&gt;
+      &lt;input ref={inputRef} type="text" defaultValue="Startwert" /&gt;
+      &lt;button onClick={handleSubmit}&gt;Lesen&lt;/button&gt;
+    &lt;/&gt;
+  );
+};</code></pre>
+      </div>
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#10003;</div>
+        <div class="callout-body">
+          <div class="callout-title">Wann Controlled, wann Uncontrolled?</div>
+          <p>
+            F&uuml;r fast alle Formulare: <strong>Controlled</strong>. Du hast jederzeit Zugriff auf den
+            aktuellen Wert, kannst ihn validieren, transformieren (z.B. Gro&szlig;buchstaben erzwingen) und
+            programmatisch setzen. Uncontrolled ist haupts&auml;chlich f&uuml;r <code>&lt;input type="file"&gt;</code>
+            n&ouml;tig, da Datei-Inputs aus Sicherheitsgr&uuml;nden nicht per JavaScript gesteuert werden k&ouml;nnen.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>TypeScript Event-Typen</h2>
+      <p>
+        Jedes HTML-Eingabeelement hat seinen eigenen Event-Typ in React. Das generische <code>HTMLElement</code>
+        funktioniert nicht, weil z.B. <code>e.target.value</code> nur bei <code>HTMLInputElement</code> und
+        <code>HTMLSelectElement</code> existiert. Die korrekten Typen zu kennen vermeidet TypeScript-Fehler.
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Event-Typen in TypeScript</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import { FlightType, FlightStatus } from '../types/flight';
+
+// Text-Input: React.ChangeEvent&lt;HTMLInputElement&gt;
+const handleTextChange = (e: React.ChangeEvent&lt;HTMLInputElement&gt;) => {
+  const wert: string = e.target.value;
+  setSuchtext(wert);
+};
+
+// Select-Element: React.ChangeEvent&lt;HTMLSelectElement&gt;
+// ACHTUNG: e.target.value ist immer string &rarr; Type Assertion n&ouml;tig!
+const handleTypeChange = (e: React.ChangeEvent&lt;HTMLSelectElement&gt;) => {
+  const typ = e.target.value as FlightType;  // Type Assertion
+  setFlightType(typ);
+};
+
+// Checkbox: e.target.checked (kein .value!)
+const handleCheckboxChange = (e: React.ChangeEvent&lt;HTMLInputElement&gt;) => {
+  const checked: boolean = e.target.checked;
+  setNurPuenktlich(checked);
+};
+
+// Formular-Submit: React.FormEvent&lt;HTMLFormElement&gt;
+const handleSubmit = (e: React.FormEvent&lt;HTMLFormElement&gt;) => {
+  e.preventDefault();  // Verhindert den Standard-Seiten-Reload!
+  // Formulardaten verarbeiten...
+};
+
+// Textarea: ebenfalls React.ChangeEvent&lt;HTMLTextAreaElement&gt;
+const handleTextareaChange = (e: React.ChangeEvent&lt;HTMLTextAreaElement&gt;) => {
+  setNotiz(e.target.value);
+};</code></pre>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Suchfeld f&uuml;r das FlugBoard</h2>
+      <p>
+        Eine Suchleiste ist eines der h&auml;ufigsten UI-Patterns. Wir erstellen eine wiederverwendbare
+        <code>SearchBar</code>-Komponente als Controlled Component. Die eigentliche Filter-Logik liegt
+        in <code>App.tsx</code> (Lifting State Up).
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">src/components/SearchBar.tsx</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">interface SearchBarProps {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+}
+
+/**
+ * Wiederverwendbares Suchfeld.
+ * Der Elternteil kontrolliert den Wert &uuml;ber den onChange-Callback.
+ */
+const SearchBar = ({
+  value,
+  onChange,
+  placeholder = 'Flugnummer oder Ziel suchen...',
+}: SearchBarProps) => {
+  return (
+    &lt;div className="search-bar"&gt;
+      {/* Such-Icon als dekoratives Element */}
+      &lt;span className="search-icon"&gt;
+        &#128269;
+      &lt;/span&gt;
+      &lt;input
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="search-input"
+      /&gt;
+      {/* L&ouml;schen-Button nur anzeigen wenn Eingabe vorhanden */}
+      {value &amp;&amp; (
+        &lt;button
+          onClick={() => onChange('')}
+          className="search-clear-btn"
+        &gt;
+          &times;
+        &lt;/button&gt;
+      )}
+    &lt;/div&gt;
+  );
+};
+
+export default SearchBar;</code></pre>
+      </div>
+      <p>In <code>App.tsx</code> wird der Suchtext verwendet um die Flugdaten zu filtern:</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Suchfilter in App.tsx</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">const [searchQuery, setSearchQuery] = useState('');
+
+// Case-insensitive Suche in Flugnummer UND Flughafen
+const filteredFlights = sampleFlights.filter(f => {
+  const query = searchQuery.toLowerCase();
+  return (
+    f.flightNumber.toLowerCase().includes(query) ||
+    f.airport.toLowerCase().includes(query) ||
+    f.airline.toLowerCase().includes(query)
+  );
+});
+
+// Im JSX:
+&lt;SearchBar value={searchQuery} onChange={setSearchQuery} /&gt;
+&lt;FlightBoard flights={filteredFlights.filter(f =&gt; f.type === 'departure')} title="Abfl&uuml;ge" /&gt;</code></pre>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Filter-Bar mit Select-Elementen</h2>
+      <p>
+        Select-Elemente (<code>&lt;select&gt;</code>) funktionieren in React genau wie Inputs: wir binden
+        <code>value</code> an State und aktualisieren ihn per <code>onChange</code>. Da <code>e.target.value</code>
+        immer den Typ <code>string</code> hat, ist eine Type Assertion notwendig.
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">src/components/FilterBar.tsx</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import { FlightType, FlightStatus } from '../types/flight';
+
+type FilterType   = 'all' | FlightType;
+type StatusFilter = 'all' | FlightStatus;
+
+interface FilterBarProps {
+  typeFilter:     FilterType;
+  statusFilter:   StatusFilter;
+  onTypeChange:   (value: FilterType) => void;
+  onStatusChange: (value: StatusFilter) => void;
+}
+
+/**
+ * Filterleiste mit Typ- und Status-Filter.
+ */
+const FilterBar = ({
+  typeFilter,
+  statusFilter,
+  onTypeChange,
+  onStatusChange,
+}: FilterBarProps) => {
+  return (
+    &lt;div className="filter-bar"&gt;
+      &lt;span className="filter-label"&gt;
+        Filter:
+      &lt;/span&gt;
+
+      {/* Typ-Filter */}
+      &lt;select
+        value={typeFilter}
+        onChange={(e) =&gt; onTypeChange(e.target.value as FilterType)}
+        className="filter-select"
+      &gt;
+        &lt;option value="all"&gt;Alle Fl&uuml;ge&lt;/option&gt;
+        &lt;option value="departure"&gt;Nur Abfl&uuml;ge&lt;/option&gt;
+        &lt;option value="arrival"&gt;Nur Ank&uuml;nfte&lt;/option&gt;
+      &lt;/select&gt;
+
+      {/* Status-Filter */}
+      &lt;select
+        value={statusFilter}
+        onChange={(e) =&gt; onStatusChange(e.target.value as StatusFilter)}
+        className="filter-select"
+      &gt;
+        &lt;option value="all"&gt;Alle Flüge&lt;/option&gt;
+        &lt;option value="on-time"&gt;P&uuml;nktlich&lt;/option&gt;
+        &lt;option value="delayed"&gt;Versp&auml;tet&lt;/option&gt;
+        &lt;option value="boarding"&gt;Boarding&lt;/option&gt;
+        &lt;option value="departed"&gt;Abgeflogen&lt;/option&gt;
+        &lt;option value="landed"&gt;Gelandet&lt;/option&gt;
+        &lt;option value="cancelled"&gt;Annulliert&lt;/option&gt;
+      &lt;/select&gt;
+
+      {/* Aktive Filter anzeigen / zur&uuml;cksetzen */}
+      {(typeFilter !== 'all' || statusFilter !== 'all') &amp;&amp; (
+        &lt;button
+          onClick={() => { onTypeChange('all'); onStatusChange('all'); }}
+          style={{ ...selectStyle, background: 'transparent', color: '#f85149', border: '1px solid #f8514944' }}
+        &gt;
+          &times; Zur&uuml;cksetzen
+        &lt;/button&gt;
+      )}
+    &lt;/div&gt;
+  );
+};
+
+export default FilterBar;</code></pre>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Formular: Neuen Flug hinzuf&uuml;gen</h2>
+      <p>
+        Das Herzst&uuml;ck dieser Lektion: ein vollst&auml;ndiges Formular mit Validierung. Wir verwenden
+        separate <code>useState</code>-Aufrufe f&uuml;r jedes Feld &ndash; das ist bei vielen Feldern etwas
+        ausf&uuml;hrlich, aber sehr explizit und gut lesbar. Eine Alternative w&auml;re ein einzelner State
+        mit einem Objekt (beide Ans&auml;tze sind g&uuml;ltig).
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">src/components/AddFlightForm.tsx</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import { useState } from 'react';
+import { Flight, FlightType } from '../types/flight';
+
+interface AddFlightFormProps {
+  onAdd:    (flight: Flight) => void;
+  onCancel: () => void;
+}
+
+/**
+ * Formular zum Hinzuf&uuml;gen eines neuen Fluges.
+ * Pflichtfelder: Flugnummer, Airline, Zeit, Flughafen.
+ */
+const AddFlightForm = ({ onAdd, onCancel }: AddFlightFormProps) => {
+  // Ein State pro Formularfeld
+  const [flightNumber,   setFlightNumber]   = useState('');
+  const [airline,        setAirline]        = useState('');
+  const [type,           setType]           = useState&lt;FlightType&gt;('departure');
+  const [scheduledTime,  setScheduledTime]  = useState('');
+  const [airport,        setAirport]        = useState('');
+  const [terminal,       setTerminal]       = useState('T1');
+  const [gate,           setGate]           = useState('');
+  const [errors,         setErrors]         = useState&lt;Record&lt;string, string&gt;&gt;({});
+
+  const FLIGHT_NUMBER_PATTERN = /^[A-Z]{2}\d{3,4}$/;
+
+  // Validierungsfunktion &ndash; gibt Fehler-Objekt zur&uuml;ck
+  const validate = (): Record&lt;string, string&gt; =&gt; {
+    const errs: Record&lt;string, string&gt; = {};
+    const normalizedFlightNumber = flightNumber.trim().toUpperCase();
+    if (!normalizedFlightNumber) {
+      errs.flightNumber = 'Flugnummer ist erforderlich';
+    } else if (!FLIGHT_NUMBER_PATTERN.test(normalizedFlightNumber)) {
+      errs.flightNumber = 'Flugnummer muss genau 2 Buchstaben und 3 oder 4 Ziffern enthalten (z.B. OS123).';
+    }
+    if (!airline.trim())       errs.airline       = 'Airline ist erforderlich';
+    if (!scheduledTime)        errs.scheduledTime = 'Abflugzeit ist erforderlich';
+    if (!airport.trim())       errs.airport       = 'Flughafen ist erforderlich';
+    // Zeitformat pr&uuml;fen: HH:MM
+    if (scheduledTime &amp;&amp; !/^\d{2}:\d{2}$/.test(scheduledTime)) {
+      errs.scheduledTime = 'Format: HH:MM (z.B. 14:30)';
+    }
+    return errs;
+  };
+
+  const handleSubmit = (e: React.FormEvent&lt;HTMLFormElement&gt;) => {
+    e.preventDefault();  // Kein Seiten-Reload!
+
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length &gt; 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    // Neues Flight-Objekt erstellen
+    const newFlight: Flight = {
+      id:            Date.now(),          // Einfache tempor&auml;re ID
+      flightNumber:  flightNumber.trim().toUpperCase(),
+      airline:       airline.trim(),
+      type,
+      scheduledTime,
+      status:        'on-time',           // Neuer Flug startet als p&uuml;nktlich
+      airport:       airport.trim(),
+      terminal:      terminal || 'T1',
+      gate:          gate.trim() || undefined,
+    };
+
+    onAdd(newFlight);
+  };
+
+  // Wiederverwendbarer Style f&uuml;r alle Inputs
+  const inputStyle: React.CSSProperties = {
+    width: '100%',
+    padding: '0.5rem 0.75rem',
+    background: '#1c2128',
+    border: '1px solid #30363d',
+    borderRadius: '6px',
+    color: '#e6edf3',
+    fontSize: '0.875rem',
+    boxSizing: 'border-box',
+  };
+
+  const errorStyle: React.CSSProperties = {
+    color: '#f85149',
+    fontSize: '0.75rem',
+    marginTop: '0.2rem',
+  };
+
+  const labelStyle: React.CSSProperties = {
+    display: 'block',
+    marginBottom: '0.25rem',
+    fontSize: '0.8rem',
+    color: '#8b949e',
+  };
+
+  return (
+    &lt;form
+      onSubmit={handleSubmit}
+      style={{
+        background: '#161b22',
+        border: '1px solid #30363d',
+        borderRadius: '8px',
+        padding: '1.5rem',
+        marginBottom: '1.5rem',
+      }}
+    &gt;
+      &lt;h3 style={{ color: '#3fb950', marginBottom: '1.25rem', fontSize: '1rem' }}&gt;
+        Neuen Flug hinzuf&uuml;gen
+      &lt;/h3&gt;
+
+      &lt;div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 1rem' }}&gt;
+        {/* Flugnummer */}
+        &lt;div style={{ marginBottom: '0.75rem' }}&gt;
+          &lt;label style={labelStyle}&gt;Flugnummer *&lt;/label&gt;
+          &lt;input
+            style={{ ...inputStyle, borderColor: errors.flightNumber ? '#f85149' : '#30363d' }}
+            value={flightNumber}
+            onChange={e =&gt; setFlightNumber(e.target.value)}
+            placeholder="OS123"
+          /&gt;
+          {errors.flightNumber &amp;&amp; &lt;p style={errorStyle}&gt;{errors.flightNumber}&lt;/p&gt;}
+        &lt;/div&gt;
+
+        {/* Airline */}
+        &lt;div style={{ marginBottom: '0.75rem' }}&gt;
+          &lt;label style={labelStyle}&gt;Airline *&lt;/label&gt;
+          &lt;input
+            style={{ ...inputStyle, borderColor: errors.airline ? '#f85149' : '#30363d' }}
+            value={airline}
+            onChange={e =&gt; setAirline(e.target.value)}
+            placeholder="Austrian Airlines"
+          /&gt;
+          {errors.airline &amp;&amp; &lt;p style={errorStyle}&gt;{errors.airline}&lt;/p&gt;}
+        &lt;/div&gt;
+
+        {/* Typ */}
+        &lt;div style={{ marginBottom: '0.75rem' }}&gt;
+          &lt;label style={labelStyle}&gt;Typ *&lt;/label&gt;
+          &lt;select
+            style={inputStyle}
+            value={type}
+            onChange={e =&gt; setType(e.target.value as FlightType)}
+          &gt;
+            &lt;option value="departure"&gt;Abflug&lt;/option&gt;
+            &lt;option value="arrival"&gt;Ankunft&lt;/option&gt;
+          &lt;/select&gt;
+        &lt;/div&gt;
+
+        {/* Zeit */}
+        &lt;div style={{ marginBottom: '0.75rem' }}&gt;
+          &lt;label style={labelStyle}&gt;{type === 'departure' ? 'Abflugzeit' : 'Ankunftszeit'} *&lt;/label&gt;
+          &lt;input
+            style={{ ...inputStyle, borderColor: errors.scheduledTime ? '#f85149' : '#30363d' }}
+            type="time"
+            value={scheduledTime}
+            onChange={e =&gt; setScheduledTime(e.target.value)}
+          /&gt;
+          {errors.scheduledTime &amp;&amp; &lt;p style={errorStyle}&gt;{errors.scheduledTime}&lt;/p&gt;}
+        &lt;/div&gt;
+
+        {/* Flughafen */}
+        &lt;div style={{ marginBottom: '0.75rem' }}&gt;
+          &lt;label style={labelStyle}&gt;{type === 'departure' ? 'Zielflughafen' : 'Herkunftsflughafen'} *&lt;/label&gt;
+          &lt;input
+            style={{ ...inputStyle, borderColor: errors.airport ? '#f85149' : '#30363d' }}
+            value={airport}
+            onChange={e =&gt; setAirport(e.target.value)}
+            placeholder="London Heathrow (LHR)"
+          /&gt;
+          {errors.airport &amp;&amp; &lt;p style={errorStyle}&gt;{errors.airport}&lt;/p&gt;}
+        &lt;/div&gt;
+
+        {/* Terminal */}
+        &lt;div style={{ marginBottom: '0.75rem' }}&gt;
+          &lt;label style={labelStyle}&gt;Terminal&lt;/label&gt;
+          &lt;select style={inputStyle} value={terminal} onChange={e =&gt; setTerminal(e.target.value)}&gt;
+            &lt;option&gt;T1&lt;/option&gt;
+            &lt;option&gt;T2&lt;/option&gt;
+            &lt;option&gt;T3&lt;/option&gt;
+          &lt;/select&gt;
+        &lt;/div&gt;
+
+        {/* Gate (optional) */}
+        &lt;div style={{ marginBottom: '0.75rem' }}&gt;
+          &lt;label style={labelStyle}&gt;Gate (optional)&lt;/label&gt;
+          &lt;input
+            style={inputStyle}
+            value={gate}
+            onChange={e =&gt; setGate(e.target.value)}
+            placeholder="B12"
+          /&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      {/* Schaltfl&auml;chen */}
+      &lt;div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}&gt;
+        &lt;button
+          type="submit"
+          style={{
+            padding: '0.5rem 1.25rem',
+            background: '#3fb950',
+            border: 'none',
+            borderRadius: '6px',
+            color: '#000',
+            fontWeight: 600,
+            cursor: 'pointer',
+            fontSize: '0.875rem',
+          }}
+        &gt;
+          Hinzuf&uuml;gen
+        &lt;/button&gt;
+        &lt;button
+          type="button"
+          onClick={onCancel}
+          style={{
+            padding: '0.5rem 1.25rem',
+            background: 'transparent',
+            border: '1px solid #30363d',
+            borderRadius: '6px',
+            color: '#8b949e',
+            cursor: 'pointer',
+            fontSize: '0.875rem',
+          }}
+        &gt;
+          Abbrechen
+        &lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/form&gt;
+  );
+};
+
+export default AddFlightForm;</code></pre>
+      </div>
+    </section>
+
+    <section class="section section-projekt">
+      <h2>Projektschritt</h2>
+      <div class="projekt-box">
+        <div class="projekt-box-header">
+          <span class="projekt-step">Projektschritt 2.1</span>
+          <h3>Suche, Filter &amp; Neuen Flug hinzuf&uuml;gen</h3>
+        </div>
+        <p>
+          Das FlugBoard wird vollst&auml;ndig interaktiv: Suche, Filterung und das Hinzuf&uuml;gen neuer
+          Fl&uuml;ge sind m&ouml;glich. <code>App.tsx</code> wird zum zentralen State-Manager.
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">App.tsx &ndash; Vollst&auml;ndiger State</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">import { useState } from 'react';
+import { Flight, FlightType, FlightStatus } from './types/flight';
+import { sampleFlights } from './data/flights';
+import SearchBar from './components/SearchBar';
+import FilterBar from './components/FilterBar';
+import FlightBoard from './components/FlightBoard';
+import AddFlightForm from './components/AddFlightForm';
+
+type TypeFilter   = 'all' | FlightType;
+type StatusFilter = 'all' | FlightStatus;
+
+function App() {
+  const [flights, setFlights]           = useState&lt;Flight[]&gt;(sampleFlights);
+  const [searchQuery, setSearchQuery]   = useState('');
+  const [typeFilter, setTypeFilter]     = useState&lt;TypeFilter&gt;('all');
+  const [statusFilter, setStatusFilter] = useState&lt;StatusFilter&gt;('all');
+  const [showAddForm, setShowAddForm]   = useState(false);
+
+  // Fl&uuml;ge hinzuf&uuml;gen
+  const handleAddFlight = (flight: Flight) => {
+    setFlights(prev =&gt; [...prev, flight]);
+    setShowAddForm(false);  // Formular nach Einreichen schlie&szlig;en
+  };
+
+  // Alle aktiven Filter anwenden
+  const filteredFlights = flights
+    .filter(f =&gt; typeFilter === 'all' || f.type === typeFilter)
+    .filter(f =&gt; statusFilter === 'all' || f.status === statusFilter)
+    .filter(f =&gt; {
+      if (!searchQuery) return true;
+      const q = searchQuery.toLowerCase();
+      return (
+        f.flightNumber.toLowerCase().includes(q) ||
+        f.airport.toLowerCase().includes(q) ||
+        f.airline.toLowerCase().includes(q)
+      );
+    });
+
+  return (
+    &lt;div className="app-page"&gt;
+      &lt;header className="app-header"&gt;
+        &lt;h1 className="app-title"&gt;&#9992; FlugBoard&lt;/h1&gt;
+        &lt;button onClick={() =&gt; setShowAddForm(v =&gt; !v)} style={{ /* ... */ }}&gt;
+          {showAddForm ? 'Abbrechen' : '+ Flug hinzuf&uuml;gen'}
+        &lt;/button&gt;
+      &lt;/header&gt;
+
+      {showAddForm &amp;&amp; (
+        &lt;AddFlightForm onAdd={handleAddFlight} onCancel={() =&gt; setShowAddForm(false)} /&gt;
+      )}
+
+      &lt;SearchBar value={searchQuery} onChange={setSearchQuery} /&gt;
+      &lt;FilterBar
+        typeFilter={typeFilter}
+        statusFilter={statusFilter}
+        onTypeChange={setTypeFilter}
+        onStatusChange={setStatusFilter}
+      /&gt;
+
+      &lt;FlightBoard
+        flights={filteredFlights.filter(f =&gt; f.type === 'departure')}
+        title={`Abfl&uuml;ge (${filteredFlights.filter(f =&gt; f.type === 'departure').length})`}
+      /&gt;
+      &lt;FlightBoard
+        flights={filteredFlights.filter(f =&gt; f.type === 'arrival')}
+        title={`Ank&uuml;nfte (${filteredFlights.filter(f =&gt; f.type === 'arrival').length})`}
+      /&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default App;</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-fehler">
+      <h2>H&auml;ufige Fehler</h2>
+
+      <div class="fehler-item">
+        <div class="fehler-title">Fehler: <code>e.preventDefault()</code> in <code>onSubmit</code> vergessen</div>
+        <p>
+          Ohne <code>e.preventDefault()</code> f&uuml;hrt das Absenden des Formulars einen Standard-HTTP-Request
+          durch und die Seite wird neu geladen. In React-SPAs ist das unerw&uuml;nscht &ndash; der State geht
+          verloren und die App startet neu.
+        </p>
+        <p class="fehler-fix"><code>const handleSubmit = (e: React.FormEvent&lt;HTMLFormElement&gt;) =&gt; &#123; e.preventDefault(); ... &#125;</code></p>
+      </div>
+
+      <div class="fehler-item">
+        <div class="fehler-title">Fehler: Select-Wert ohne Type Assertion</div>
+        <p>
+          <code>e.target.value</code> hat in TypeScript immer den Typ <code>string</code>, auch wenn wir
+          wissen, dass nur g&uuml;ltige <code>FlightType</code>-Werte kommen. Ohne Type Assertion bekommt
+          man einen TypeScript-Fehler beim Zuweisen an die State-Variable.
+        </p>
+        <p class="fehler-fix">Type Assertion verwenden: <code>e.target.value as FlightType</code></p>
+      </div>
+
+      <div class="fehler-item">
+        <div class="fehler-title">Fehler: Checkbox <code>value</code> statt <code>checked</code></div>
+        <p>
+          Bei Checkboxen ist das relevante Prop <code>checked</code> (ein Boolean), nicht <code>value</code>
+          (ein String). <code>e.target.checked</code> statt <code>e.target.value</code> verwenden.
+        </p>
+        <p class="fehler-fix"><code>&lt;input type="checkbox" checked=&#123;bool&#125; onChange=&#123;e =&gt; setState(e.target.checked)&#125; /&gt;</code></p>
+      </div>
+
+      <div class="fehler-item">
+        <div class="fehler-title">Fehler: Formular ohne <code>type="button"</code> bei Buttons innerhalb eines Forms</div>
+        <p>
+          Alle <code>&lt;button&gt;</code>-Elemente innerhalb eines <code>&lt;form&gt;</code> haben standardm&auml;&szlig;ig
+          <code>type="submit"</code>. Ein &bdquo;Abbrechen&ldquo;-Button l&ouml;st damit unerwartet das Formular-Submit aus.
+        </p>
+        <p class="fehler-fix">Buttons ohne Submit-Funktion explizit mit <code>type="button"</code> auszeichnen.</p>
+      </div>
+    </section>
+
+    <section class="section section-aufgaben">
+      <h2>Aufgaben</h2>
+      <div class="aufgaben-list">
+
+        <div class="aufgabe">
+          <div class="aufgabe-header">
+            <span class="aufgabe-num">Aufgabe 1</span>
+            <span class="aufgabe-title">Suchfeld einbauen</span>
+          </div>
+          <p>
+            F&uuml;ge ein Suchfeld in <code>App.tsx</code> hinzu. Es soll Fl&uuml;ge nach Flugnummer, Flughafen
+            und Airline filtern.
+          </p>
+          <ul>
+            <li>Erstelle die <code>SearchBar</code>-Komponente mit <code>value</code> und <code>onChange</code>-Props</li>
+            <li>Suche case-insensitive mit <code>.toLowerCase().includes()</code></li>
+            <li>F&uuml;ge ein &bdquo;&times;&ldquo;-Symbol hinzu, das das Suchfeld leert</li>
+            <li>Zeige die Anzahl der Treffer unter dem Suchfeld an: &bdquo;5 Fl&uuml;ge gefunden&ldquo;</li>
+          </ul>
+        </div>
+
+        <div class="aufgabe">
+          <div class="aufgabe-header">
+            <span class="aufgabe-num">Aufgabe 2</span>
+            <span class="aufgabe-title">FilterBar erstellen</span>
+          </div>
+          <p>
+            Erstelle die <code>FilterBar</code>-Komponente mit Typ-Filter und Status-Filter.
+          </p>
+          <ul>
+            <li>Zwei Select-Elemente: eines f&uuml;r Typ (Alle/Abfl&uuml;ge/Ank&uuml;nfte), eines f&uuml;r Status</li>
+            <li>Type Assertion bei <code>onChange</code> verwenden</li>
+            <li>Einen &bdquo;Zur&uuml;cksetzen&ldquo;-Button einbauen, der nur erscheint wenn ein Filter aktiv ist</li>
+            <li>Die Filterlogik liegt in <code>App.tsx</code>, nicht in der <code>FilterBar</code></li>
+          </ul>
+        </div>
+
+        <div class="aufgabe">
+          <div class="aufgabe-header">
+            <span class="aufgabe-num">Aufgabe 3</span>
+            <span class="aufgabe-title">AddFlightForm implementieren</span>
+          </div>
+          <p>
+            Erstelle das vollst&auml;ndige Formular zum Hinzuf&uuml;gen eines neuen Fluges mit Validierung.
+          </p>
+          <ul>
+            <li>Pflichtfelder: Flugnummer, Airline, Zeit, Flughafen (alle pr&uuml;fen)</li>
+            <li>Fehler-Messages direkt unter dem jeweiligen Feld anzeigen (rotes Styling)</li>
+            <li>Nach erfolgreichem Submit: Formular schlie&szlig;en und Flug zur Liste hinzuf&uuml;gen</li>
+            <li>Zeitfeld als <code>&lt;input type="time"&gt;</code> implementieren</li>
+          </ul>
+        </div>
+
+        <div class="aufgabe aufgabe-bonus">
+          <div class="aufgabe-header">
+            <span class="aufgabe-num">Bonus</span>
+            <span class="aufgabe-title">Flug l&ouml;schen mit Best&auml;tigung</span>
+          </div>
+          <p>
+            F&uuml;ge einen L&ouml;schen-Button in <code>FlightCard</code> hinzu.
+          </p>
+          <ul>
+            <li>Ein kleines Papierkorb-Symbol (&#128465;) rechts in jeder Zeile</li>
+            <li>Beim Klick: <code>window.confirm('Flug wirklich l&ouml;schen?')</code> &ndash; nur wenn der Nutzer best&auml;tigt, wird der Flug entfernt</li>
+            <li>Der Flug wird per Callback aus dem State in <code>App.tsx</code> gel&ouml;scht: <code>setFlights(prev =&gt; prev.filter(f =&gt; f.id !== id))</code></li>
+            <li>Nach dem L&ouml;schen des ausgew&auml;hlten Fluges: <code>selectedFlight</code> auf <code>null</code> setzen</li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+  </div><!-- /content-area -->
+
+        <nav class="lesson-nav">
+    <a class="nav-btn" href="1.6-listen-conditional.html">&larr; Lektion 1.6: Listen &amp; Conditional Rendering</a>
+    <span class="nav-center-info">Lektion 2.1</span>
+    <a class="nav-btn primary" href="2.2-useeffect-api.html">Lektion 2.2: useEffect &amp; API &rarr;</a>
+  </nav>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+<script>
+  // Hamburger menu
+  const ham = document.getElementById('hamburger');
+  const sb  = document.getElementById('sidebar');
+  const ov  = document.getElementById('overlay');
+  ham.addEventListener('click', () => { sb.classList.toggle('open'); ov.classList.toggle('visible'); });
+  ov.addEventListener('click',  () => { sb.classList.remove('open'); ov.classList.remove('visible'); });
+  // Active nav link
+  const cur = window.location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.nav-link').forEach(l => {
+    if (l.getAttribute('href') === cur) l.classList.add('active');
+  });
+  // Theme toggle — einfach & robust (kein CSS-Swap nötig)
+  const themeBtn = document.getElementById('theme-toggle');
+  const applyTheme = (t) => {
+    document.documentElement.setAttribute('data-theme', t);
+    if (themeBtn) themeBtn.innerHTML = t === 'dark' ? '&#9728;' : '&#9790;';
+  };
+  // Theme aus localStorage laden (alle Seiten teilen denselben Key)
+  applyTheme(localStorage.getItem('kurs-theme') || 'dark');
+  // Transitions erst nach dem initialen Render aktivieren (verhindert Flash)
+  setTimeout(() => document.documentElement.classList.add('theme-transitions'), 50);
+  if (themeBtn) themeBtn.addEventListener('click', () => {
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('kurs-theme', next);
+    applyTheme(next);
+  });
+  hljs.highlightAll();
+</script>
+</body>
+</html>

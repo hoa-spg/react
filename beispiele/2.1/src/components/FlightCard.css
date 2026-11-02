@@ -1,0 +1,64 @@
+.flight-row {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.flight-row:hover {
+  background: #161b22;
+}
+
+.flight-row.is-selected {
+  border-left-color: #61dafb;
+  background: rgb(97 218 251 / 14%);
+}
+
+.flight-row.is-cancelled {
+  opacity: 0.6;
+}
+
+.flight-cell {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid #30363d;
+  color: #e6edf3;
+}
+
+.flight-num.is-cancelled {
+  color: #8b949e;
+  text-decoration: line-through;
+}
+
+.time-old {
+  margin-right: 4px;
+  color: #8b949e;
+  text-decoration: line-through;
+}
+
+.time-delayed {
+  color: #d29922;
+}
+
+.time-boarding {
+  color: #61dafb;
+}
+
+.mini-select {
+  padding: 3px 6px;
+  border: 1px solid #30363d;
+  border-radius: 4px;
+  background: #21262d;
+  color: #e6edf3;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.delete-btn {
+  padding: 2px 7px;
+  border: 1px solid #f85149;
+  border-radius: 4px;
+  background: none;
+  color: #f85149;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  cursor: pointer;
+}

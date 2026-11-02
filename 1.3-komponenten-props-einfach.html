@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1.3 &ndash; Komponenten &amp; Props (einfach) | React Kurs</title>
+  <script>(function () { var t = localStorage.getItem('kurs-theme') || 'dark'; document.documentElement.setAttribute('data-theme', t); })();</script>
+  <link rel="stylesheet" href="assets/kurs.css">
+  <link rel="stylesheet" id="hljs-theme"
+    href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+
+<body>
+
+  <button class="hamburger" id="hamburger" aria-label="Navigation &ouml;ffnen">&#9776;</button>
+  <div class="sidebar-overlay" id="overlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <a href="index.html">
+        <span class="brand-icon">&#9992;</span>
+        <div>
+          <div class="brand-name">React Kurs</div>
+          <div class="brand-sub">Web &amp; Mobile</div>
+        </div>
+      </a>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Dark/Light Mode"
+        title="Theme wechseln">&#9728;</button>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-group">
+        <div class="nav-group-label react-label">Teil 1 &mdash; React Einführung</div>
+        <a class="nav-link" href="1.1-einfuehrung-spa.html"><span class="ln">1.1</span>Motivation &amp; SPA</a>
+        <a class="nav-link" href="1.2-einfuehrung.html"><span class="ln">1.2</span>Einführung &amp; Umgebung</a>
+        <a class="nav-link" href="1.3-komponenten-props-einfach.html"><span class="ln">1.3</span>Komponenten
+          &amp; Props (einfach)</a>
+        <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten &amp;
+          Props (Vertiefung)</a>
+        <a class="nav-link" href="1.5-state-events.html"><span class="ln">1.5</span>State &amp; Events</a>
+        <a class="nav-link" href="1.6-listen-conditional.html"><span class="ln">1.6</span>Listen &amp; Conditional
+          Rendering</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label react-label">Teil 2 &mdash; React Praxis</div>
+        <a class="nav-link" href="2.1-formulare.html"><span class="ln">2.1</span>Formulare &amp; Inputs</a>
+        <a class="nav-link" href="2.2-useeffect-api.html"><span class="ln">2.2</span>useEffect &amp; API</a>
+        <a class="nav-link" href="2.3-kommunikation.html"><span class="ln">2.3</span>Komponentenkommunikation</a>
+        <a class="nav-link" href="2.4-context.html"><span class="ln">2.4</span>Context API</a>
+        <a class="nav-link" href="2.5-custom-hooks.html"><span class="ln">2.5</span>Custom Hooks</a>
+        <a class="nav-link" href="2.6-testen-vitest-rtl.html"><span class="ln">2.6</span>Testen mit Vitest + RTL</a>
+        <a class="nav-link" href="2.7-react-router.html"><span class="ln">2.7</span>React Router</a>
+        <a class="nav-link" href="2.8-datenbank-drizzle-sqlite.html"><span class="ln">2.8</span>Datenbankzugriff mit
+          Drizzle + SQLite</a>
+        <a class="nav-link" href="2.9-redux-state-management.html"><span class="ln">2.9</span>State Management mit Redux
+          (Überblick)</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label next-label">Teil 3 &mdash; Next.js</div>
+        <a class="nav-link" href="3.1-nextjs-einfuehrung.html"><span class="ln">3.1</span>Einführung Next.js</a>
+        <a class="nav-link" href="3.2-nextjs-routing.html"><span class="ln">3.2</span>Routing &amp; Layouts</a>
+        <a class="nav-link" href="3.3-server-client.html"><span class="ln">3.3</span>Server &amp; Client Components</a>
+        <a class="nav-link" href="3.4-api-routes.html"><span class="ln">3.4</span>API Routes &amp; Datenabruf</a>
+        <a class="nav-link" href="3.5-playwright-e2e.html"><span class="ln">3.5</span>Playwright E2E</a>
+      <a class="nav-link" href="3.6-deployment.html"><span class="ln">3.6</span>Deployment</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label rn-label">Teil 4 &mdash; React Native</div>
+        <a class="nav-link" href="4.1-rn-einfuehrung.html"><span class="ln">4.1</span>Einführung React Native</a>
+        <a class="nav-link" href="4.2-rn-komponenten.html"><span class="ln">4.2</span>Native Komponenten &amp;
+          Styling</a>
+        <a class="nav-link" href="4.3-rn-navigation.html"><span class="ln">4.3</span>Navigation &amp; State</a>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <header class="lesson-header">
+      <p class="lesson-eyebrow">Lektion 1.3 &mdash; Teil 1: React Einführung</p>
+      <h1>Komponenten &amp; Props (einfach)</h1>
+      <div class="lesson-tags">
+        <span class="tag tag-react">React</span>
+        <span class="tag tag-time">ca. 60 min</span>
+        <span class="tag tag-level">Zwischenschritt</span>
+      </div>
+    </header>
+
+    <div class="content-area">
+
+      <section class="section section-lernziele">
+        <h2>Lernziele</h2>
+        <ul class="lernziele-list">
+          <li>Komponenten als wiederverwendbare UI-Bausteine verstehen</li>
+          <li>Einfache Props zwischen Eltern- und Kindkomponenten weitergeben</li>
+          <li>Ohne komplizierte Typ-Tricks eine kleine Struktur aufbauen</li>
+          <li>Erste Aufteilung von <code>App.tsx</code> in mehrere Dateien umsetzen</li>
+        </ul>
+      </section>
+
+      <section class="section">
+        <h2>1 &mdash; Idee: Eine große App in kleine Teile zerlegen</h2>
+        <p>
+          In Lektion 1.2 war alles in einer Datei. Das war f&uuml;r den Start gut, wird aber schnell
+          un&uuml;bersichtlich.
+          Deshalb teilen wir die Oberfl&auml;che jetzt in kleine Komponenten auf.
+        </p>
+        <p>
+          Eine Komponente ist einfach eine Funktion, die JSX zur&uuml;ckgibt. Eine andere Komponente kann sie dann
+          wie ein eigenes HTML-Element verwenden.
+        </p>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">Sehr einfache Komponente</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">const HelloBox = () => {
+  return &lt;div&gt;Hallo vom FlugBoard&lt;/div&gt;;
+};
+
+function App() {
+  return (
+    &lt;main&gt;
+      &lt;HelloBox /&gt;
+    &lt;/main&gt;
+  );
+}</code></pre>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>2 &mdash; Props ohne Ballast</h2>
+        <p>
+          Props sind Eingabewerte f&uuml;r Komponenten.
+        </p>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">Mini-Beispiel: ein String-Prop</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+<pre><code class="language-typescript">const Welcome = (props: { name: string }) => {
+  return &lt;p&gt;Hallo {props.name}!&lt;/p&gt;;
+};
+
+function App() {
+  return &lt;Welcome name="Max" /&gt;;
+}</code></pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">src/components/FlightRow.tsx</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+<pre><code class="language-typescript">type FlightRowProps = {
+  flightNumber: string;
+  airline: string;
+  destination: string;
+  time: string;
+};
+
+const FlightRow = (props: FlightRowProps) => {
+  return (
+    &lt;tr&gt;
+      &lt;td&gt;{props.flightNumber}&lt;/td&gt;
+      &lt;td&gt;{props.airline}&lt;/td&gt;
+      &lt;td&gt;{props.destination}&lt;/td&gt;
+      &lt;td&gt;{props.time}&lt;/td&gt;
+    &lt;/tr&gt;
+  );
+};
+
+export default FlightRow;</code></pre>
+        </div>
+
+        <div class="callout callout-tip">
+          <div class="callout-icon">&#128161;</div>
+          <div class="callout-body">
+            <div class="callout-title">Bewusst einfacher Schritt</div>
+            <p>
+              Diese Lektion ist als sanfter Einstieg gedacht. Die erweiterten TypeScript-Muster
+              (Union-Typen, Record, Destructuring, Spread) kommen erst in der Lektion 1.4.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section-projekt">
+        <h2>Projektschritt</h2>
+        <div class="projekt-box">
+          <div class="projekt-box-header">
+            <span class="projekt-step">Projektschritt 1.3</span>
+            <h3>Erste Komponenten auslagern</h3>
+          </div>
+
+          <p>
+            Wir zerlegen die statische Tabelle aus L01 in zwei einfache Komponenten:
+            <code>AirportHeader</code> und <code>FlightRow</code>. Styling bleibt wie im Projekt
+            standardm&auml;&szlig;ig in CSS-Dateien pro Komponente.
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-filename">src/App.tsx</span>
+              <span class="code-lang">TypeScript</span>
+            </div>
+            <pre><code class="language-typescript">import './App.css';
+import AirportHeader from './components/AirportHeader';
+import FlightRow from './components/FlightRow';
+
+function App() {
+  return (
+    &lt;div className="app-page"&gt;
+      &lt;AirportHeader airportName="Flughafen Wien-Schwechat" /&gt;
+
+      &lt;table className="flight-table"&gt;
+        &lt;thead&gt;
+          &lt;tr&gt;
+            &lt;th&gt;Flug&lt;/th&gt;
+            &lt;th&gt;Airline&lt;/th&gt;
+            &lt;th&gt;Ziel&lt;/th&gt;
+            &lt;th&gt;Zeit&lt;/th&gt;
+          &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+          &lt;FlightRow
+            flightNumber="OS123"
+            airline="Austrian Airlines"
+            destination="London Heathrow (LHR)"
+            time="10:30"
+          /&gt;
+          &lt;FlightRow
+            flightNumber="LH456"
+            airline="Lufthansa"
+            destination="Frankfurt (FRA)"
+            time="11:15"
+          /&gt;
+        &lt;/tbody&gt;
+      &lt;/table&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default App;</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-filename">src/components/AirportHeader.tsx</span>
+              <span class="code-lang">TypeScript</span>
+            </div>
+            <pre><code class="language-typescript">import './AirportHeader.css';
+
+const AirportHeader = ({ airportName }: { airportName: string }) => {
+  return (
+    &lt;header className="airport-header"&gt;
+      &lt;h1 className="airport-header__title"&gt;&#9992; FlugBoard&lt;/h1&gt;
+      &lt;p className="airport-header__subtitle"&gt;{airportName}&lt;/p&gt;
+    &lt;/header&gt;
+  );
+};
+
+export default AirportHeader;</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section-fehler">
+        <h2>H&auml;ufige Fehler</h2>
+
+        <div class="fehler-item">
+          <div class="fehler-title">Fehler: Komponentenname klein geschrieben</div>
+          <p>
+            <code>&lt;flightrow /&gt;</code> wird als HTML-Tag interpretiert, nicht als React-Komponente.
+          </p>
+          <p class="fehler-fix">Komponenten immer in PascalCase schreiben: <code>&lt;FlightRow /&gt;</code>.</p>
+        </div>
+
+        <div class="fehler-item">
+          <div class="fehler-title">Fehler: Props-Name passt nicht</div>
+          <p>
+            Du &uuml;bergibst <code>destination</code>, die Komponente liest aber <code>props.airport</code>.
+          </p>
+          <p class="fehler-fix">Prop-Namen beim Aufruf und in der Komponente identisch halten.</p>
+        </div>
+
+        <div class="fehler-item">
+          <div class="fehler-title">Fehler: Datei nicht exportiert</div>
+          <p>
+            Ohne <code>export default</code> kann die Komponente nicht importiert werden.
+          </p>
+          <p class="fehler-fix">Jede Komponenten-Datei mit <code>export default ...;</code> abschlie&szlig;en.</p>
+        </div>
+      </section>
+
+      <section class="section section-aufgaben">
+        <h2>Aufgaben</h2>
+        <div class="aufgaben-list">
+          <div class="aufgabe">
+            <div class="aufgabe-header">
+              <span class="aufgabe-num">Aufgabe 1</span>
+              <span class="aufgabe-title">Dritte Zeile als Komponente</span>
+            </div>
+            <p>F&uuml;ge eine dritte <code>FlightRow</code>-Instanz f&uuml;r BA234 hinzu.</p>
+          </div>
+
+          <div class="aufgabe">
+            <div class="aufgabe-header">
+              <span class="aufgabe-num">Aufgabe 2</span>
+              <span class="aufgabe-title">Header-Text erweitern</span>
+            </div>
+            <p>Gib der Header-Komponente ein zweites Prop <code>subtitle</code> und zeige es unter dem Flughafennamen
+              an.</p>
+          </div>
+
+          <div class="aufgabe">
+            <div class="aufgabe-header">
+              <span class="aufgabe-num">Aufgabe 3</span>
+              <span class="aufgabe-title">Spalte Status ergänzen</span>
+            </div>
+            <p>
+              Erweitere <code>FlightRow</code> um ein Prop <code>status: string</code> und zeige den Wert als
+              f&uuml;nfte Spalte an.
+            </p>
+          </div>
+
+          <div class="aufgabe aufgabe-bonus">
+            <div class="aufgabe-header">
+              <span class="aufgabe-num">Bonus</span>
+              <span class="aufgabe-title">Click-Handler auf Zeile</span>
+            </div>
+            <p>
+              F&uuml;ge ein Prop <code>onRowClick</code> hinzu und gib bei Klick auf eine Zeile die
+              Flugnummer in der Konsole aus.
+            </p>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <nav class="lesson-nav">
+      <a class="nav-btn" href="1.2-einfuehrung.html">&larr; Lektion 1.2: Einführung &amp; Umgebung</a>
+      <span class="nav-center-info">Lektion 1.3</span>
+      <a class="nav-btn primary" href="1.4-komponenten-props-vertiefung.html">Lektion 1.4: Komponenten &amp; Props
+        (Vertiefung) &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+  <script>
+    const ham = document.getElementById('hamburger');
+    const sb = document.getElementById('sidebar');
+    const ov = document.getElementById('overlay');
+    ham.addEventListener('click', () => { sb.classList.toggle('open'); ov.classList.toggle('visible'); });
+    ov.addEventListener('click', () => { sb.classList.remove('open'); ov.classList.remove('visible'); });
+    const cur = window.location.pathname.split('/').pop() || 'index.html';
+    document.querySelectorAll('.nav-link').forEach(l => {
+      if (l.getAttribute('href') === cur) l.classList.add('active');
+    });
+    const themeBtn = document.getElementById('theme-toggle');
+    const applyTheme = (t) => {
+      document.documentElement.setAttribute('data-theme', t);
+      if (themeBtn) themeBtn.innerHTML = t === 'dark' ? '&#9728;' : '&#9790;';
+    };
+    applyTheme(localStorage.getItem('kurs-theme') || 'dark');
+    setTimeout(() => document.documentElement.classList.add('theme-transitions'), 50);
+    if (themeBtn) themeBtn.addEventListener('click', () => {
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('kurs-theme', next);
+      applyTheme(next);
+    });
+    hljs.highlightAll();
+  </script>
+</body>
+
+</html>

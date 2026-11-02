@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2.6 &ndash; Testen mit Vitest + RTL | React Kurs</title>
+  <script>(function(){var t=localStorage.getItem('kurs-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
+  <link rel="stylesheet" href="assets/kurs.css">
+  <link rel="stylesheet" id="hljs-theme" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+<body>
+
+<button class="hamburger" id="hamburger" aria-label="Navigation &ouml;ffnen">&#9776;</button>
+<div class="sidebar-overlay" id="overlay"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html">
+      <span class="brand-icon">&#9992;</span>
+      <div>
+        <div class="brand-name">React Kurs</div>
+        <div class="brand-sub">Web &amp; Mobile</div>
+      </div>
+    </a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Dark/Light Mode" title="Theme wechseln">&#9728;</button>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-label react-label">Teil 1 &mdash; React Einführung</div>
+      <a class="nav-link" href="1.1-einfuehrung-spa.html"><span class="ln">1.1</span>Motivation &amp; SPA</a>
+      <a class="nav-link" href="1.2-einfuehrung.html"><span class="ln">1.2</span>Einführung &amp; Umgebung</a>
+      <a class="nav-link" href="1.3-komponenten-props-einfach.html"><span class="ln">1.3</span>Komponenten &amp; Props (einfach)</a>
+      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten &amp; Props (Vertiefung)</a>
+      <a class="nav-link" href="1.5-state-events.html"><span class="ln">1.5</span>State &amp; Events</a>
+      <a class="nav-link" href="1.6-listen-conditional.html"><span class="ln">1.6</span>Listen &amp; Conditional Rendering</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label react-label">Teil 2 &mdash; React Praxis</div>
+      <a class="nav-link" href="2.1-formulare.html"><span class="ln">2.1</span>Formulare &amp; Inputs</a>
+      <a class="nav-link" href="2.2-useeffect-api.html"><span class="ln">2.2</span>useEffect &amp; API</a>
+      <a class="nav-link" href="2.3-kommunikation.html"><span class="ln">2.3</span>Komponentenkommunikation</a>
+      <a class="nav-link" href="2.4-context.html"><span class="ln">2.4</span>Context API</a>
+      <a class="nav-link" href="2.5-custom-hooks.html"><span class="ln">2.5</span>Custom Hooks</a>
+      <a class="nav-link" href="2.6-testen-vitest-rtl.html"><span class="ln">2.6</span>Testen mit Vitest + RTL</a>
+      <a class="nav-link" href="2.7-react-router.html"><span class="ln">2.7</span>React Router</a>
+      <a class="nav-link" href="2.8-datenbank-drizzle-sqlite.html"><span class="ln">2.8</span>Datenbankzugriff mit Drizzle + SQLite</a>
+      <a class="nav-link" href="2.9-redux-state-management.html"><span class="ln">2.9</span>State Management mit Redux (Überblick)</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label next-label">Teil 3 &mdash; Next.js</div>
+      <a class="nav-link" href="3.1-nextjs-einfuehrung.html"><span class="ln">3.1</span>Einführung Next.js</a>
+      <a class="nav-link" href="3.2-nextjs-routing.html"><span class="ln">3.2</span>Routing &amp; Layouts</a>
+      <a class="nav-link" href="3.3-server-client.html"><span class="ln">3.3</span>Server &amp; Client Components</a>
+      <a class="nav-link" href="3.4-api-routes.html"><span class="ln">3.4</span>API Routes &amp; Datenabruf</a>
+      <a class="nav-link" href="3.5-playwright-e2e.html"><span class="ln">3.5</span>Playwright E2E</a>
+      <a class="nav-link" href="3.6-deployment.html"><span class="ln">3.6</span>Deployment</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label rn-label">Teil 4 &mdash; React Native</div>
+      <a class="nav-link" href="4.1-rn-einfuehrung.html"><span class="ln">4.1</span>Einführung React Native</a>
+      <a class="nav-link" href="4.2-rn-komponenten.html"><span class="ln">4.2</span>Native Komponenten &amp; Styling</a>
+      <a class="nav-link" href="4.3-rn-navigation.html"><span class="ln">4.3</span>Navigation &amp; State</a>
+    </div>
+  </nav>
+</aside>
+
+<main class="main-content">
+  <header class="lesson-header">
+    <p class="lesson-eyebrow">Lektion 2.6 &mdash; Teil 2: React Praxis</p>
+    <h1>Testen mit Vitest + React Testing Library</h1>
+    <div class="lesson-tags">
+      <span class="tag tag-react">React</span>
+      <span class="tag tag-time">ca. 90 min</span>
+    </div>
+  </header>
+
+  <div class="content-area">
+    <section class="section section-lernziele">
+      <h2>Lernziele</h2>
+      <ul>
+        <li>Testpyramide f&uuml;r React-Projekte einordnen</li>
+        <li>Vitest im Vite-Projekt konfigurieren</li>
+        <li>Mit React Testing Library benutzerzentriert testen</li>
+        <li>Interaktionen mit <code>@testing-library/user-event</code> abdecken</li>
+        <li><code>@testing-library/jest-dom</code> Matchers sinnvoll einsetzen</li>
+        <li>Integrationstests mit API-Mocks (MSW) kurz einordnen</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>1. Warum testen?</h2>
+      <p>
+        Tests sind f&uuml;r React-Projekte kein Selbstzweck. Sie reduzieren Regressionen,
+        geben beim Refactoring Sicherheit und dokumentieren implizit, wie Komponenten
+        genutzt werden sollen.
+      </p>
+      <p>
+        In diesem Kapitel setzen wir den Fokus klar auf <strong>Komponententests</strong>.
+        Sie laufen schnell, sind lokal stabil und liefern den gr&ouml;&szlig;ten Lerneffekt
+        f&uuml;r den UI-Alltag.
+      </p>
+      <div class="callout callout-info">
+        <div class="callout-icon">&#8505;</div>
+        <div class="callout-body">
+          <div class="callout-title">Genau ein Test-Kapitel in Teil 2</div>
+          <p>
+            Teil 2 hat absichtlich nur dieses eine Test-Kapitel. Sp&auml;tere Kapitel
+            bleiben auf Feature-Umsetzung fokussiert; die Test-Grundlage nehmen wir
+            aber weiter mit.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>2. Setup mit Vitest, RTL und jest-dom</h2>
+      <p>
+        Wir nutzen das Beispiel unter <code>beispiele/2.6</code>. Das Setup ist bewusst
+        leichtgewichtig und bleibt nahe an Vite.
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Terminal</span>
+          <span class="code-lang">Bash</span>
+        </div>
+        <pre><code class="language-bash">npm install -D vitest jsdom @testing-library/react @testing-library/user-event @testing-library/jest-dom
+
+# einmalig ausf&uuml;hren
+npm run test
+
+# beim Entwickeln
+npm run test:watch</code></pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">vite.config.ts</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+
+export default defineConfig({
+  plugins: [react()],
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: './src/test/setup.ts',
+  },
+});</code></pre>
+      </div>
+
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#128161;</div>
+        <div class="callout-body">
+          <div class="callout-title">jsdom statt Browser</div>
+          <p>
+            Vitest nutzt f&uuml;r Komponententests eine DOM-Simulation. Das reicht f&uuml;r
+            Rendering, Klicks, Eingaben und die meisten Formular-Workflows.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>3. Erster Komponententest</h2>
+      <p>
+        React Testing Library testet aus Sicht von Nutzerinnen und Nutzern.
+        Deshalb fragen wir Elemente bevorzugt &uuml;ber Rollen, Labels und sichtbaren Text
+        ab &ndash; nicht &uuml;ber CSS-Selektoren oder Implementierungsdetails.
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">src/components/flight-form.test.tsx</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import FlightForm from './FlightForm';
+
+test('sendet Callback mit Formdaten', async () =&gt; {
+  const user = userEvent.setup();
+  const onCreate = vi.fn();
+
+  render(&lt;FlightForm onCreate={onCreate} /&gt;);
+
+  await user.type(screen.getByLabelText(/flugnummer/i), 'LH123');
+  await user.type(screen.getByLabelText(/airline/i), 'Lufthansa');
+  await user.click(screen.getByRole('button', { name: /flug anlegen/i }));
+
+  expect(onCreate).toHaveBeenCalledWith({
+    flightNumber: 'LH123',
+    airline: 'Lufthansa',
+  });
+});</code></pre>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>4. Kurzer Integrationsteil: Komponente + State + Mock</h2>
+      <p>
+        Nur kurz zur Einordnung: Ein Integrationstest verbindet mehrere Bausteine,
+        etwa Formular + Liste + Filter-Logik oder UI + API-Aufruf.
+      </p>
+      <p>
+        Im Kapitel bleibt das bewusst klein: eine Seite mit Eingabe und gefilterter
+        Liste. F&uuml;r API-Tests kannst du zus&auml;tzlich MSW einsetzen, um Endpunkte
+        realistisch zu mocken.
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">src/integration/flight-board.integration.test.tsx</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import FlightBoardPage from '../pages/FlightBoardPage';
+
+test('filtert die Liste nach Eingabe', async () =&gt; {
+  const user = userEvent.setup();
+  render(&lt;FlightBoardPage /&gt;);
+
+  await user.type(screen.getByRole('searchbox', { name: /suche/i }), 'LH');
+
+  expect(screen.getByText('LH123')).toBeInTheDocument();
+  expect(screen.queryByText('OS404')).not.toBeInTheDocument();
+});</code></pre>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">&#8505;</div>
+        <div class="callout-body">
+          <div class="callout-title">MSW nur als Ausblick</div>
+          <p>
+            Vollst&auml;ndige API-Integrationsstrategien mit MSW vertiefen wir hier
+            bewusst nicht weiter. Ziel ist, die Grundlagen in einem Kapitel sauber
+            zu etablieren.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-projekt">
+      <h2>Projektschritt</h2>
+      <div class="projekt-box">
+        <div class="projekt-box-header">
+          <span class="projekt-step">Projektschritt 2.6</span>
+          <h3>Test-Basis f&uuml;r FlugBoard einziehen</h3>
+        </div>
+        <ol>
+          <li>Testabh&auml;ngigkeiten installieren und Scripts in <code>package.json</code> erg&auml;nzen.</li>
+          <li><code>src/test/setup.ts</code> mit <code>@testing-library/jest-dom</code> erstellen.</li>
+          <li>Einen Komponententest f&uuml;r ein Formular oder ein Badge schreiben.</li>
+          <li>Einen kurzen Integrationstest f&uuml;r Suche + Liste erg&auml;nzen.</li>
+          <li>Alle Tests gr&uuml;n halten, bevor du zu Router/Backend weitergehst.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section section-fehler">
+      <h2>H&auml;ufige Fehler</h2>
+      <div class="fehler-item">
+        <div class="fehler-title">Fehler: Falsche Query-Methode</div>
+        <p>
+          Tests nutzen <code>getByTestId</code> f&uuml;r alles und ignorieren Rollen/Labels.
+          Dadurch werden Tests fragiler und weniger aussagekr&auml;ftig.
+        </p>
+        <p class="fehler-fix">
+          Fix: Bevorzuge <code>getByRole</code>, <code>getByLabelText</code> und
+          <code>getByText</code> in dieser Reihenfolge.
+        </p>
+      </div>
+      <div class="fehler-item">
+        <div class="fehler-title">Fehler: userEvent ohne await</div>
+        <p>
+          Eingaben und Klicks werden bei <code>userEvent</code> asynchron verarbeitet.
+          Ohne <code>await</code> treten Race Conditions auf.
+        </p>
+        <p class="fehler-fix">
+          Fix: <code>const user = userEvent.setup()</code> und alle Interaktionen
+          mit <code>await</code> ausf&uuml;hren.
+        </p>
+      </div>
+      <div class="fehler-item">
+        <div class="fehler-title">Fehler: Integrationstest wird zu E2E-Test</div>
+        <p>
+          Im Komponententest wird versucht, komplette Browser-Navigation und
+          externe Dienste abzudecken. Das macht die Tests langsam und instabil.
+        </p>
+        <p class="fehler-fix">
+          Fix: In Teil 2 lokal bleiben (Komponenten + kurze Integrationen).
+          E2E mit Playwright folgt in Teil 3.
+        </p>
+      </div>
+    </section>
+
+    <section class="section section-aufgaben">
+      <h2>Aufgaben</h2>
+      <div class="aufgabe">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">Aufgabe 1</span>
+          <span class="aufgabe-title">Vitest einrichten</span>
+        </div>
+        <ul>
+          <li>F&uuml;ge Testabh&auml;ngigkeiten und Scripts hinzu.</li>
+          <li>Konfiguriere <code>vite.config.ts</code> mit <code>jsdom</code> und Setup-Datei.</li>
+          <li>Pr&uuml;fe, dass <code>npm run test</code> lokal durchl&auml;uft.</li>
+        </ul>
+      </div>
+      <div class="aufgabe">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">Aufgabe 2</span>
+          <span class="aufgabe-title">Komponententest schreiben</span>
+        </div>
+        <ul>
+          <li>Teste ein Formular oder eine Filter-Komponente aus FlugBoard.</li>
+          <li>Simuliere Eingabe und Klick mit <code>userEvent</code>.</li>
+          <li>Verifiziere den Callback mit den erwarteten Daten.</li>
+        </ul>
+      </div>
+      <div class="aufgabe">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">Aufgabe 3</span>
+          <span class="aufgabe-title">Kurzer Integrationstest</span>
+        </div>
+        <ul>
+          <li>Teste eine kleine Benutzerstrecke: Sucheingabe &rarr; gefilterte Liste.</li>
+          <li>Verifiziere sichtbare und nicht sichtbare Eintr&auml;ge.</li>
+          <li>Optional: Mocke API-Response mit MSW als kurzen Zusatz.</li>
+        </ul>
+      </div>
+      <div class="aufgabe aufgabe-bonus">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">Bonus</span>
+          <span class="aufgabe-title">Test-Helfer abstrahieren</span>
+        </div>
+        <ul>
+          <li>Erstelle eine eigene <code>renderWithProviders()</code>-Funktion.</li>
+          <li>Nutze sie in mindestens zwei Tests.</li>
+          <li>Vergleiche Lesbarkeit vor/nach der Abstraktion.</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+
+  <nav class="lesson-nav">
+    <a class="nav-btn" href="2.5-custom-hooks.html">&larr; Lektion 2.5: Custom Hooks</a>
+    <span class="nav-center-info">Lektion 2.6</span>
+    <a class="nav-btn primary" href="2.7-react-router.html">Lektion 2.7: React Router &rarr;</a>
+  </nav>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+<script>
+  const ham = document.getElementById('hamburger');
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('overlay');
+  ham.addEventListener('click', () => { sb.classList.toggle('open'); ov.classList.toggle('visible'); });
+  ov.addEventListener('click', () => { sb.classList.remove('open'); ov.classList.remove('visible'); });
+
+  const cur = window.location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.nav-link').forEach(l => {
+    if (l.getAttribute('href') === cur) l.classList.add('active');
+  });
+
+  const themeBtn = document.getElementById('theme-toggle');
+  const applyTheme = (t) => {
+    document.documentElement.setAttribute('data-theme', t);
+    if (themeBtn) themeBtn.innerHTML = t === 'dark' ? '&#9728;' : '&#9790;';
+  };
+  applyTheme(localStorage.getItem('kurs-theme') || 'dark');
+  setTimeout(() => document.documentElement.classList.add('theme-transitions'), 50);
+  if (themeBtn) themeBtn.addEventListener('click', () => {
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('kurs-theme', next);
+    applyTheme(next);
+  });
+  hljs.highlightAll();
+</script>
+</body>
+</html>

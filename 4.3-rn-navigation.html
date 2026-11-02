@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4.3 &ndash; Navigation &amp; State | React Kurs</title>
+  <script>(function(){var t=localStorage.getItem('kurs-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
+  <link rel="stylesheet" href="assets/kurs.css">
+  <link rel="stylesheet" id="hljs-theme" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+<body>
+
+<button class="hamburger" id="hamburger" aria-label="Navigation &ouml;ffnen">&#9776;</button>
+<div class="sidebar-overlay" id="overlay"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html">
+      <span class="brand-icon">&#9992;</span>
+      <div>
+        <div class="brand-name">React Kurs</div>
+        <div class="brand-sub">Web &amp; Mobile</div>
+      </div>
+    </a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Dark/Light Mode" title="Theme wechseln">&#9728;</button>
+  </div>
+        <nav class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-label react-label">Teil 1 &mdash; React Einführung</div>
+      <a class="nav-link" href="1.1-einfuehrung-spa.html"><span class="ln">1.1</span>Motivation &amp; SPA</a>
+      <a class="nav-link" href="1.2-einfuehrung.html"><span class="ln">1.2</span>Einführung &amp; Umgebung</a>
+      <a class="nav-link" href="1.3-komponenten-props-einfach.html"><span class="ln">1.3</span>Komponenten &amp; Props (einfach)</a>
+      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten &amp; Props (Vertiefung)</a>
+      <a class="nav-link" href="1.5-state-events.html"><span class="ln">1.5</span>State &amp; Events</a>
+      <a class="nav-link" href="1.6-listen-conditional.html"><span class="ln">1.6</span>Listen &amp; Conditional Rendering</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label react-label">Teil 2 &mdash; React Praxis</div>
+      <a class="nav-link" href="2.1-formulare.html"><span class="ln">2.1</span>Formulare &amp; Inputs</a>
+      <a class="nav-link" href="2.2-useeffect-api.html"><span class="ln">2.2</span>useEffect &amp; API</a>
+      <a class="nav-link" href="2.3-kommunikation.html"><span class="ln">2.3</span>Komponentenkommunikation</a>
+      <a class="nav-link" href="2.4-context.html"><span class="ln">2.4</span>Context API</a>
+      <a class="nav-link" href="2.5-custom-hooks.html"><span class="ln">2.5</span>Custom Hooks</a>
+      <a class="nav-link" href="2.6-testen-vitest-rtl.html"><span class="ln">2.6</span>Testen mit Vitest + RTL</a>
+      <a class="nav-link" href="2.7-react-router.html"><span class="ln">2.7</span>React Router</a>
+      <a class="nav-link" href="2.8-datenbank-drizzle-sqlite.html"><span class="ln">2.8</span>Datenbankzugriff mit Drizzle + SQLite</a>
+      <a class="nav-link" href="2.9-redux-state-management.html"><span class="ln">2.9</span>State Management mit Redux (Überblick)</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label next-label">Teil 3 &mdash; Next.js</div>
+      <a class="nav-link" href="3.1-nextjs-einfuehrung.html"><span class="ln">3.1</span>Einführung Next.js</a>
+      <a class="nav-link" href="3.2-nextjs-routing.html"><span class="ln">3.2</span>Routing &amp; Layouts</a>
+      <a class="nav-link" href="3.3-server-client.html"><span class="ln">3.3</span>Server &amp; Client Components</a>
+      <a class="nav-link" href="3.4-api-routes.html"><span class="ln">3.4</span>API Routes &amp; Datenabruf</a>
+      <a class="nav-link" href="3.5-playwright-e2e.html"><span class="ln">3.5</span>Playwright E2E</a>
+      <a class="nav-link" href="3.6-deployment.html"><span class="ln">3.6</span>Deployment</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label rn-label">Teil 4 &mdash; React Native</div>
+      <a class="nav-link" href="4.1-rn-einfuehrung.html"><span class="ln">4.1</span>Einführung React Native</a>
+      <a class="nav-link" href="4.2-rn-komponenten.html"><span class="ln">4.2</span>Native Komponenten &amp; Styling</a>
+      <a class="nav-link" href="4.3-rn-navigation.html"><span class="ln">4.3</span>Navigation &amp; State</a>
+    </div>
+  </nav>
+</aside>
+
+<main class="main-content">
+
+  <header class="lesson-header">
+    <p class="lesson-eyebrow">Lektion 4.3 &mdash; Teil 4: React Native</p>
+    <h1>Navigation &amp; State</h1>
+    <div class="lesson-tags">
+      <span class="tag tag-rn">React Native</span>
+      <span class="tag tag-time">ca. 105 min</span>
+    </div>
+  </header>
+
+  <div class="content-area">
+
+  <!-- Lernziele -->
+  <section class="section-lernziele">
+    <h2>Lernziele</h2>
+    <ul>
+      <li>React Navigation installieren und konfigurieren</li>
+      <li>Einen Tab-Navigator f&uuml;r Abfl&uuml;ge und Ank&uuml;nfte einrichten</li>
+      <li>Einen Stack-Navigator f&uuml;r Detailseiten mit TypeScript-Typen verwenden</li>
+      <li>Mit <code>useNavigation</code> und <code>useRoute</code> zwischen Screens navigieren</li>
+      <li>Parameter (z.B. ein <code>Flight</code>-Objekt) sicher zwischen Screens &uuml;bergeben</li>
+      <li>Tab- und Stack-Navigatoren ineinander verschachteln</li>
+      <li>Geteilten State mit dem Context API &uuml;ber alle Screens teilen</li>
+    </ul>
+  </section>
+
+  <!-- Section 1: React Navigation installieren -->
+  <section>
+    <h2>1 &mdash; React Navigation installieren</h2>
+    <p>
+      React Native hat keine eingebaute Navigation &ndash; anders als React Router im Web
+      muss man sie separat installieren. <strong>React Navigation</strong> ist die
+      Standardl&ouml;sung: battle-tested, aktiv gepflegt, vollst&auml;ndig typisiert
+      und von Expo offiziell unterst&uuml;tzt.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">Terminal</span>
+        <span class="code-lang">Bash</span>
+      </div>
+      <pre><code class="language-bash"># Kern-Bibliothek von React Navigation
+npx expo install @react-navigation/native
+
+# Bottom-Tab-Navigator (die Tab-Leiste am unteren Bildschirmrand)
+npx expo install @react-navigation/bottom-tabs
+
+# Stack-Navigator (Push/Pop zwischen Screens wie im Browser)
+npx expo install @react-navigation/native-stack
+
+# Pflicht-Abhängigkeiten für native Animationen und Safe-Area-Handling
+npx expo install react-native-screens react-native-safe-area-context</code></pre>
+    </div>
+
+    <div class="callout callout-info">
+      <div class="callout-icon">&#8505;</div>
+      <div class="callout-body">
+        <div class="callout-title">npx expo install statt npm install</div>
+        <p>
+          F&uuml;r Expo-Projekte immer <code>npx expo install</code> (nicht
+          <code>npm install</code>) verwenden. Der Expo-Paketmanager w&auml;hlt
+          automatisch die Versionen, die mit der installierten Expo-Version kompatibel
+          sind. <code>npm install</code> kann zu Versions-Konflikten f&uuml;hren,
+          die schwer zu debuggen sind.
+        </p>
+      </div>
+    </div>
+
+    <h3>React Router vs. React Navigation &ndash; Vergleich</h3>
+    <p>
+      Die Konzepte sind &auml;hnlich, die API jedoch unterschiedlich. Diese Tabelle
+      hilft beim Transfer des Wissens aus Lektion 2.7 (React Router):
+    </p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>React Router (Web, L10)</th>
+            <th>React Navigation (Mobile)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>BrowserRouter</code></td>
+            <td><code>NavigationContainer</code></td>
+          </tr>
+          <tr>
+            <td><code>Routes</code> + <code>Route</code></td>
+            <td><code>Stack.Navigator</code> + <code>Stack.Screen</code></td>
+          </tr>
+          <tr>
+            <td><code>&lt;Link to="/detail"&gt;</code></td>
+            <td><code>navigation.navigate('Detail')</code></td>
+          </tr>
+          <tr>
+            <td><code>useParams()</code></td>
+            <td><code>route.params</code> (via <code>useRoute()</code>)</td>
+          </tr>
+          <tr>
+            <td><code>useNavigate()</code></td>
+            <td><code>useNavigation()</code></td>
+          </tr>
+          <tr>
+            <td><code>navigate(-1)</code> (zur&uuml;ck)</td>
+            <td><code>navigation.goBack()</code></td>
+          </tr>
+          <tr>
+            <td>Browser-History (URL-basiert)</td>
+            <td>Stack (in-memory, keine URL)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Section 2: Tab-Navigator -->
+  <section>
+    <h2>2 &mdash; Tab-Navigator einrichten</h2>
+    <p>
+      Der Tab-Navigator rendert eine Leiste am unteren Bildschirmrand (iOS) oder oben
+      (Android, konfigurierbar). Jeder Tab hat einen eigenen Navigations-Stack.
+      Das Umschalten zwischen Tabs ist sofort &ndash; der State jedes Tabs bleibt
+      erhalten, selbst wenn der Nutzer zwischen Tabs wechselt.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">App.tsx</span>
+        <span class="code-lang">TypeScript</span>
+      </div>
+      <pre><code class="language-typescript">import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Text } from 'react-native';
+
+// Platzhalter-Screens (werden in Abschnitt 3 durch echte Stack-Navigatoren ersetzt)
+import { DepartureStackNavigator } from './src/navigation/DepartureStack';
+import { ArrivalStackNavigator } from './src/navigation/ArrivalStack';
+
+// Tab-Navigator-Typ: Name → Props des jeweiligen Screens
+// Leere {} bedeutet: kein Param für diesen Tab-Screen
+type TabParamList = {
+  DepartureTab: undefined;
+  ArrivalTab: undefined;
+};
+
+const Tab = createBottomTabNavigator&lt;TabParamList&gt;();
+
+export default function App() {
+  return (
+    // NavigationContainer MUSS die gesamte App umschließen (einmalig!)
+    &lt;NavigationContainer&gt;
+      &lt;Tab.Navigator
+        screenOptions={{
+          // Allgemeines Dark-Theme für alle Tabs
+          headerStyle: {
+            backgroundColor: '#161b22',
+          },
+          headerTintColor: '#e6edf3',
+          headerTitleStyle: {
+            fontWeight: '600',
+          },
+          // Tab-Leiste styling
+          tabBarStyle: {
+            backgroundColor: '#161b22',
+            borderTopColor: '#21262d',
+            borderTopWidth: 1,
+            height: 60,
+            paddingBottom: 8,
+            paddingTop: 4,
+          },
+          tabBarActiveTintColor: '#61dafb',
+          tabBarInactiveTintColor: '#8b949e',
+          tabBarLabelStyle: {
+            fontSize: 12,
+            fontWeight: '500',
+          },
+        }}
+      &gt;
+        &lt;Tab.Screen
+          name="DepartureTab"
+          component={DepartureStackNavigator}
+          options={{
+            title: 'Abfl&uuml;ge',
+            headerShown: false,       // Stack-Navigator hat seinen eigenen Header
+            tabBarIcon: ({ color, size }) =&gt; (
+              &lt;Text style={{ color, fontSize: size }}&gt;&#9992;&lt;/Text&gt;
+            ),
+          }}
+        /&gt;
+        &lt;Tab.Screen
+          name="ArrivalTab"
+          component={ArrivalStackNavigator}
+          options={{
+            title: 'Ank&uuml;nfte',
+            headerShown: false,
+            tabBarIcon: ({ color, size }) =&gt; (
+              &lt;Text style={{ color, fontSize: size }}&gt;&#8600;&lt;/Text&gt;
+            ),
+          }}
+        /&gt;
+      &lt;/Tab.Navigator&gt;
+    &lt;/NavigationContainer&gt;
+  );
+}</code></pre>
+    </div>
+  </section>
+
+  <!-- Section 3: Stack-Navigator mit TypeScript -->
+  <section>
+    <h2>3 &mdash; Stack-Navigator mit TypeScript</h2>
+    <p>
+      Der Stack-Navigator funktioniert wie der Browser-Verlauf: Screens werden
+      &bdquo;gestapelt&ldquo; (gepusht), und der Zur&uuml;ck-Button poppt den
+      obersten Screen vom Stack. Mit TypeScript definieren wir die erlaubten
+      Screen-Namen und ihre Parameter als Typ &ndash; das verhindert Tippfehler beim
+      Navigieren und gibt vollst&auml;ndige Autovervollst&auml;ndigung.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">navigation/DepartureStack.tsx</span>
+        <span class="code-lang">TypeScript</span>
+      </div>
+      <pre><code class="language-typescript">import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { Flight } from '../types/flight';
+import { DepartureListScreen } from '../screens/DepartureListScreen';
+import { FlightDetailScreen } from '../screens/FlightDetailScreen';
+
+// ParamList-Typ: definiert alle Screens und ihre erwarteten Parameter.
+// undefined = Screen erwartet keine Parameter.
+// { flight: Flight } = Screen erwartet ein Flight-Objekt.
+export type DepartureStackParamList = {
+  DepartureList: undefined;
+  FlightDetail: { flight: Flight };
+};
+
+const Stack = createNativeStackNavigator&lt;DepartureStackParamList&gt;();
+
+export function DepartureStackNavigator() {
+  return (
+    &lt;Stack.Navigator
+      // Standard-Options gelten für alle Screens in diesem Stack
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: '#161b22',
+        },
+        headerTintColor: '#e6edf3',
+        headerTitleStyle: {
+          fontWeight: '600',
+          fontSize: 17,
+        },
+        headerBackTitle: 'Zur&uuml;ck',        // iOS: Text des Zurück-Buttons
+        contentStyle: {
+          backgroundColor: '#0d1117',    // Hintergrundfarbe der Screen-Animation
+        },
+        // Animations-Stil: 'default' (iOS: slide), 'fade', 'slide_from_right', etc.
+        animation: 'slide_from_right',
+      }}
+    &gt;
+      &lt;Stack.Screen
+        name="DepartureList"
+        component={DepartureListScreen}
+        options={{ title: '&#9992; Abfl&uuml;ge' }}
+      /&gt;
+      &lt;Stack.Screen
+        name="FlightDetail"
+        component={FlightDetailScreen}
+        // options als Funktion: Zugriff auf route.params für dynamischen Header-Titel
+        options={({ route }) =&gt; ({
+          title: route.params.flight.flightNumber,
+          headerBackTitle: 'Abfl&uuml;ge',
+        })}
+      /&gt;
+    &lt;/Stack.Navigator&gt;
+  );
+}
+
+// Analog: ArrivalStack (gleiche Struktur, anderer ParamList-Name)
+export type ArrivalStackParamList = {
+  ArrivalList: undefined;
+  FlightDetail: { flight: Flight };
+};
+
+// navigation/ArrivalStack.tsx (analog zu DepartureStack, nur Title-Anpassungen)</code></pre>
+    </div>
+  </section>
+
+  <!-- Section 4: Navigation und Parameter -->
+  <section>
+    <h2>4 &mdash; Navigieren und Parameter &uuml;bergeben</h2>
+    <p>
+      Mit <code>useNavigation</code> und <code>useRoute</code> greift man in
+      jeder Komponente auf Navigation und Parameter zu &ndash; ohne Props
+      &bdquo;durchreichen&ldquo; zu m&uuml;ssen. Der TypeScript-Generic sorgt
+      dabei f&uuml;r typsichere Autovervollst&auml;ndigung.
+    </p>
+
+    <h3>Von der Liste zum Detail navigieren</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">screens/DepartureListScreen.tsx</span>
+        <span class="code-lang">TypeScript</span>
+      </div>
+      <pre><code class="language-typescript">import { useState, useMemo } from 'react';
+import { SafeAreaView, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+import { DepartureStackParamList } from '../navigation/DepartureStack';
+import { FlightList } from '../components/FlightList';
+import { SearchBar } from '../components/SearchBar';
+import { useFlights } from '../context/FlightContext';
+
+// Typ: Navigationsfunktion für diesen Stack – gibt Typsicherheit bei navigate()
+type DepartureListNavProp = NativeStackNavigationProp&lt;
+  DepartureStackParamList,
+  'DepartureList'   // aktueller Screen-Name
+&gt;;
+
+export function DepartureListScreen() {
+  // useNavigation mit dem korrekten Typ → navigate() ist typsicher
+  const navigation = useNavigation&lt;DepartureListNavProp&gt;();
+
+  // Flüge aus dem Context (Lektion 8-Muster – funktioniert identisch in RN)
+  const { departures, isLoading, refetch } = useFlights();
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
+
+  const filteredFlights = useMemo(
+    () =&gt;
+      departures.filter(
+        (f) =&gt;
+          f.flightNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          f.destination.toLowerCase().includes(searchQuery.toLowerCase())
+      ),
+    [departures, searchQuery]
+  );
+
+  const handleFlightPress = (flight: Flight) =&gt; {
+    // TypeScript prüft: 'FlightDetail' ist ein gültiger Screen-Name,
+    // und { flight } ist der korrekte Parameter-Typ
+    navigation.navigate('FlightDetail', { flight });
+  };
+
+  const handleRefresh = async () =&gt; {
+    setRefreshing(true);
+    refetch();
+    await new Promise((r) =&gt; setTimeout(r, 800));
+    setRefreshing(false);
+  };
+
+  return (
+    &lt;SafeAreaView style={styles.container}&gt;
+      &lt;SearchBar
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+        resultCount={filteredFlights.length}
+      /&gt;
+      &lt;FlightList
+        flights={filteredFlights}
+        onFlightPress={handleFlightPress}
+        isLoading={isLoading}
+        onRefresh={handleRefresh}
+        refreshing={refreshing}
+      /&gt;
+    &lt;/SafeAreaView&gt;
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#0d1117',
+  },
+});</code></pre>
+    </div>
+
+    <h3>Den Detail-Screen: useRoute und Parameter empfangen</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">screens/FlightDetailScreen.tsx</span>
+        <span class="code-lang">TypeScript</span>
+      </div>
+      <pre><code class="language-typescript">import { ScrollView, View, Text, StyleSheet, SafeAreaView } from 'react-native';
+import { useRoute } from '@react-navigation/native';
+import { NativeStackRouteProp } from '@react-navigation/native-stack';
+import { DepartureStackParamList } from '../navigation/DepartureStack';
+
+// Typ für route.params in diesem Screen
+type FlightDetailRouteProp = NativeStackRouteProp&lt;
+  DepartureStackParamList,
+  'FlightDetail'
+&gt;;
+
+// Status-Labels (für den Detail-Screen)
+const STATUS_LABEL: Record&lt;string, string&gt; = {
+  'on-time':   'P&uuml;nktlich',
+  'delayed':   'Versp&auml;tet',
+  'boarding':  'Boarding',
+  'departed':  'Abgeflogen',
+  'landed':    'Gelandet',
+  'cancelled': 'Storniert',
+};
+const STATUS_COLOR: Record&lt;string, string&gt; = {
+  'on-time':   '#3fb950',
+  'delayed':   '#d29922',
+  'boarding':  '#61dafb',
+  'departed':  '#8b949e',
+  'landed':    '#3fb950',
+  'cancelled': '#f85149',
+};
+
+export function FlightDetailScreen() {
+  // useRoute() gibt das route-Objekt zurück, einschließlich route.params
+  const route = useRoute&lt;FlightDetailRouteProp&gt;();
+
+  // TypeScript weiß: flight ist vom Typ Flight (dank ParamList-Definition)
+  const { flight } = route.params;
+
+  const statusColor = STATUS_COLOR[flight.status] ?? '#8b949e';
+  const statusLabel = STATUS_LABEL[flight.status] ?? flight.status;
+
+  return (
+    &lt;SafeAreaView style={styles.safeArea}&gt;
+      &lt;ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}&gt;
+
+        {/* Hero-Bereich: Flugnummer + Status */}
+        &lt;View style={styles.hero}&gt;
+          &lt;Text style={styles.flightNumber}&gt;{flight.flightNumber}&lt;/Text&gt;
+          &lt;Text style={styles.airline}&gt;{flight.airline}&lt;/Text&gt;
+          &lt;View style={[styles.statusPill, { backgroundColor: statusColor + '22' }]}&gt;
+            &lt;Text style={[styles.statusText, { color: statusColor }]}&gt;
+              &#9679; {statusLabel}
+            &lt;/Text&gt;
+          &lt;/View&gt;
+        &lt;/View&gt;
+
+        {/* Route-Karte: Abflug → Ankunft */}
+        &lt;View style={styles.routeCard}&gt;
+          &lt;View style={styles.routeEndpoint}&gt;
+            &lt;Text style={styles.routeCode}&gt;VIE&lt;/Text&gt;
+            &lt;Text style={styles.routeCity}&gt;Wien&lt;/Text&gt;
+            &lt;Text style={styles.routeTime}&gt;{flight.departureTime}&lt;/Text&gt;
+          &lt;/View&gt;
+
+          &lt;View style={styles.routeMiddle}&gt;
+            &lt;Text style={styles.routeArrow}&gt;&mdash;&mdash;&#9992;&mdash;&mdash;&gt;&lt;/Text&gt;
+            &lt;Text style={styles.routeDuration}&gt;
+              {flight.duration ?? 'k.A.'}
+            &lt;/Text&gt;
+          &lt;/View&gt;
+
+          &lt;View style={[styles.routeEndpoint, styles.routeEndpointRight]}&gt;
+            &lt;Text style={styles.routeCode}&gt;{flight.destinationCode ?? '???'}&lt;/Text&gt;
+            &lt;Text style={styles.routeCity}&gt;{flight.destination}&lt;/Text&gt;
+            &lt;Text style={styles.routeTime}&gt;{flight.arrivalTime ?? '--:--'}&lt;/Text&gt;
+          &lt;/View&gt;
+        &lt;/View&gt;
+
+        {/* Detail-Tabelle */}
+        &lt;View style={styles.detailCard}&gt;
+          &lt;Text style={styles.detailCardTitle}&gt;Fluginformationen&lt;/Text&gt;
+          &lt;DetailRow label="Gate" value={flight.gate ?? 'TBD'} /&gt;
+          &lt;DetailRow label="Terminal" value={flight.terminal ?? '–'} /&gt;
+          &lt;DetailRow label="Flugzeugtyp" value={flight.aircraft ?? '–'} /&gt;
+          &lt;DetailRow
+            label="Versp&auml;tung"
+            value={flight.delayMinutes
+              ? `${flight.delayMinutes} Min.`
+              : 'Keine'}
+            valueColor={flight.delayMinutes ? '#d29922' : '#3fb950'}
+          /&gt;
+        &lt;/View&gt;
+
+      &lt;/ScrollView&gt;
+    &lt;/SafeAreaView&gt;
+  );
+}
+
+// Wiederverwendbare Detail-Zeile
+function DetailRow({
+  label,
+  value,
+  valueColor = '#e6edf3',
+}: {
+  label: string;
+  value: string;
+  valueColor?: string;
+}) {
+  return (
+    &lt;View style={detailRowStyles.row}&gt;
+      &lt;Text style={detailRowStyles.label}&gt;{label}&lt;/Text&gt;
+      &lt;Text style={[detailRowStyles.value, { color: valueColor }]}&gt;{value}&lt;/Text&gt;
+    &lt;/View&gt;
+  );
+}
+
+const detailRowStyles = StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#21262d',
+  },
+  label: { fontSize: 14, color: '#8b949e' },
+  value: { fontSize: 14, fontWeight: '500' },
+});
+
+const styles = StyleSheet.create({
+  safeArea: { flex: 1, backgroundColor: '#0d1117' },
+  scroll: { flex: 1 },
+  hero: {
+    alignItems: 'center',
+    paddingVertical: 32,
+    paddingHorizontal: 24,
+    borderBottomWidth: 1,
+    borderBottomColor: '#21262d',
+  },
+  flightNumber: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    color: '#61dafb',
+    letterSpacing: 2,
+    marginBottom: 4,
+  },
+  airline: {
+    fontSize: 16,
+    color: '#8b949e',
+    marginBottom: 16,
+  },
+  statusPill: {
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  statusText: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  routeCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    margin: 16,
+    padding: 20,
+    backgroundColor: '#161b22',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#21262d',
+  },
+  routeEndpoint: { flex: 2, alignItems: 'flex-start' },
+  routeEndpointRight: { alignItems: 'flex-end' },
+  routeCode: { fontSize: 22, fontWeight: 'bold', color: '#e6edf3' },
+  routeCity: { fontSize: 12, color: '#8b949e', marginTop: 2 },
+  routeTime: { fontSize: 16, fontWeight: '600', color: '#61dafb', marginTop: 4 },
+  routeMiddle: { flex: 3, alignItems: 'center' },
+  routeArrow: { fontSize: 12, color: '#30363d', marginBottom: 4 },
+  routeDuration: { fontSize: 12, color: '#8b949e' },
+  detailCard: {
+    margin: 16,
+    marginTop: 0,
+    padding: 16,
+    backgroundColor: '#161b22',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#21262d',
+  },
+  detailCardTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#8b949e',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+    marginBottom: 4,
+  },
+});</code></pre>
+    </div>
+  </section>
+
+  <!-- Section 5: Verschachtelte Navigation -->
+  <section>
+    <h2>5 &mdash; Verschachtelte Navigation: Tabs + Stacks</h2>
+    <p>
+      Das endg&uuml;ltige Navigations-Setup kombiniert Tab-Navigator (untere Leiste)
+      und Stack-Navigator (Push/Pop) zu einer typischen mobilen App-Struktur.
+      Jeder Tab hat seinen eigenen Stack, sodass der Navigations-Verlauf
+      pro Tab unabh&auml;ngig ist.
+    </p>
+
+    <h3>Navigationsbaum der FlugBoard App</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">Navigationsstruktur (ASCII)</span>
+        <span class="code-lang">Bash</span>
+      </div>
+      <pre><code class="language-bash">App
+└── FlightProvider (Context)
+    └── NavigationContainer
+        └── Tab.Navigator (Bottom Tabs)
+            ├── DepartureTab
+            │   └── DepartureStack (Stack.Navigator)
+            │       ├── DepartureList    ← initiale Route
+            │       └── FlightDetail     ← nach navigate('FlightDetail', { flight })
+            └── ArrivalTab
+                └── ArrivalStack (Stack.Navigator)
+                    ├── ArrivalList      ← initiale Route
+                    └── FlightDetail     ← eigene Instanz! Kein geteilter Stack</code></pre>
+    </div>
+
+    <div class="callout callout-info">
+      <div class="callout-icon">&#8505;</div>
+      <div class="callout-body">
+        <div class="callout-title">Separate Stacks f&uuml;r separate Tabs</div>
+        <p>
+          Beide Tabs haben ihre <strong>eigene</strong> Instanz des
+          <code>FlightDetailScreen</code>. Das ist kein Fehler, sondern Absicht:
+          Wenn der Nutzer in Tab 1 in ein Flug-Detail navigiert und dann zu Tab 2
+          wechselt, ist Tab 2 noch auf seiner eigenen Listenansicht. Die
+          Navigations-Historys sind komplett unabh&auml;ngig voneinander.
+        </p>
+      </div>
+    </div>
+
+    <h3>Vollst&auml;ndiges App.tsx mit verschachtelter Navigation</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">App.tsx (vollst&auml;ndig)</span>
+        <span class="code-lang">TypeScript</span>
+      </div>
+      <pre><code class="language-typescript">import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Text } from 'react-native';
+import { FlightProvider } from './src/context/FlightContext';
+import { DepartureStackNavigator } from './src/navigation/DepartureStack';
+import { ArrivalStackNavigator } from './src/navigation/ArrivalStack';
+
+type RootTabParamList = {
+  DepartureTab: undefined;
+  ArrivalTab: undefined;
+};
+
+const Tab = createBottomTabNavigator&lt;RootTabParamList&gt;();
+
+export default function App() {
+  return (
+    // 1. FlightProvider: geteilter State für alle Screens (Context)
+    &lt;FlightProvider&gt;
+      {/* 2. NavigationContainer: einmal, ganz außen */}
+      &lt;NavigationContainer&gt;
+        &lt;Tab.Navigator
+          screenOptions={{
+            // Kein Header auf Tab-Ebene – jeder Stack bringt seinen eigenen Header
+            headerShown: false,
+            tabBarStyle: {
+              backgroundColor: '#161b22',
+              borderTopColor: '#21262d',
+              borderTopWidth: 1,
+              paddingBottom: 8,
+              paddingTop: 4,
+              height: 60,
+            },
+            tabBarActiveTintColor: '#61dafb',
+            tabBarInactiveTintColor: '#484f58',
+          }}
+        &gt;
+          &lt;Tab.Screen
+            name="DepartureTab"
+            component={DepartureStackNavigator}
+            options={{
+              title: 'Abfl&uuml;ge',
+              tabBarIcon: ({ color }) =&gt; (
+                &lt;Text style={{ fontSize: 20, color }}&gt;&#9992;&lt;/Text&gt;
+              ),
+            }}
+          /&gt;
+          &lt;Tab.Screen
+            name="ArrivalTab"
+            component={ArrivalStackNavigator}
+            options={{
+              title: 'Ank&uuml;nfte',
+              tabBarIcon: ({ color }) =&gt; (
+                &lt;Text style={{ fontSize: 20, color }}&gt;&#8595;&lt;/Text&gt;
+              ),
+            }}
+          /&gt;
+        &lt;/Tab.Navigator&gt;
+      &lt;/NavigationContainer&gt;
+    &lt;/FlightProvider&gt;
+  );
+}</code></pre>
+    </div>
+  </section>
+
+  <!-- Section 6: FlightContext -->
+  <section>
+    <h2>6 &mdash; FlightContext &ndash; Geteilter State</h2>
+    <p>
+      Context in React Native funktioniert <strong>exakt genauso</strong> wie im Web
+      (Lektion 2.4). Wir erstellen einen <code>FlightContext</code>, der Abflug- und
+      Ankunftsdaten bereitstellt, und beide List-Screens greifen dar&uuml;ber auf
+      dieselbe Datenquelle zu. Der Context wird au&szlig;erhalb des
+      <code>NavigationContainer</code> platziert, damit alle Screens darauf zugreifen
+      k&ouml;nnen.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">context/FlightContext.tsx</span>
+        <span class="code-lang">TypeScript</span>
+      </div>
+      <pre><code class="language-typescript">import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  ReactNode,
+} from 'react';
+import { Flight } from '../types/flight';
+
+// Context-Typ: was der Context nach außen anbietet
+interface FlightContextValue {
+  departures: Flight[];
+  arrivals: Flight[];
+  isLoading: boolean;
+  error: string | null;
+  refetch: () =&gt; void;
+  lastUpdated: Date | null;
+}
+
+// 1. Context erstellen (identisch zu Lektion 2.4)
+const FlightContext = createContext&lt;FlightContextValue | null&gt;(null);
+
+// 2. Provider-Komponente: verwaltet den State und stellt ihn bereit
+export function FlightProvider({ children }: { children: ReactNode }) {
+  const [departures, setDepartures] = useState&lt;Flight[]&gt;([]);
+  const [arrivals, setArrivals] = useState&lt;Flight[]&gt;([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState&lt;string | null&gt;(null);
+  const [lastUpdated, setLastUpdated] = useState&lt;Date | null&gt;(null);
+  const [fetchKey, setFetchKey] = useState(0);
+
+  const refetch = useCallback(() =&gt; setFetchKey((k) =&gt; k + 1), []);
+
+  useEffect(() =&gt; {
+    const controller = new AbortController();
+    setIsLoading(true);
+    setError(null);
+
+    const fetchAll = async () =&gt; {
+      try {
+        // Beide API-Calls parallel mit Promise.all
+        const [depResponse, arrResponse] = await Promise.all([
+          fetch('http://192.168.1.42:3000/api/flights?type=departures', {
+            signal: controller.signal,
+          }),
+          fetch('http://192.168.1.42:3000/api/flights?type=arrivals', {
+            signal: controller.signal,
+          }),
+        ]);
+
+        if (!depResponse.ok || !arrResponse.ok) {
+          throw new Error('Fehler beim Laden der Flugdaten');
+        }
+
+        const [depData, arrData] = await Promise.all([
+          depResponse.json() as Promise&lt;Flight[]&gt;,
+          arrResponse.json() as Promise&lt;Flight[]&gt;,
+        ]);
+
+        setDepartures(depData);
+        setArrivals(arrData);
+        setLastUpdated(new Date());
+      } catch (err) {
+        if (err instanceof Error &amp;&amp; err.name === 'AbortError') return;
+        setError(err instanceof Error ? err.message : 'Unbekannter Fehler');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAll();
+    return () =&gt; controller.abort();
+  }, [fetchKey]);
+
+  return (
+    &lt;FlightContext.Provider
+      value={{ departures, arrivals, isLoading, error, refetch, lastUpdated }}
+    &gt;
+      {children}
+    &lt;/FlightContext.Provider&gt;
+  );
+}
+
+// 3. Custom Hook für bequemen Zugriff (identisch zu Lektion 8+9)
+export function useFlights(): FlightContextValue {
+  const context = useContext(FlightContext);
+  if (!context) {
+    throw new Error(
+      'useFlights muss innerhalb eines &lt;FlightProvider&gt; verwendet werden'
+    );
+  }
+  return context;
+}</code></pre>
+    </div>
+
+    <h3>Context in den List-Screens verwenden</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">screens/ArrivalListScreen.tsx</span>
+        <span class="code-lang">TypeScript</span>
+      </div>
+      <pre><code class="language-typescript">import { useMemo } from 'react';
+import { SafeAreaView, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useFlights } from '../context/FlightContext';
+import { ArrivalStackParamList } from '../navigation/ArrivalStack';
+import { FlightList } from '../components/FlightList';
+import { SearchBar } from '../components/SearchBar';
+
+type ArrivalListNavProp = NativeStackNavigationProp&lt;
+  ArrivalStackParamList,
+  'ArrivalList'
+&gt;;
+
+export function ArrivalListScreen() {
+  const navigation = useNavigation&lt;ArrivalListNavProp&gt;();
+
+  // Greift auf DENSELBEN Context zu wie DepartureListScreen –
+  // kein doppelter API-Call, da die Daten im Context gecacht sind!
+  const {
+    arrivals,
+    isLoading,
+    isRefreshing,
+    refetch,
+    searchQuery,
+    setSearchQuery,
+  } = useFlights();
+
+  const filteredArrivals = useMemo(
+    () =&gt;
+      arrivals.filter(
+        (f) =&gt;
+          f.flightNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          f.destination.toLowerCase().includes(searchQuery.toLowerCase())
+      ),
+    [arrivals, searchQuery]
+  );
+
+  return (
+    &lt;SafeAreaView style={styles.container}&gt;
+      &lt;SearchBar value={searchQuery} onChangeText={setSearchQuery} /&gt;
+      &lt;FlightList
+        flights={filteredArrivals}
+        isLoading={isLoading}
+        onFlightPress={(flight) =&gt; navigation.navigate('FlightDetail', { flight })}
+        onRefresh={refetch}
+        refreshing={isRefreshing}
+      /&gt;
+    &lt;/SafeAreaView&gt;
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#0d1117' },
+});</code></pre>
+    </div>
+
+    <div class="callout callout-info">
+      <div class="callout-icon">&#10003;</div>
+      <div class="callout-body">
+        <div class="callout-title">Herzlichen Gl&uuml;ckwunsch!</div>
+        <p>
+          Du hast alle 22 Lektionen des FlugBoard-Kurses abgeschlossen! Du beherrschst
+          jetzt React (Lektion 1.1&ndash;2.9), Next.js (Lektion 3.1&ndash;3.6) und React Native
+          (Lektion 4.1&ndash;4.3). Du kannst Web-Apps, serverseitig gerenderte Anwendungen
+          und native mobile Apps entwickeln &ndash; mit einem gemeinsamen Fundament aus
+          TypeScript und React.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Projektschritt -->
+  <section class="section-projekt">
+    <h2>Projektschritt</h2>
+    <div class="projekt-box">
+      <div class="projekt-box-header">
+        <span class="projekt-step">Projektschritt 4.3</span>
+        <h3>FlugBoard Mobile &ndash; Vollst&auml;ndige Navigation</h3>
+      </div>
+      <p>
+        Im finalen Projektschritt binden wir alle Teile zusammen: Navigation,
+        State-Management und die vollst&auml;ndige App-Struktur mit Tabs und
+        Stack-Navigatoren.
+      </p>
+      <ol>
+        <li>
+          <strong>Pakete installieren:</strong><br>
+          <code>npx expo install @react-navigation/native @react-navigation/bottom-tabs @react-navigation/native-stack react-native-screens react-native-safe-area-context</code>
+        </li>
+        <li>
+          <strong>DepartureStack.tsx + ArrivalStack.tsx erstellen:</strong>
+          Je einen <code>createNativeStackNavigator</code> mit <code>ParamList</code>-Typ,
+          je zwei Screens: List + Detail.
+        </li>
+        <li>
+          <strong>DepartureListScreen.tsx + ArrivalListScreen.tsx erstellen:</strong>
+          <code>useNavigation</code> mit typisiertem Generic,
+          <code>navigate('FlightDetail', { flight })</code> bei FlightCard-Druck.
+        </li>
+        <li>
+          <strong>FlightDetailScreen.tsx erstellen:</strong>
+          <code>useRoute</code> mit typisiertem Generic,
+          <code>route.params.flight</code> auslesen, vollst&auml;ndige Detail-UI
+          mit <code>ScrollView</code>.
+        </li>
+        <li>
+          <strong>FlightContext.tsx erstellen:</strong>
+          <code>FlightProvider</code> mit <code>departures</code>, <code>arrivals</code>,
+          <code>isLoading</code>, <code>error</code>, <code>refetch</code>.
+          <code>useFlights()</code>-Hook exportieren.
+        </li>
+        <li>
+          <strong>App.tsx fertigstellen:</strong>
+          <code>FlightProvider</code> um <code>NavigationContainer</code> wrappen,
+          <code>Tab.Navigator</code> mit beiden Stack-Navigatoren, dunkles Tab-Bar-Styling.
+        </li>
+        <li>
+          <strong>Navigation testen:</strong>
+          Auf einen Flug tippen &rarr; Detail &ouml;ffnet sich.
+          Zur&uuml;ck-Button pr&uuml;fen. Zwischen Tabs wechseln &rarr;
+          Navigations-Verlauf ist unabh&auml;ngig.
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- Häufige Fehler -->
+  <section class="section-fehler">
+    <h2>H&auml;ufige Fehler</h2>
+
+    <div class="fehler-item">
+      <div class="fehler-title">Fehler: NavigationContainer vergessen oder falsch platziert</div>
+      <p>
+        Wenn man <code>useNavigation()</code> oder <code>useRoute()</code> in einer
+        Komponente aufruft, die <strong>nicht</strong> innerhalb eines
+        <code>NavigationContainer</code> gerendert wird, wirft React Navigation
+        einen Fehler: <em>&bdquo;Couldn't find a navigation object. Is your component
+        inside a screen in a navigator?&ldquo;</em>. Das passiert h&auml;ufig, wenn
+        der <code>NavigationContainer</code> vergessen wurde oder eine Komponente
+        au&szlig;erhalb davon verwendet wird.
+      </p>
+      <p class="fehler-fix">
+        <strong>Fix:</strong> Sicherstellen, dass <code>NavigationContainer</code>
+        in <code>App.tsx</code> die gesamte App umschlie&szlig;t und
+        <strong>genau einmal</strong> vorkommt. Alle Screens und Navigatoren m&uuml;ssen
+        Kinder des <code>NavigationContainer</code> sein. Context-Provider wie
+        <code>FlightProvider</code> geh&ouml;ren <strong>au&szlig;erhalb</strong> des
+        <code>NavigationContainer</code>.
+      </p>
+    </div>
+
+    <div class="fehler-item">
+      <div class="fehler-title">Fehler: Falscher Screen-Name in navigation.navigate()</div>
+      <p>
+        <code>navigation.navigate('FlghtDetail', { flight })</code> (Tippfehler!)
+        wirft zur Laufzeit einen Fehler. Ohne TypeScript-Typen sieht man diesen
+        Fehler erst beim Ausf&uuml;hren, nicht beim Schreiben des Codes.
+      </p>
+      <p class="fehler-fix">
+        <strong>Fix:</strong> Den <code>useNavigation</code>-Hook immer mit dem
+        korrekten Generic-Typ versehen:
+        <code>useNavigation&lt;NativeStackNavigationProp&lt;DepartureStackParamList, 'DepartureList'&gt;&gt;()</code>.
+        TypeScript erkennt dann Tippfehler im Screen-Namen sofort beim Schreiben.
+        Zus&auml;tzlich: Screen-Namen als Konstanten auslagern um Duplikate zu vermeiden.
+      </p>
+    </div>
+
+    <div class="fehler-item">
+      <div class="fehler-title">Fehler: Denselben Stack in beiden Tabs verwendet</div>
+      <p>
+        Wenn Departure-Tab und Arrival-Tab denselben <code>Stack.Navigator</code>
+        teilen (also dieselbe Komponenteninstanz), teilen sie auch den
+        Navigations-State. Navigiert man in Tab 1 in ein Detail, ist Tab 2
+        pl&ouml;tzlich auch auf der Detail-Ansicht. Das ist ein subtiler Fehler,
+        der sich manchmal erst nach l&auml;ngerem Testen zeigt.
+      </p>
+      <p class="fehler-fix">
+        <strong>Fix:</strong> Jeder Tab bekommt seinen <strong>eigenen</strong>
+        Stack-Navigator: <code>DepartureStackNavigator</code> und
+        <code>ArrivalStackNavigator</code> als separate Komponenten mit jeweils
+        eigenem <code>createNativeStackNavigator()</code>-Aufruf. Auch wenn beide
+        denselben <code>FlightDetailScreen</code> rendern &ndash; es sind zwei
+        unabh&auml;ngige Instanzen mit unabh&auml;ngigem State.
+      </p>
+    </div>
+
+    <div class="fehler-item">
+      <div class="fehler-title">Fehler: headerShown: false vergessen &rarr; doppelter Header</div>
+      <p>
+        Wenn der Tab-Navigator <code>headerShown</code> nicht auf <code>false</code>
+        setzt, und der Stack-Navigator ebenfalls einen Header rendert, erscheint ein
+        doppelter Header auf dem Bildschirm: einmal der Tab-Header (mit dem Tab-Namen)
+        und einmal der Stack-Header (mit dem Screen-Titel). Das sieht unfertig aus
+        und verschwendet kostbaren Bildschirmplatz.
+      </p>
+      <p class="fehler-fix">
+        <strong>Fix:</strong> Im Tab-Navigator <code>headerShown: false</code> in den
+        <code>screenOptions</code> setzen (gilt dann f&uuml;r alle Tabs), oder in den
+        <code>options</code> jedes einzelnen Tab-Screens:
+        <code>&lt;Tab.Screen options={{ headerShown: false }} /&gt;</code>.
+        Der Stack-Navigator bringt dann seinen eigenen, korrekt konfigurierten
+        Header f&uuml;r jeden Screen mit.
+      </p>
+    </div>
+  </section>
+
+  <!-- Aufgaben -->
+  <section class="section-aufgaben">
+    <h2>Aufgaben</h2>
+    <div class="aufgaben-list">
+
+      <div class="aufgabe">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">Aufgabe 1</span>
+          <span class="aufgabe-title">Tab-Navigator mit dunklem Styling</span>
+        </div>
+        <p>
+          Richte den Tab-Navigator mit zwei Tabs ein und style die Tab-Leiste
+          im FlugBoard-Design.
+        </p>
+        <ul>
+          <li><code>NavigationContainer</code> in <code>App.tsx</code></li>
+          <li>Zwei Tabs: &bdquo;Abfl&uuml;ge&ldquo; und &bdquo;Ank&uuml;nfte&ldquo;</li>
+          <li>Tab-Bar-Hintergrund: <code>#161b22</code>, oberer Border: <code>#21262d</code></li>
+          <li>Aktive Tab-Farbe: <code>#61dafb</code>, inaktiv: <code>#484f58</code></li>
+          <li>Tab-Icons als <code>Text</code>-Emoji-Komponenten (&#9992; / &#8595;)</li>
+          <li><code>headerShown: false</code> f&uuml;r alle Tabs</li>
+        </ul>
+      </div>
+
+      <div class="aufgabe">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">Aufgabe 2</span>
+          <span class="aufgabe-title">Stack-Navigator: Liste &rarr; Detail mit Parameter</span>
+        </div>
+        <p>
+          Erstelle den Stack-Navigator f&uuml;r den Abflug-Tab und implementiere die
+          Navigation von der Liste zum Detail.
+        </p>
+        <ul>
+          <li><code>DepartureStackParamList</code>-Typ mit <code>DepartureList</code> und <code>FlightDetail: { flight: Flight }</code></li>
+          <li><code>createNativeStackNavigator</code> mit zwei Screens</li>
+          <li><code>screenOptions</code>: dunkler Header (<code>#161b22</code>), helle Schrift (<code>#e6edf3</code>)</li>
+          <li><code>DepartureListScreen</code>: <code>useNavigation</code> mit korrektem Generic-Typ</li>
+          <li>Bei FlightCard-Druck: <code>navigation.navigate('FlightDetail', { flight })</code></li>
+          <li><code>FlightDetailScreen</code>: <code>useRoute</code>, <code>route.params.flight</code> auslesen und anzeigen</li>
+        </ul>
+      </div>
+
+      <div class="aufgabe">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">Aufgabe 3</span>
+          <span class="aufgabe-title">FlightContext: beide List-Screens aus Context</span>
+        </div>
+        <p>
+          Erstelle den <code>FlightContext</code> und stelle sicher, dass beide
+          List-Screens dieselben Daten nutzen.
+        </p>
+        <ul>
+          <li><code>FlightProvider</code> mit <code>departures</code>, <code>arrivals</code>, <code>isLoading</code>, <code>error</code>, <code>refetch</code></li>
+          <li><code>useFlights()</code>-Hook mit Fehlerbehandlung (wirft Error au&szlig;erhalb des Providers)</li>
+          <li><code>FlightProvider</code> in <code>App.tsx</code> au&szlig;erhalb des <code>NavigationContainer</code></li>
+          <li>Beide List-Screens nutzen <code>useFlights()</code> statt eigenem <code>useState</code></li>
+          <li>Verifizieren: Tab wechseln &rarr; kein zweiter API-Call (Daten schon im Context gecacht)</li>
+        </ul>
+      </div>
+
+      <div class="aufgabe aufgabe-bonus">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">Aufgabe 4 &mdash; Bonus</span>
+          <span class="aufgabe-title">Favoriten-System</span>
+        </div>
+        <p>
+          Erweitere den <code>FlightContext</code> um ein Favoriten-System, das
+          &uuml;ber alle Screens und Tabs hinweg synchronisiert ist.
+        </p>
+        <ul>
+          <li><code>favorites: Set&lt;number&gt;</code> State im Context (Menge von Flug-IDs)</li>
+          <li><code>toggleFavorite(id: number)</code> Funktion im Context</li>
+          <li>Stern-Symbol (&#9733;/&#9734;) in der <code>FlightCard</code>:
+              gef&uuml;llt wenn favorisiert, leer wenn nicht</li>
+          <li>Tippen auf den Stern toggelt den Favoriten-Status (ohne zur Detail-Seite zu navigieren)</li>
+          <li>Im <code>FlightDetailScreen</code> ebenfalls Favoriten-Button anzeigen</li>
+          <li>Optionaler dritter Tab: &bdquo;Favoriten&ldquo; zeigt nur favorisierte Fl&uuml;ge</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Lesson Navigation (LAST LESSON) -->
+
+  </div><!-- /content-area -->
+
+        <nav class="lesson-nav">
+    <a class="nav-btn" href="4.2-rn-komponenten.html">&larr; Lektion 4.2: Native Komponenten &amp; Styling</a>
+    <span class="nav-center-info">Lektion 4.3</span>
+    <span class="nav-btn" style="opacity:0.4;cursor:default;">Kursabschluss &#127881;</span>
+  </nav>
+
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+<script>
+  // Hamburger menu
+  const ham = document.getElementById('hamburger');
+  const sb  = document.getElementById('sidebar');
+  const ov  = document.getElementById('overlay');
+  ham.addEventListener('click', () => { sb.classList.toggle('open'); ov.classList.toggle('visible'); });
+  ov.addEventListener('click',  () => { sb.classList.remove('open'); ov.classList.remove('visible'); });
+  // Active nav link
+  const cur = window.location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.nav-link').forEach(l => {
+    if (l.getAttribute('href') === cur) l.classList.add('active');
+  });
+  // Theme toggle — einfach & robust (kein CSS-Swap nötig)
+  const themeBtn = document.getElementById('theme-toggle');
+  const applyTheme = (t) => {
+    document.documentElement.setAttribute('data-theme', t);
+    if (themeBtn) themeBtn.innerHTML = t === 'dark' ? '&#9728;' : '&#9790;';
+  };
+  // Theme aus localStorage laden (alle Seiten teilen denselben Key)
+  applyTheme(localStorage.getItem('kurs-theme') || 'dark');
+  // Transitions erst nach dem initialen Render aktivieren (verhindert Flash)
+  setTimeout(() => document.documentElement.classList.add('theme-transitions'), 50);
+  if (themeBtn) themeBtn.addEventListener('click', () => {
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('kurs-theme', next);
+    applyTheme(next);
+  });
+  hljs.highlightAll();
+</script>
+</body>
+</html>

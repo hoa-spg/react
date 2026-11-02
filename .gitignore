@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.next/
+.env
+.env.local
+*.db
+*.sqlite
+.DS_Store
+*.log
+.pnp
+.pnp.js
+coverage/
+.turbo/

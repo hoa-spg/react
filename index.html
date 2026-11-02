@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>React Kurs</title>
+  <script>(function(){var t=localStorage.getItem('kurs-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
+  <link rel="stylesheet" href="assets/kurs.css">
+</head>
+<body>
+
+<button class="hamburger" id="hamburger" aria-label="Navigation öffnen">&#9776;</button>
+<div class="sidebar-overlay" id="overlay"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html">
+      <div>
+        <div class="brand-name">React Kurs</div>
+        <div class="brand-sub">Web &amp; Mobile</div>
+      </div>
+    </a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Dark/Light Mode" title="Theme wechseln">&#9728;</button>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-label react-label">Teil 1 &mdash; React Einführung</div>
+      <a class="nav-link" href="1.1-einfuehrung-spa.html"><span class="ln">1.1</span>Motivation &amp; SPA</a>
+      <a class="nav-link" href="1.2-einfuehrung.html"><span class="ln">1.2</span>Einf&uuml;hrung &amp; Umgebung</a>
+      <a class="nav-link" href="1.3-komponenten-props-einfach.html"><span class="ln">1.3</span>Komponenten &amp; Props (einfach)</a>
+      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten &amp; Props (Vertiefung)</a>
+      <a class="nav-link" href="1.5-state-events.html"><span class="ln">1.5</span>State &amp; Events</a>
+      <a class="nav-link" href="1.6-listen-conditional.html"><span class="ln">1.6</span>Listen &amp; Conditional Rendering</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label react-label">Teil 2 &mdash; React Praxis</div>
+      <a class="nav-link" href="2.1-formulare.html"><span class="ln">2.1</span>Formulare &amp; Inputs</a>
+      <a class="nav-link" href="2.2-useeffect-api.html"><span class="ln">2.2</span>useEffect &amp; API</a>
+      <a class="nav-link" href="2.3-kommunikation.html"><span class="ln">2.3</span>Komponentenkommunikation</a>
+      <a class="nav-link" href="2.4-context.html"><span class="ln">2.4</span>Context API</a>
+      <a class="nav-link" href="2.5-custom-hooks.html"><span class="ln">2.5</span>Custom Hooks</a>
+      <a class="nav-link" href="2.6-testen-vitest-rtl.html"><span class="ln">2.6</span>Testen mit Vitest + RTL</a>
+      <a class="nav-link" href="2.7-react-router.html"><span class="ln">2.7</span>React Router</a>
+      <a class="nav-link" href="2.8-datenbank-drizzle-sqlite.html"><span class="ln">2.8</span>Datenbankzugriff mit Drizzle + SQLite</a>
+      <a class="nav-link" href="2.9-redux-state-management.html"><span class="ln">2.9</span>State Management mit Redux (Überblick)</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label next-label">Teil 3 &mdash; Next.js</div>
+      <a class="nav-link" href="3.1-nextjs-einfuehrung.html"><span class="ln">3.1</span>Einf&uuml;hrung Next.js</a>
+      <a class="nav-link" href="3.2-nextjs-routing.html"><span class="ln">3.2</span>Routing &amp; Layouts</a>
+      <a class="nav-link" href="3.3-server-client.html"><span class="ln">3.3</span>Server &amp; Client Components</a>
+      <a class="nav-link" href="3.4-api-routes.html"><span class="ln">3.4</span>API Routes &amp; Datenabruf</a>
+      <a class="nav-link" href="3.5-playwright-e2e.html"><span class="ln">3.5</span>Playwright E2E</a>
+      <a class="nav-link" href="3.6-deployment.html"><span class="ln">3.6</span>Deployment</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label rn-label">Teil 4 &mdash; React Native</div>
+      <a class="nav-link" href="4.1-rn-einfuehrung.html"><span class="ln">4.1</span>Einf&uuml;hrung React Native</a>
+      <a class="nav-link" href="4.2-rn-komponenten.html"><span class="ln">4.2</span>Native Komponenten &amp; Styling</a>
+      <a class="nav-link" href="4.3-rn-navigation.html"><span class="ln">4.3</span>Navigation &amp; State</a>
+    </div>
+  </nav>
+</aside>
+
+<main class="main-content">
+  <div class="index-hero">
+    <p class="lesson-eyebrow">Kurs&uuml;bersicht</p>
+    <h1>React Kurs <span>Web &amp; Mobile</span></h1>
+    <p class="subtitle">
+      24 Lektionen &mdash; von SPA-Grundlagen &uuml;ber React und Next.js bis React Native.
+      Ein durchgehender Kurs mit Praxisprojekt.
+    </p>
+    <div class="lesson-tags" style="margin-top:1.25rem">
+      <span class="tag tag-react">React 18</span>
+      <span class="tag tag-next">Next.js 14</span>
+      <span class="tag tag-rn">React Native / Expo</span>
+      <span class="tag tag-level">TypeScript</span>
+      <span class="tag tag-time">Deno + Hono Backend</span>
+    </div>
+  </div>
+
+  <div class="content-area">
+
+    <!-- Intro -->
+    <div class="section">
+      <h2>Projektidee: FlugBoard</h2>
+      <p>
+        Im Mittelpunkt des Kurses steht das Projekt <strong>FlugBoard</strong> &mdash; eine
+        Echtzeit-Fluganzeigetafel &auml;hnlich einem Abflug-/Ankunftsmonitor an einem realen Flughafen.
+        Die App wird in jeder Lektion um neue Konzepte und Features erweitert, sodass am Ende
+        eine vollst&auml;ndige Web-App (mit React und Next.js) sowie eine native Mobile-App
+        (mit React Native) entstehen.
+      </p>
+      <p>
+        Das Backend ist ein schlanker <strong>Deno + Hono</strong>-Server, der Flugdaten als JSON
+        bereitstellt. Ab Lektion&nbsp;06 wird die App an dieses Backend angebunden.
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Feld</th>
+              <th>Typ</th>
+              <th>Beschreibung</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><code>id</code></td><td><code>number</code></td><td>Eindeutige ID</td></tr>
+            <tr><td><code>flightNumber</code></td><td><code>string</code></td><td>Flugnummer, z.B. <em>OS123</em></td></tr>
+            <tr><td><code>airline</code></td><td><code>string</code></td><td>Name der Fluggesellschaft</td></tr>
+            <tr><td><code>type</code></td><td><code>'arrival' | 'departure'</code></td><td>Ankunft oder Abflug</td></tr>
+            <tr><td><code>scheduledTime</code></td><td><code>string</code></td><td>Geplante Zeit (HH:MM)</td></tr>
+            <tr><td><code>expectedTime</code></td><td><code>string?</code></td><td>Erwartete Zeit bei Versp&auml;tung</td></tr>
+            <tr><td><code>status</code></td><td><code>FlightStatus</code></td><td>on-time | delayed | boarding | &hellip;</td></tr>
+            <tr><td><code>airport</code></td><td><code>string</code></td><td>Herkunft (arrival) / Ziel (departure)</td></tr>
+            <tr><td><code>terminal</code></td><td><code>string</code></td><td>Terminal, z.B. <em>T2</em></td></tr>
+            <tr><td><code>gate</code></td><td><code>string?</code></td><td>Gate, z.B. <em>B12</em></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Part 1 -->
+    <div class="section">
+      <h2 class="react-header" style="border-bottom:2px solid rgba(97,218,251,0.4);padding-bottom:.5rem">
+        Teil 1 &mdash; React Einf&uuml;hrung
+      </h2>
+      <div class="course-grid">
+        <a href="1.1-einfuehrung-spa.html" class="lesson-card react-card">
+          <span class="lesson-card-num">1.1</span>
+          <div class="lesson-card-content">
+            <h4>Motivation &amp; SPA-Konzepte</h4>
+            <p>Warum React? SPA vs. MPA, Komponenten-Idee, React vs. Alternativen</p>
+          </div>
+        </a>
+        <a class="lesson-card react-card" href="1.2-einfuehrung.html">
+          <span class="lesson-card-num">1.2</span>
+          <div class="lesson-card-content">
+            <h4>Einf&uuml;hrung &amp; Umgebung</h4>
+            <p>React, JSX, Vite, TypeScript, erste App</p>
+          </div>
+        </a>
+        <a class="lesson-card react-card" href="1.3-komponenten-props-einfach.html">
+          <span class="lesson-card-num">1.3</span>
+          <div class="lesson-card-content">
+            <h4>Komponenten &amp; Props (einfach)</h4>
+            <p>Sanfter Einstieg: kleine Komponenten, einfache Props, ohne Typ-Overhead</p>
+          </div>
+        </a>
+        <a class="lesson-card react-card" href="1.4-komponenten-props-vertiefung.html">
+          <span class="lesson-card-num">1.4</span>
+          <div class="lesson-card-content">
+            <h4>Komponenten &amp; Props (Vertiefung)</h4>
+            <p>Union Types, Record, Destructuring, Spread f&uuml;r robuste Komponenten</p>
+          </div>
+        </a>
+        <a class="lesson-card react-card" href="1.5-state-events.html">
+          <span class="lesson-card-num">1.5</span>
+          <div class="lesson-card-content">
+            <h4>State &amp; Events</h4>
+            <p>useState, Event-Handler, Immutability</p>
+          </div>
+        </a>
+        <a class="lesson-card react-card" href="1.6-listen-conditional.html">
+          <span class="lesson-card-num">1.6</span>
+          <div class="lesson-card-content">
+            <h4>Listen &amp; Conditional Rendering</h4>
+            <p>map, keys, Ternary, Status-Badges</p>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Part 3 -->
+    <div class="section">
+      <h2 class="react-header" style="border-bottom:2px solid rgba(97,218,251,0.4);padding-bottom:.5rem">
+        Teil 2 &mdash; React Praxis
+      </h2>
+      <div class="course-grid">
+        <a class="lesson-card react-card" href="2.1-formulare.html">
+          <span class="lesson-card-num">2.1</span>
+          <div class="lesson-card-content">
+            <h4>Formulare &amp; Inputs</h4>
+            <p>Controlled Components, onChange, onSubmit</p>
+          </div>
+        </a>
+        <a class="lesson-card react-card" href="2.2-useeffect-api.html">
+          <span class="lesson-card-num">2.2</span>
+          <div class="lesson-card-content">
+            <h4>useEffect &amp; API</h4>
+            <p>useEffect, fetch, Deno + Hono Backend</p>
+          </div>
+        </a>
+        <a class="lesson-card react-card" href="2.3-kommunikation.html">
+          <span class="lesson-card-num">2.3</span>
+          <div class="lesson-card-content">
+            <h4>Komponentenkommunikation</h4>
+            <p>Lifting State Up, Callback Props</p>
+          </div>
+        </a>
+        <a class="lesson-card react-card" href="2.4-context.html">
+          <span class="lesson-card-num">2.4</span>
+          <div class="lesson-card-content">
+            <h4>Context API</h4>
+            <p>createContext, useContext, Provider</p>
+          </div>
+        </a>
+        <a class="lesson-card react-card" href="2.5-custom-hooks.html">
+          <span class="lesson-card-num">2.5</span>
+          <div class="lesson-card-content">
+            <h4>Custom Hooks</h4>
+            <p>Eigene Hooks, useFlights, useLocalStorage</p>
+          </div>
+        </a>
+        <a class="lesson-card react-card" href="2.6-testen-vitest-rtl.html">
+          <span class="lesson-card-num">2.6</span>
+          <div class="lesson-card-content">
+            <h4>Testen mit Vitest + RTL</h4>
+            <p>Komponententests, user-event, jest-dom, kurzer Integrationsteil</p>
+          </div>
+        </a>
+        <a class="lesson-card react-card" href="2.7-react-router.html">
+          <span class="lesson-card-num">2.7</span>
+          <div class="lesson-card-content">
+            <h4>React Router</h4>
+            <p>BrowserRouter, Route, useParams, useNavigate</p>
+          </div>
+        </a>
+        <a class="lesson-card react-card" href="2.8-datenbank-drizzle-sqlite.html">
+          <span class="lesson-card-num">2.8</span>
+          <div class="lesson-card-content">
+            <h4>Datenbankzugriff mit Drizzle + SQLite</h4>
+            <p>Deno + Hono Backend, persistente Flugdaten, CRUD via SQL</p>
+          </div>
+        </a>
+        <a class="lesson-card react-card" href="2.9-redux-state-management.html">
+          <span class="lesson-card-num">2.9</span>
+          <div class="lesson-card-content">
+            <h4>State Management mit Redux (Überblick)</h4>
+            <p>Konzeptuell: Store, Actions, Reducer, Selectors, Datenfluss</p>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Part 2 -->
+    <div class="section">
+      <h2 class="next-header" style="border-bottom:2px solid rgba(226,232,240,0.25);padding-bottom:.5rem">
+        Teil 3 &mdash; Next.js
+      </h2>
+      <div class="course-grid">
+        <a class="lesson-card next-card" href="3.1-nextjs-einfuehrung.html">
+          <span class="lesson-card-num">3.1</span>
+          <div class="lesson-card-content">
+            <h4>Einf&uuml;hrung Next.js</h4>
+            <p>SSR, SSG, CSR, App Router, Projektstruktur</p>
+          </div>
+        </a>
+        <a class="lesson-card next-card" href="3.2-nextjs-routing.html">
+          <span class="lesson-card-num">3.2</span>
+          <div class="lesson-card-content">
+            <h4>Routing &amp; Layouts</h4>
+            <p>layout.tsx, page.tsx, loading.tsx, error.tsx</p>
+          </div>
+        </a>
+        <a class="lesson-card next-card" href="3.3-server-client.html">
+          <span class="lesson-card-num">3.3</span>
+          <div class="lesson-card-content">
+            <h4>Server &amp; Client Components</h4>
+            <p>&ldquo;use client&rdquo;, Datenabruf im Server</p>
+          </div>
+        </a>
+        <a class="lesson-card next-card" href="3.4-api-routes.html">
+          <span class="lesson-card-num">3.4</span>
+          <div class="lesson-card-content">
+            <h4>API Routes &amp; Datenabruf</h4>
+            <p>Route Handlers, fetch, Loading States</p>
+          </div>
+        </a>
+        <a class="lesson-card next-card" href="3.5-playwright-e2e.html">
+          <span class="lesson-card-num">3.5</span>
+          <div class="lesson-card-content">
+            <h4>Playwright E2E</h4>
+            <p>End-to-End-Flows, Locators, Reports, CI</p>
+          </div>
+        </a>
+        <a class="lesson-card next-card" href="3.6-deployment.html">
+          <span class="lesson-card-num">3.6</span>
+          <div class="lesson-card-content">
+            <h4>Deployment</h4>
+            <p>Vercel, .env, GitHub Integration, CI/CD</p>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Part 4 -->
+    <div class="section">
+      <h2 class="rn-header" style="border-bottom:2px solid rgba(167,139,250,0.3);padding-bottom:.5rem">
+        Teil 4 &mdash; React Native
+      </h2>
+      <div class="course-grid">
+        <a class="lesson-card rn-card" href="4.1-rn-einfuehrung.html">
+          <span class="lesson-card-num">4.1</span>
+          <div class="lesson-card-content">
+            <h4>Einf&uuml;hrung React Native</h4>
+            <p>Expo, mobile Konzepte, Unterschiede zu Web</p>
+          </div>
+        </a>
+        <a class="lesson-card rn-card" href="4.2-rn-komponenten.html">
+          <span class="lesson-card-num">4.2</span>
+          <div class="lesson-card-content">
+            <h4>Native Komponenten &amp; Styling</h4>
+            <p>View, Text, FlatList, StyleSheet, Flexbox</p>
+          </div>
+        </a>
+        <a class="lesson-card rn-card" href="4.3-rn-navigation.html">
+          <span class="lesson-card-num">4.3</span>
+          <div class="lesson-card-content">
+            <h4>Navigation &amp; State</h4>
+            <p>React Navigation, Tabs, Stack, useNavigation</p>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Prerequisites -->
+    <div class="section">
+      <h2>Voraussetzungen</h2>
+      <div class="callout callout-info">
+        <div class="callout-icon">&#8505;</div>
+        <div class="callout-body">
+          <div class="callout-title">Empfohlenes Vorwissen</div>
+          <p>HTML &amp; CSS Grundlagen, JavaScript (ES6+: Arrow Functions, Destructuring, Spread, Promises/async-await), TypeScript Basics, HTTP-Methoden (GET, POST, PUT, PATCH, DELETE).</p>
+        </div>
+      </div>
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#10003;</div>
+        <div class="callout-body">
+          <div class="callout-title">Empfohlene Tools</div>
+          <p>Visual Studio Code mit den Extensions <strong>ESLint</strong>, <strong>Prettier</strong> und <strong>TypeScript + React (TSX)</strong>. Node.js &ge; 18, Deno &ge; 1.40, Git.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- GitHub Info -->
+    <div class="section">
+      <h2>GitHub Pages</h2>
+      <p>
+        Dieser Kurs ist als statische HTML-Seiten konzipiert und l&auml;uft direkt im Browser &mdash;
+        ohne Build-Schritt. Alle Pfade sind relativ, sodass er auf GitHub Pages, einem lokalen
+        Webserver oder per Doppelklick auf die HTML-Dateien funktioniert.
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Lokaler Test</span>
+          <span class="code-lang">bash</span>
+        </div>
+        <pre><code class="language-bash"># Mit Python (kein Install nötig)
+python3 -m http.server 8080
+# → http://localhost:8080/index.html
+
+# Mit Node.js
+npx serve .
+# → http://localhost:3000</code></pre>
+      </div>
+    </div>
+
+  </div><!-- /content-area -->
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+<script>
+  // Hamburger menu
+  const ham = document.getElementById('hamburger');
+  const sb  = document.getElementById('sidebar');
+  const ov  = document.getElementById('overlay');
+  ham.addEventListener('click', () => { sb.classList.toggle('open'); ov.classList.toggle('visible'); });
+  ov.addEventListener('click',  () => { sb.classList.remove('open'); ov.classList.remove('visible'); });
+  // Active nav link
+  const cur = window.location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.nav-link').forEach(l => {
+    if (l.getAttribute('href') === cur) l.classList.add('active');
+  });
+  // Theme toggle — einfach & robust (kein CSS-Swap nötig)
+  const themeBtn = document.getElementById('theme-toggle');
+  const applyTheme = (t) => {
+    document.documentElement.setAttribute('data-theme', t);
+    if (themeBtn) themeBtn.innerHTML = t === 'dark' ? '&#9728;' : '&#9790;';
+  };
+  // Theme aus localStorage laden (alle Seiten teilen denselben Key)
+  applyTheme(localStorage.getItem('kurs-theme') || 'dark');
+  // Transitions erst nach dem initialen Render aktivieren (verhindert Flash)
+  setTimeout(() => document.documentElement.classList.add('theme-transitions'), 50);
+  if (themeBtn) themeBtn.addEventListener('click', () => {
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('kurs-theme', next);
+    applyTheme(next);
+  });
+  hljs.highlightAll();
+</script>
+</body>
+</html>

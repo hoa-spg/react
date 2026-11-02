@@ -1,0 +1,31 @@
+.empty-state {
+  align-items: center;
+  background: #1c2128;
+  border-radius: 8px;
+  color: #8b949e;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  justify-content: center;
+  padding: 3rem 1rem;
+}
+
+.empty-state-icon {
+  font-size: 2.5rem;
+  opacity: 0.4;
+}
+
+.empty-state-message {
+  font-size: 0.95rem;
+}
+
+.empty-state-reset-btn {
+  background: #21262d;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #e6edf3;
+  cursor: pointer;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  padding: 6px 16px;
+}

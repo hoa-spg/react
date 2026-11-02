@@ -1,0 +1,330 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #0d1117;
+  color: #e6edf3;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+a {
+  color: #61dafb;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+button {
+  cursor: pointer;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  padding: 0 2rem;
+  border-bottom: 1px solid #30363d;
+  background: #161b22;
+}
+
+.app-brand {
+  color: #61dafb;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.app-nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.app-nav-link {
+  color: #8b949e;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.board-nav {
+  display: flex;
+  gap: 0;
+  padding: 0 2rem;
+  border-bottom: 1px solid #30363d;
+  background: #161b22;
+}
+
+.board-nav-link {
+  display: block;
+  padding: 12px 20px;
+  border-bottom: 2px solid transparent;
+  color: #8b949e;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.page-wrap {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.home-title {
+  margin-bottom: 0.5rem;
+  color: #61dafb;
+  font-size: 2rem;
+}
+
+.home-subtitle {
+  margin-bottom: 2rem;
+  color: #8b949e;
+}
+
+.home-links {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 3rem;
+}
+
+.home-link {
+  display: block;
+  padding: 1rem 2rem;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  background: #1c2128;
+  font-weight: 600;
+}
+
+.home-link--primary {
+  color: #61dafb;
+}
+
+.home-link--secondary {
+  color: #e6edf3;
+}
+
+.section-title {
+  margin-bottom: 1rem;
+  color: #e6edf3;
+}
+
+.board-page-title {
+  margin-bottom: 1.5rem;
+  color: #61dafb;
+}
+
+.table-base {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-base thead tr {
+  background: #161b22;
+}
+
+.table-base th {
+  padding: 8px 12px;
+  border-bottom: 1px solid #30363d;
+  color: #8b949e;
+  text-align: left;
+  font-size: 0.85rem;
+}
+
+.table-base td {
+  padding: 10px 12px;
+}
+
+.table-base tbody tr {
+  border-bottom: 1px solid #30363d;
+}
+
+.table-link {
+  color: #61dafb;
+  font-weight: 600;
+}
+
+.text-muted {
+  color: #8b949e;
+}
+
+.text-main {
+  color: #e6edf3;
+}
+
+.time-delayed {
+  margin-left: 6px;
+  color: #d29922;
+}
+
+.status-pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.status-on-time {
+  color: #3fb950;
+  background: #1a3a1a;
+}
+
+.status-delayed {
+  color: #d29922;
+  background: #3a2a0a;
+}
+
+.status-boarding {
+  color: #61dafb;
+  background: #0a2a3a;
+}
+
+.status-departed,
+.status-landed {
+  color: #8b949e;
+  background: #21262d;
+}
+
+.status-cancelled {
+  color: #f85149;
+  background: #3a0a0a;
+}
+
+.search-row {
+  margin-bottom: 1rem;
+}
+
+.search-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  background: #21262d;
+  color: #e6edf3;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+.search-count {
+  margin-bottom: 1rem;
+  color: #8b949e;
+  font-size: 0.85rem;
+}
+
+.empty-table {
+  padding: 2rem;
+  color: #8b949e;
+  text-align: center;
+}
+
+.state-screen {
+  padding: 4rem;
+  text-align: center;
+}
+
+.state-screen--muted {
+  color: #8b949e;
+}
+
+.state-screen--error {
+  color: #f85149;
+}
+
+.state-icon {
+  margin-bottom: 1rem;
+  font-size: 2rem;
+}
+
+.state-title {
+  margin-bottom: 1rem;
+}
+
+.state-text {
+  margin-bottom: 1.5rem;
+  color: #8b949e;
+}
+
+.ghost-btn {
+  padding: 8px 20px;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  background: #1c2128;
+  color: #e6edf3;
+}
+
+.not-found-code {
+  margin-bottom: 1rem;
+  font-size: 4rem;
+}
+
+.not-found-title {
+  margin-bottom: 0.5rem;
+  color: #e6edf3;
+}
+
+.not-found-text {
+  margin-bottom: 2rem;
+}
+
+.detail-wrap {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.detail-back {
+  display: inline-block;
+  margin-bottom: 1.5rem;
+  color: #8b949e;
+}
+
+.detail-card {
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #1c2128;
+}
+
+.detail-head {
+  padding: 1.5rem;
+  border-bottom: 1px solid #30363d;
+  background: #161b22;
+}
+
+.detail-number {
+  color: #61dafb;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.detail-airline {
+  margin-top: 4px;
+  color: #8b949e;
+}
+
+.detail-body {
+  padding: 1.5rem;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #30363d;
+}
+
+.detail-label {
+  color: #8b949e;
+}
+
+.detail-value {
+  color: #e6edf3;
+  font-weight: 500;
+}

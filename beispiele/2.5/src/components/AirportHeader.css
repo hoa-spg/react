@@ -1,0 +1,61 @@
+.airport-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--app-border);
+  border-radius: 8px;
+  background: var(--app-sidebar-bg);
+}
+
+.airport-header-title-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.airport-header-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--app-accent);
+}
+
+.airport-header-subtitle {
+  color: var(--app-muted);
+  font-size: 1rem;
+}
+
+.airport-header-updated {
+  margin-top: 0.25rem;
+  color: var(--app-muted);
+  font-size: 0.8rem;
+}
+
+.airport-header-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.airport-header-action-btn {
+  padding: 7px 14px;
+  border: 1px solid var(--app-border);
+  border-radius: 6px;
+  background: var(--app-card-bg);
+  color: var(--app-text);
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.airport-header-theme-btn {
+  padding: 7px 10px;
+  border: 1px solid var(--app-border);
+  border-radius: 6px;
+  background: var(--app-card-bg);
+  color: var(--app-text);
+  font-size: 1rem;
+  cursor: pointer;
+}

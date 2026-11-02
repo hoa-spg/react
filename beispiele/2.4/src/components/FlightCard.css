@@ -1,0 +1,64 @@
+.flight-row {
+  border-left: 3px solid transparent;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.flight-row:hover {
+  background: var(--app-sidebar-bg);
+}
+
+.flight-row.is-selected {
+  border-left-color: var(--app-accent);
+  background: color-mix(in srgb, var(--app-accent) 14%, transparent);
+}
+
+.flight-row.is-cancelled {
+  opacity: 0.6;
+}
+
+.flight-cell {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--app-border);
+  color: var(--app-text);
+}
+
+.flight-num.is-cancelled {
+  color: var(--app-muted);
+  text-decoration: line-through;
+}
+
+.time-old {
+  margin-right: 4px;
+  color: var(--app-muted);
+  text-decoration: line-through;
+}
+
+.time-delayed {
+  color: #d29922;
+}
+
+.time-boarding {
+  color: var(--app-accent);
+}
+
+.mini-select {
+  padding: 3px 6px;
+  border: 1px solid var(--app-border);
+  border-radius: 4px;
+  background: var(--app-sidebar-bg);
+  color: var(--app-text);
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.delete-btn {
+  padding: 2px 7px;
+  border: 1px solid #f85149;
+  border-radius: 4px;
+  background: none;
+  color: #f85149;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  cursor: pointer;
+}

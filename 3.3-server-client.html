@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3.3 &ndash; Server &amp; Client Components | React Kurs</title>
+  <script>(function(){var t=localStorage.getItem('kurs-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
+  <link rel="stylesheet" href="assets/kurs.css">
+  <link rel="stylesheet" id="hljs-theme" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+<body>
+
+<button class="hamburger" id="hamburger" aria-label="Navigation &ouml;ffnen">&#9776;</button>
+<div class="sidebar-overlay" id="overlay"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html">
+      <span class="brand-icon">&#9992;</span>
+      <div>
+        <div class="brand-name">React Kurs</div>
+        <div class="brand-sub">Web &amp; Mobile</div>
+      </div>
+    </a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Dark/Light Mode" title="Theme wechseln">&#9728;</button>
+  </div>
+        <nav class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-label react-label">Teil 1 &mdash; React Einführung</div>
+      <a class="nav-link" href="1.1-einfuehrung-spa.html"><span class="ln">1.1</span>Motivation &amp; SPA</a>
+      <a class="nav-link" href="1.2-einfuehrung.html"><span class="ln">1.2</span>Einführung &amp; Umgebung</a>
+      <a class="nav-link" href="1.3-komponenten-props-einfach.html"><span class="ln">1.3</span>Komponenten &amp; Props (einfach)</a>
+      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten &amp; Props (Vertiefung)</a>
+      <a class="nav-link" href="1.5-state-events.html"><span class="ln">1.5</span>State &amp; Events</a>
+      <a class="nav-link" href="1.6-listen-conditional.html"><span class="ln">1.6</span>Listen &amp; Conditional Rendering</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label react-label">Teil 2 &mdash; React Praxis</div>
+      <a class="nav-link" href="2.1-formulare.html"><span class="ln">2.1</span>Formulare &amp; Inputs</a>
+      <a class="nav-link" href="2.2-useeffect-api.html"><span class="ln">2.2</span>useEffect &amp; API</a>
+      <a class="nav-link" href="2.3-kommunikation.html"><span class="ln">2.3</span>Komponentenkommunikation</a>
+      <a class="nav-link" href="2.4-context.html"><span class="ln">2.4</span>Context API</a>
+      <a class="nav-link" href="2.5-custom-hooks.html"><span class="ln">2.5</span>Custom Hooks</a>
+      <a class="nav-link" href="2.6-testen-vitest-rtl.html"><span class="ln">2.6</span>Testen mit Vitest + RTL</a>
+      <a class="nav-link" href="2.7-react-router.html"><span class="ln">2.7</span>React Router</a>
+      <a class="nav-link" href="2.8-datenbank-drizzle-sqlite.html"><span class="ln">2.8</span>Datenbankzugriff mit Drizzle + SQLite</a>
+      <a class="nav-link" href="2.9-redux-state-management.html"><span class="ln">2.9</span>State Management mit Redux (Überblick)</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label next-label">Teil 3 &mdash; Next.js</div>
+      <a class="nav-link" href="3.1-nextjs-einfuehrung.html"><span class="ln">3.1</span>Einführung Next.js</a>
+      <a class="nav-link" href="3.2-nextjs-routing.html"><span class="ln">3.2</span>Routing &amp; Layouts</a>
+      <a class="nav-link" href="3.3-server-client.html"><span class="ln">3.3</span>Server &amp; Client Components</a>
+      <a class="nav-link" href="3.4-api-routes.html"><span class="ln">3.4</span>API Routes &amp; Datenabruf</a>
+      <a class="nav-link" href="3.5-playwright-e2e.html"><span class="ln">3.5</span>Playwright E2E</a>
+      <a class="nav-link" href="3.6-deployment.html"><span class="ln">3.6</span>Deployment</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label rn-label">Teil 4 &mdash; React Native</div>
+      <a class="nav-link" href="4.1-rn-einfuehrung.html"><span class="ln">4.1</span>Einführung React Native</a>
+      <a class="nav-link" href="4.2-rn-komponenten.html"><span class="ln">4.2</span>Native Komponenten &amp; Styling</a>
+      <a class="nav-link" href="4.3-rn-navigation.html"><span class="ln">4.3</span>Navigation &amp; State</a>
+    </div>
+  </nav>
+</aside>
+
+<main class="main-content">
+
+  <header class="lesson-header">
+    <p class="lesson-eyebrow">Lektion 3.3 &mdash; Teil 3: Next.js</p>
+    <h1>Server &amp; Client Components</h1>
+    <div class="lesson-tags">
+      <span class="tag tag-next">Next.js</span>
+      <span class="tag tag-time">ca. 105 min</span>
+    </div>
+  </header>
+
+  <div class="content-area">
+
+  <!-- LERNZIELE -->
+  <section class="section section-lernziele">
+    <h2>Lernziele</h2>
+    <p>Nach dieser Lektion kannst du folgendes:</p>
+    <ul>
+      <li>Den fundamentalen Unterschied zwischen Server und Client Components erkl&auml;ren</li>
+      <li>Wissen, wann <code>'use client'</code> notwendig ist &mdash; und wann nicht</li>
+      <li>Daten direkt in Server Components fetchen, ohne <code>useEffect</code></li>
+      <li>Die Kompositionsregel verstehen: Server kann Client rendern, nicht umgekehrt</li>
+      <li>Die verschiedenen Caching-Strategien f&uuml;r <code>fetch</code> in Next.js einsetzen</li>
+      <li>URL-basierte Filter mit <code>useSearchParams</code> in Client Components implementieren</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 1 -->
+  <section class="section">
+    <h2>1 &mdash; Server Components &mdash; der neue Standard</h2>
+    <p>
+      Im App Router ist <strong>jede Komponente standardm&auml;&szlig;ig eine Server Component</strong>.
+      Das ist der wichtigste Paradigmenwechsel gegen&uuml;ber klassischem React.
+      Server Components laufen ausschlie&szlig;lich auf dem Server und senden fertiges HTML
+      zum Browser &mdash; ohne JavaScript-Bundle f&uuml;r diese Komponente.
+    </p>
+
+    <h3>Was Server Components k&ouml;nnen:</h3>
+    <ul>
+      <li><code>async/await</code> direkt in der Komponente verwenden</li>
+      <li>Direkt auf Datenbanken, Dateisystem oder interne APIs zugreifen</li>
+      <li>Secrets und API-Keys sicher nutzen (nie an den Browser gesendet)</li>
+      <li>Vollst&auml;ndiges SEO-freundliches HTML generieren</li>
+      <li>Andere Server <em>und</em> Client Components rendern</li>
+    </ul>
+
+    <h3>Was Server Components <em>nicht</em> k&ouml;nnen:</h3>
+    <ul>
+      <li><code>useState</code>, <code>useEffect</code> oder andere Client-Hooks nutzen</li>
+      <li>Event-Handler wie <code>onClick</code>, <code>onChange</code> definieren</li>
+      <li>Browser-APIs wie <code>window</code>, <code>localStorage</code>, <code>document</code> nutzen</li>
+      <li>Context-Provider oder Context-Consumer einsetzen</li>
+    </ul>
+
+    <h3>Vorher (React mit Vite) vs. Nachher (Next.js Server Component)</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">VORHER: src/pages/DeparturePage.tsx (React + Vite)</span>
+        <span class="code-lang">TypeScript</span>
+      </div>
+      <pre><code class="language-typescript">import { useState, useEffect } from 'react';
+import FlightBoard from '../components/FlightBoard';
+import type { Flight } from '../types/flight';
+
+export default function DeparturePage() {
+  const [flights, setFlights]   = useState&lt;Flight[]&gt;([]);
+  const [isLoading, setLoading] = useState(true);
+  const [error, setError]       = useState&lt;string | null&gt;(null);
+
+  useEffect(() =&gt; {
+    setLoading(true);
+    fetch('http://localhost:3000/api/flights?type=departure')
+      .then(res =&gt; {
+        if (!res.ok) throw new Error('Fehler beim Laden');
+        return res.json();
+      })
+      .then((data: Flight[]) =&gt; setFlights(data))
+      .catch(err =&gt; setError(err.message))
+      .finally(() =&gt; setLoading(false));
+  }, []);
+
+  if (isLoading) return &lt;p&gt;Lade Flugdaten&hellip;&lt;/p&gt;;
+  if (error)     return &lt;p&gt;Fehler: {error}&lt;/p&gt;;
+
+  return &lt;FlightBoard flights={flights} /&gt;;
+}</code></pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">NACHHER: src/app/(board)/departures/page.tsx (Next.js)</span>
+        <span class="code-lang">TypeScript</span>
+      </div>
+      <pre><code class="language-typescript">import FlightBoard from '@/components/FlightBoard';
+import type { Flight } from '@/types/flight';
+
+export default async function DeparturePage() {
+  const response = await fetch(
+    'http://localhost:3000/api/flights?type=departure',
+    { next: { revalidate: 30 } }  // ISR: alle 30 Sekunden neu laden
+  );
+
+  if (!response.ok) {
+    throw new Error('Fehler beim Laden der Abflugdaten');
+  }
+
+  const flights: Flight[] = await response.json();
+
+  return &lt;FlightBoard flights={flights} /&gt;;
+}</code></pre>
+    </div>
+
+    <p>
+      Aus ~40 Zeilen werden ~15 Zeilen. Kein State, kein Effect, kein Lade-Spinner-Management.
+      Next.js &uuml;bernimmt das Lade-UI automatisch &uuml;ber <code>loading.tsx</code> und
+      das Fehler-Handling &uuml;ber <code>error.tsx</code>.
+    </p>
+
+    <div class="callout callout-tip">
+      <div class="callout-icon">&#10003;</div>
+      <div class="callout-body">
+        <div class="callout-title">Fehler m&uuml;ssen geworfen werden</div>
+        <p>
+          In einer Server Component <em>wirfst</em> du Fehler mit <code>throw new Error()</code>.
+          Du f&auml;ngst sie <strong>nicht</strong> mit <code>try/catch</code> ab (au&szlig;er du
+          m&ouml;chtest spezifische Fallbacks). Das n&auml;chste <code>error.tsx</code> in der
+          Ordnerhierarchie f&auml;ngt den Fehler automatisch auf.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2 -->
+  <section class="section">
+    <h2>2 &mdash; Client Components und <code>'use client'</code></h2>
+    <p>
+      Du markierst eine Komponente als Client Component, indem du <code>'use client'</code>
+      als <em>allererste Zeile</em> der Datei schreibst. Alle Komponenten, die diese Datei
+      importieren, werden ebenfalls zu Client Components.
+    </p>
+
+    <h3>Wann brauchst du <code>'use client'</code>?</h3>
+
+    <div style="overflow-x:auto;">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>F&auml;higkeit / Feature</th>
+            <th>Server Component</th>
+            <th>Client Component</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>useState</code> / <code>useReducer</code></td>
+            <td>&#10060; nicht m&ouml;glich</td>
+            <td>&#10003; m&ouml;glich</td>
+          </tr>
+          <tr>
+            <td><code>useEffect</code> / <code>useLayoutEffect</code></td>
+            <td>&#10060; nicht m&ouml;glich</td>
+            <td>&#10003; m&ouml;glich</td>
+          </tr>
+          <tr>
+            <td>Event-Handler (<code>onClick</code>, <code>onChange</code>)</td>
+            <td>&#10060; nicht m&ouml;glich</td>
+            <td>&#10003; m&ouml;glich</td>
+          </tr>
+          <tr>
+            <td>Browser-APIs (<code>window</code>, <code>localStorage</code>)</td>
+            <td>&#10060; nicht m&ouml;glich</td>
+            <td>&#10003; m&ouml;glich</td>
+          </tr>
+          <tr>
+            <td><code>async</code> Datenabruf</td>
+            <td>&#10003; direkt m&ouml;glich</td>
+            <td>&#10003; via <code>useEffect</code></td>
+          </tr>
+          <tr>
+            <td>Backend-Zugriff (DB, Dateisystem)</td>
+            <td>&#10003; sicher m&ouml;glich</td>
+            <td>&#10060; nie direkt</td>
+          </tr>
+          <tr>
+            <td>SEO-HTML beim ersten Laden</td>
+            <td>&#10003; immer</td>
+            <td>&#10060; nur nach JS-Ausf&uuml;hrung</td>
+          </tr>
+          <tr>
+            <td>Secrets / API-Keys</td>
+            <td>&#10003; sicher (nicht im Bundle)</td>
+            <td>&#10060; werden an Browser gesendet!</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Beispiel: SearchBar als Client Component</h3>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">src/components/SearchBar.tsx</span>
+        <span class="code-lang">TypeScript</span>
+      </div>
+      <pre><code class="language-typescript">'use client';
+
+import { useState } from 'react';
+
+interface SearchBarProps {
+  onSearch: (query: string) =&gt; void;
+  placeholder?: string;
+}
+
+export default function SearchBar({ onSearch, placeholder }: SearchBarProps) {
+  const [value, setValue] = useState('');
+
+  function handleChange(e: React.ChangeEvent&lt;HTMLInputElement&gt;) {
+    setValue(e.target.value);
+    onSearch(e.target.value);
+  }
+
+  return (
+    &lt;div className="search-bar"&gt;
+      &lt;input
+        type="search"
+        value={value}
+        onChange={handleChange}
+        placeholder={placeholder ?? 'Flugnummer oder Ziel suchen&hellip;'}
+        className="search-input"
+      /&gt;
+      {value &amp;&amp; (
+        &lt;button
+          onClick={() =&gt; { setValue(''); onSearch(''); }}
+          className="search-clear"
+          aria-label="Suche zur&uuml;cksetzen"
+        &gt;
+          &times;
+        &lt;/button&gt;
+      )}
+    &lt;/div&gt;
+  );
+}</code></pre>
+    </div>
+  </section>
+
+  <!-- SECTION 3 -->
+  <section class="section">
+    <h2>3 &mdash; Kompositionsregel: Server und Client kombinieren</h2>
+    <p>
+      Die Grundregel ist: <strong>Server Components k&ouml;nnen Client Components rendern,
+      aber nicht umgekehrt</strong>. Sobald eine Komponente mit <code>'use client'</code>
+      markiert ist, werden auch alle importierten Komponenten zu Client Components
+      &mdash; auch wenn sie selbst kein <code>'use client'</code> haben.
+    </p>
+
+    <h3>Das &bdquo;Leaf&ldquo;-Pattern</h3>
+    <p>
+      Verschiebe <code>'use client'</code> so weit wie m&ouml;glich nach &bdquo;unten&ldquo; im
+      Komponentenbaum &mdash; an die &bdquo;Bl&auml;tter&ldquo; (Leaf Components). Gr&ouml;&szlig;ere
+      Container-Komponenten k&ouml;nnen Server Components bleiben und damit das HTML
+      vorrendern.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">src/components/SearchWrapper.tsx &mdash; Client Component als H&uuml;lle</span>
+        <span class="code-lang">TypeScript</span>
+      </div>
+      <pre><code class="language-typescript">'use client';
+
+import { useState } from 'react';
+import SearchBar from './SearchBar';
+import type { Flight } from '@/types/flight';
+
+interface SearchWrapperProps {
+  // Fl&uuml;ge werden als Props vom Server Component &uuml;bergeben
+  allFlights: Flight[];
+  children: (filtered: Flight[]) =&gt; React.ReactNode;
+}
+
+export default function SearchWrapper(
+  { allFlights, children }: SearchWrapperProps
+) {
+  const [query, setQuery] = useState('');
+
+  const filtered = allFlights.filter(f =&gt;
+    f.flightNumber.toLowerCase().includes(query.toLowerCase()) ||
+    f.airport.toLowerCase().includes(query.toLowerCase()) ||
+    f.airline.toLowerCase().includes(query.toLowerCase())
+  );
+
+  return (
+    &lt;&gt;
+      &lt;SearchBar onSearch={setQuery} /&gt;
+      {children(filtered)}
+    &lt;/&gt;
+  );
+}</code></pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">src/app/(board)/departures/page.tsx &mdash; Server Component nutzt Client H&uuml;lle</span>
+        <span class="code-lang">TypeScript</span>
+      </div>
+      <pre><code class="language-typescript">import SearchWrapper from '@/components/SearchWrapper';
+import FlightTable from '@/components/FlightTable';
+import { listFlights } from '@/lib/flights-db';
+
+export default async function DeparturePage() {
+  const res = await fetch(
+    'http://localhost:3000/api/flights?type=departure',
+    { next: { revalidate: 30 } }
+  );
+  const flights: Flight[] = await res.json();
+
+  return (
+    &lt;section&gt;
+      &lt;h1&gt;Abfl&uuml;ge ({flights.length})&lt;/h1&gt;
+      {/*
+        Server Component &uuml;bergibt Daten an Client Component.
+        FlightTable ist eine Server Component (kein 'use client').
+      */}
+      &lt;SearchWrapper allFlights={flights}&gt;
+        {(filtered) =&gt; &lt;FlightTable flights={filtered} /&gt;}
+      &lt;/SearchWrapper&gt;
+    &lt;/section&gt;
+  );
+}</code></pre>
+    </div>
+
+    <div class="callout callout-info">
+      <div class="callout-icon">&#8505;</div>
+      <div class="callout-body">
+        <div class="callout-title">Daten flie&szlig;en nur eine Richtung: Server &rarr; Client</div>
+        <p>
+          Du kannst Daten als Props von Server nach Client Components &uuml;bergeben.
+          Aber nur Daten, die sich serialisieren lassen (JSON-kompatible Werte):
+          Strings, Zahlen, Arrays, einfache Objekte. <strong>Keine Funktionen</strong>
+          (au&szlig;er Server Actions), keine Klassen-Instanzen, keine React-Elemente
+          von Server Components.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4 -->
+  <section class="section">
+    <h2>4 &mdash; Caching-Strategien f&uuml;r <code>fetch</code></h2>
+    <p>
+      Next.js erweitert die native <code>fetch</code>-API um ein Caching-System.
+      Mit dem zweiten Argument von <code>fetch</code> steuerst du, wie lange die
+      Antwort gecacht werden soll.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">Caching-Optionen im &Uuml;berblick</span>
+        <span class="code-lang">TypeScript</span>
+      </div>
+      <pre><code class="language-typescript">// 1. Kein Cache – immer frische Daten (SSR bei jedem Request)
+const res = await fetch('/api/flights', {
+  cache: 'no-store',
+});
+
+// 2. ISR – alle 30 Sekunden im Hintergrund neu laden
+const res = await fetch('/api/flights', {
+  next: { revalidate: 30 },
+});
+
+// 3. Statisch – nur beim Build (SSG, maximale Performance)
+const res = await fetch('/api/flights', {
+  cache: 'force-cache',
+});
+
+// 4. On-Demand Revalidation per Tag
+const res = await fetch('/api/flights', {
+  next: { tags: ['flights'] },
+});
+// Zum Invalidieren (z.B. nach einem POST):
+// import { revalidateTag } from 'next/cache';
+// revalidateTag('flights');</code></pre>
+    </div>
+
+    <div style="overflow-x:auto;">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Strategie</th>
+            <th>Wann sinnvoll?</th>
+            <th>FlugBoard Verwendung</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>cache: 'no-store'</code></td>
+            <td>Daten &auml;ndern sich bei jedem Request (Benutzerdaten, Echtzeit)</td>
+            <td>Pers&ouml;nliche Buchungsdetails</td>
+          </tr>
+          <tr>
+            <td><code>revalidate: 30</code></td>
+            <td>Daten &auml;ndern sich regelm&auml;&szlig;ig, aber nicht jede Sekunde</td>
+            <td>Abflug- und Ankunftslisten</td>
+          </tr>
+          <tr>
+            <td><code>force-cache</code></td>
+            <td>Daten &auml;ndern sich selten oder nie</td>
+            <td>Flughafen-Informationen, FAQ</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout callout-warning">
+      <div class="callout-icon">&#9888;</div>
+      <div class="callout-body">
+        <div class="callout-title">Cache-Verhalten hat sich in Next.js 15 ge&auml;ndert</div>
+        <p>
+          In Next.js&nbsp;14 war <code>fetch</code> standardm&auml;&szlig;ig gecacht (<code>force-cache</code>).
+          In Next.js&nbsp;15 ist der Standard <code>cache: 'no-store'</code> f&uuml;r dynamische
+          Routen. Schreibe die Cache-Option immer explizit, um Verwirrung zu vermeiden
+          und das Verhalten unabh&auml;ngig von der Next.js-Version zu kontrollieren.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 5 -->
+  <section class="section">
+    <h2>5 &mdash; URL-basierte Filter mit <code>useSearchParams</code></h2>
+    <p>
+      Statt Filter-State in einer Client Component zu speichern, kannst du ihn in die URL
+      auslagern. Das hat gro&szlig;e Vorteile: Die Seite ist bookmarkbar, der Zur&uuml;ck-Button
+      des Browsers funktioniert korrekt, und Nutzer k&ouml;nnen die gefilterte Ansicht teilen.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">src/components/FilterBar.tsx</span>
+        <span class="code-lang">TypeScript</span>
+      </div>
+      <pre><code class="language-typescript">'use client';
+
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+
+const STATUS_OPTIONS = [
+  { value: '',          label: 'Alle Flüge' },
+  { value: 'on-time',   label: 'P&uuml;nktlich' },
+  { value: 'delayed',   label: 'Versp&auml;tet' },
+  { value: 'boarding',  label: 'Boarding' },
+  { value: 'cancelled', label: 'Annulliert' },
+];
+
+export default function FilterBar() {
+  const searchParams = useSearchParams();
+  const router       = useRouter();
+  const pathname     = usePathname();
+
+  const currentStatus = searchParams.get('status') ?? '';
+
+  function handleStatusChange(status: string) {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (status) {
+      params.set('status', status);
+    } else {
+      params.delete('status');
+    }
+
+    router.replace(`${pathname}?${params.toString()}`);
+  }
+
+  return (
+    &lt;div className="filter-bar"&gt;
+      &lt;span className="filter-label"&gt;Status:&lt;/span&gt;
+      {STATUS_OPTIONS.map(opt =&gt; (
+        &lt;button
+          key={opt.value}
+          className={`filter-btn ${currentStatus === opt.value ? 'active' : ''}`}
+          onClick={() =&gt; handleStatusChange(opt.value)}
+        &gt;
+          {opt.label}
+        &lt;/button&gt;
+      ))}
+    &lt;/div&gt;
+  );
+}</code></pre>
+    </div>
+
+    <p>
+      Die Server Component kann dann <code>searchParams</code> direkt lesen und nur die
+      passenden Fl&uuml;ge laden oder filtern &mdash; ohne jeden Client-State.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">src/app/(board)/departures/page.tsx &mdash; mit searchParams</span>
+        <span class="code-lang">TypeScript</span>
+      </div>
+      <pre><code class="language-typescript">import FilterBar from '@/components/FilterBar';
+import FlightTable from '@/components/FlightTable';
+import type { Flight } from '@/types/flight';
+
+interface PageProps {
+  searchParams: Promise&lt;{ status?: string }&gt;;
+}
+
+export default async function DeparturePage({ searchParams }: PageProps) {
+  const { status } = await searchParams;
+
+  const flights = listFlights('departure').filter(
+    (flight) =&gt; !status || flight.status === status
+  );
+
+  return (
+    &lt;section&gt;
+      &lt;h1&gt;Abfl&uuml;ge&lt;/h1&gt;
+      &lt;FilterBar /&gt;
+      &lt;FlightTable flights={flights} /&gt;
+    &lt;/section&gt;
+  );
+}</code></pre>
+    </div>
+  </section>
+
+  <!-- PROJEKTSCHRITT -->
+  <section class="section section-projekt">
+    <h2>Projektschritt</h2>
+    <div class="projekt-box">
+      <div class="projekt-box-header">
+        <span class="projekt-step">Projektschritt 3.3</span>
+        <h3>Server und Client Components strukturieren</h3>
+      </div>
+      <p>
+        In diesem Projektschritt refaktorieren wir die Abflug- und Ankunftsseiten zu
+        sauberen Server Components und extrahieren alle interaktiven Teile in Client Components.
+      </p>
+      <ol>
+        <li>
+          <strong>DeparturePage umschreiben:</strong> Wandle <code>departures/page.tsx</code> in
+          eine <code>async</code> Server Component um. Entferne <code>useState</code> und
+          <code>useEffect</code> &mdash; ersetze sie durch einen direkten <code>await fetch</code>-Aufruf.
+        </li>
+        <li>
+          <strong>ArrivalPage umschreiben:</strong> Dasselbe f&uuml;r <code>arrivals/page.tsx</code>.
+        </li>
+        <li>
+          <strong>Client Components identifizieren:</strong> Gehe durch alle Komponenten im
+          <code>src/components/</code>-Ordner und f&uuml;ge <code>'use client'</code> dort ein,
+          wo es notwendig ist. Kommentiere kurz, warum.
+        </li>
+        <li>
+          <strong>SearchWrapper erstellen:</strong> Implementiere <code>SearchWrapper.tsx</code>
+          als Client Component, die die Filterfunktion &uuml;bernimmt.
+        </li>
+        <li>
+          <strong>FilterBar einbauen:</strong> Implementiere <code>FilterBar.tsx</code> mit
+          <code>useSearchParams</code> und binde sie in die Seiten ein.
+        </li>
+        <li>
+          <strong>Vergleich:</strong> Z&auml;hle die Zeilen von <code>page.tsx</code> vor und
+          nach dem Refactoring. Diskutiere die Unterschiede.
+        </li>
+      </ol>
+
+      <h3>Vor/Nachher &mdash; Zeilen im Vergleich</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">App.tsx (React/Vite) vs. page.tsx (Next.js)</span>
+          <span class="code-lang">Bash</span>
+        </div>
+        <pre><code class="language-bash"># React/Vite App.tsx
+wc -l src/App.tsx          # → ca. 120 Zeilen
+
+# Next.js page.tsx
+wc -l src/app/(board)/departures/page.tsx  # → ca. 20 Zeilen</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEHLER -->
+  <section class="section section-fehler">
+    <h2>H&auml;ufige Fehler</h2>
+
+    <div class="fehler-item">
+      <div class="fehler-title">Fehler: <code>useState</code> in einer Server Component</div>
+      <p>
+        Du vergisst <code>'use client'</code> hinzuzuf&uuml;gen, aber verwendest <code>useState</code>
+        in der Komponente. Next.js zeigt: <em>&bdquo;You're importing a component that needs useState.
+        It only works in a Client Component but none of its parents are marked with 'use client'.&ldquo;</em>
+      </p>
+      <p class="fehler-fix">
+        <strong>Fix:</strong> F&uuml;ge <code>'use client';</code> als allererste Zeile ein.
+        Wenn die Komponente auch serverseitig rendern soll, extrahiere den interaktiven Teil
+        in eine separate Client Component nach dem Leaf-Pattern.
+      </p>
+    </div>
+
+    <div class="fehler-item">
+      <div class="fehler-title">Fehler: Sensitive Daten in Client Components exponiert</div>
+      <p>
+        Du verwendest einen API-Key oder Datenbank-String in einer Client Component.
+        Der Key wird in das JavaScript-Bundle eingebettet und ist f&uuml;r jeden Besucher
+        sichtbar &mdash; ein gravierendes Sicherheitsproblem.
+      </p>
+      <p class="fehler-fix">
+        <strong>Fix:</strong> API-Keys und Credentials geh&ouml;ren ausschlie&szlig;lich in
+        Server Components oder Route Handlers. Env-Variablen ohne <code>NEXT_PUBLIC_</code>-Prefix
+        sind <em>nur</em> auf dem Server verf&uuml;gbar.
+      </p>
+    </div>
+
+    <div class="fehler-item">
+      <div class="fehler-title">Fehler: Context Provider in Server Component</div>
+      <p>
+        Du versuchst einen React Context Provider (<code>&lt;MyContext.Provider&gt;</code>)
+        in einer Server Component zu verwenden. Next.js wirft einen Fehler, da Context
+        auf Seiten-State basiert, der nur im Browser existiert.
+      </p>
+      <p class="fehler-fix">
+        <strong>Fix:</strong> Erstelle eine separate <code>Providers.tsx</code>-Datei mit
+        <code>'use client'</code>, die alle Context Provider enth&auml;lt. Importiere sie
+        im <code>layout.tsx</code> und umschlie&szlig;e damit <code>{children}</code>.
+      </p>
+    </div>
+
+    <div class="fehler-item">
+      <div class="fehler-title">Fehler: <code>fetch</code> ohne Cache-Strategie in produktionskritischen Seiten</div>
+      <p>
+        Du verwendest <code>fetch</code> ohne Cache-Option. In Next.js&nbsp;15 ist der Default
+        je nach Kontext unterschiedlich &mdash; das f&uuml;hrt zu unerwartetem Verhalten und
+        potenziell &uuml;berm&auml;&szlig;ig vielen API-Anfragen.
+      </p>
+      <p class="fehler-fix">
+        <strong>Fix:</strong> Setze die Cache-Strategie immer explizit:
+        <code>{'{ next: { revalidate: 30 } }'}</code> f&uuml;r ISR, <code>{'{ cache: "no-store" }'}</code>
+        f&uuml;r echtes SSR oder <code>{'{ cache: "force-cache" }'}</code> f&uuml;r statische Daten.
+      </p>
+    </div>
+  </section>
+
+  <!-- AUFGABEN -->
+  <section class="section section-aufgaben">
+    <h2>Aufgaben</h2>
+    <div class="aufgaben-list">
+
+      <div class="aufgabe">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">Aufgabe 1</span>
+          <span class="aufgabe-title">Server Components implementieren</span>
+        </div>
+        <p>
+          Wandle die Seiten f&uuml;r Abfl&uuml;ge und Ank&uuml;nfte in echte async Server Components um.
+        </p>
+        <ul>
+          <li>Entferne <code>useState</code>, <code>useEffect</code> und alle Lade-States</li>
+          <li>Implementiere direktes <code>await fetch</code> mit <code>{'{ next: { revalidate: 30 } }'}</code></li>
+          <li>Wirf bei Fehlern eine <code>Error</code>-Instanz mit sprechendem Text</li>
+          <li>Vergleiche die Zeilen vor und nach dem Refactoring</li>
+        </ul>
+      </div>
+
+      <div class="aufgabe">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">Aufgabe 2</span>
+          <span class="aufgabe-title">Client Components identifizieren und kommentieren</span>
+        </div>
+        <p>
+          Gehe systematisch durch alle Komponenten im <code>src/components/</code>-Ordner.
+        </p>
+        <ul>
+          <li>F&uuml;ge <code>'use client'</code> dort ein, wo es notwendig ist</li>
+          <li>Schreibe &uuml;ber jede <code>'use client'</code>-Direktive einen Kommentar, der begr&uuml;ndet warum</li>
+          <li>Entferne <code>'use client'</code> aus Komponenten, die es nicht ben&ouml;tigen</li>
+          <li>Erstelle eine kurze Liste, welche Komponenten Server und welche Client sind</li>
+        </ul>
+      </div>
+
+      <div class="aufgabe">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">Aufgabe 3</span>
+          <span class="aufgabe-title"><code>SearchWrapper</code> erstellen</span>
+        </div>
+        <p>
+          Implementiere den SearchWrapper nach dem Leaf-Pattern.
+        </p>
+        <ul>
+          <li>Erstelle <code>src/components/SearchWrapper.tsx</code> als Client Component</li>
+          <li>Empfange <code>allFlights</code> als Props (vom Server Component)</li>
+          <li>Filtere nach Flugnummer, Ziel und Airline</li>
+          <li>Verwende das Render-Props-Pattern (<code>children(filtered)</code>) f&uuml;r Flexibilit&auml;t</li>
+        </ul>
+      </div>
+
+      <div class="aufgabe aufgabe-bonus">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">Aufgabe 4 &mdash; Bonus</span>
+          <span class="aufgabe-title">URL-basierte Filter mit <code>useSearchParams</code></span>
+        </div>
+        <p>
+          Implementiere die FilterBar vollst&auml;ndig mit URL-basiertem State.
+        </p>
+        <ul>
+          <li>Erstelle <code>FilterBar.tsx</code> mit <code>useSearchParams</code>, <code>useRouter</code>, <code>usePathname</code></li>
+          <li>Aktualisiere die URL mit <code>router.replace()</code> beim Klick auf einen Filter</li>
+          <li>Lese in der Server Component <code>searchParams</code> aus und &uuml;bergebe den Filter an den <code>fetch</code>-Aufruf</li>
+          <li>Teste: Setze einen Filter, kopiere die URL, &ouml;ffne sie in einem neuen Tab &mdash; der Filter muss aktiv sein</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- LESSON NAV -->
+
+  </div><!-- /content-area -->
+
+        <nav class="lesson-nav">
+    <a class="nav-btn" href="3.2-nextjs-routing.html">&larr; Lektion 3.2: Routing &amp; Layouts</a>
+    <span class="nav-center-info">Lektion 3.3</span>
+    <a class="nav-btn primary" href="3.4-api-routes.html">Lektion 3.4: API Routes &amp; Datenabruf &rarr;</a>
+  </nav>
+
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+<script>
+  // Hamburger menu
+  const ham = document.getElementById('hamburger');
+  const sb  = document.getElementById('sidebar');
+  const ov  = document.getElementById('overlay');
+  ham.addEventListener('click', () => { sb.classList.toggle('open'); ov.classList.toggle('visible'); });
+  ov.addEventListener('click',  () => { sb.classList.remove('open'); ov.classList.remove('visible'); });
+  // Active nav link
+  const cur = window.location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.nav-link').forEach(l => {
+    if (l.getAttribute('href') === cur) l.classList.add('active');
+  });
+  // Theme toggle — einfach & robust (kein CSS-Swap nötig)
+  const themeBtn = document.getElementById('theme-toggle');
+  const applyTheme = (t) => {
+    document.documentElement.setAttribute('data-theme', t);
+    if (themeBtn) themeBtn.innerHTML = t === 'dark' ? '&#9728;' : '&#9790;';
+  };
+  // Theme aus localStorage laden (alle Seiten teilen denselben Key)
+  applyTheme(localStorage.getItem('kurs-theme') || 'dark');
+  // Transitions erst nach dem initialen Render aktivieren (verhindert Flash)
+  setTimeout(() => document.documentElement.classList.add('theme-transitions'), 50);
+  if (themeBtn) themeBtn.addEventListener('click', () => {
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('kurs-theme', next);
+    applyTheme(next);
+  });
+  hljs.highlightAll();
+</script>
+</body>
+</html>

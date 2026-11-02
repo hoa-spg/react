@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1.2 &ndash; Einf&uuml;hrung &amp; Umgebung | React Kurs</title>
+  <script>(function(){var t=localStorage.getItem('kurs-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
+  <link rel="stylesheet" href="assets/kurs.css">
+  <link rel="stylesheet" id="hljs-theme" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+<body>
+
+<button class="hamburger" id="hamburger" aria-label="Navigation &ouml;ffnen">&#9776;</button>
+<div class="sidebar-overlay" id="overlay"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html">
+      <span class="brand-icon">&#9992;</span>
+      <div>
+        <div class="brand-name">React Kurs</div>
+        <div class="brand-sub">Web &amp; Mobile</div>
+      </div>
+    </a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Dark/Light Mode" title="Theme wechseln">&#9728;</button>
+  </div>
+        <nav class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-label react-label">Teil 1 &mdash; React Einführung</div>
+      <a class="nav-link" href="1.1-einfuehrung-spa.html"><span class="ln">1.1</span>Motivation &amp; SPA</a>
+      <a class="nav-link" href="1.2-einfuehrung.html"><span class="ln">1.2</span>Einführung &amp; Umgebung</a>
+      <a class="nav-link" href="1.3-komponenten-props-einfach.html"><span class="ln">1.3</span>Komponenten &amp; Props (einfach)</a>
+      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten &amp; Props (Vertiefung)</a>
+      <a class="nav-link" href="1.5-state-events.html"><span class="ln">1.5</span>State &amp; Events</a>
+      <a class="nav-link" href="1.6-listen-conditional.html"><span class="ln">1.6</span>Listen &amp; Conditional Rendering</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label react-label">Teil 2 &mdash; React Praxis</div>
+      <a class="nav-link" href="2.1-formulare.html"><span class="ln">2.1</span>Formulare &amp; Inputs</a>
+      <a class="nav-link" href="2.2-useeffect-api.html"><span class="ln">2.2</span>useEffect &amp; API</a>
+      <a class="nav-link" href="2.3-kommunikation.html"><span class="ln">2.3</span>Komponentenkommunikation</a>
+      <a class="nav-link" href="2.4-context.html"><span class="ln">2.4</span>Context API</a>
+      <a class="nav-link" href="2.5-custom-hooks.html"><span class="ln">2.5</span>Custom Hooks</a>
+      <a class="nav-link" href="2.6-testen-vitest-rtl.html"><span class="ln">2.6</span>Testen mit Vitest + RTL</a>
+      <a class="nav-link" href="2.7-react-router.html"><span class="ln">2.7</span>React Router</a>
+      <a class="nav-link" href="2.8-datenbank-drizzle-sqlite.html"><span class="ln">2.8</span>Datenbankzugriff mit Drizzle + SQLite</a>
+      <a class="nav-link" href="2.9-redux-state-management.html"><span class="ln">2.9</span>State Management mit Redux (Überblick)</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label next-label">Teil 3 &mdash; Next.js</div>
+      <a class="nav-link" href="3.1-nextjs-einfuehrung.html"><span class="ln">3.1</span>Einführung Next.js</a>
+      <a class="nav-link" href="3.2-nextjs-routing.html"><span class="ln">3.2</span>Routing &amp; Layouts</a>
+      <a class="nav-link" href="3.3-server-client.html"><span class="ln">3.3</span>Server &amp; Client Components</a>
+      <a class="nav-link" href="3.4-api-routes.html"><span class="ln">3.4</span>API Routes &amp; Datenabruf</a>
+      <a class="nav-link" href="3.5-playwright-e2e.html"><span class="ln">3.5</span>Playwright E2E</a>
+      <a class="nav-link" href="3.6-deployment.html"><span class="ln">3.6</span>Deployment</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label rn-label">Teil 4 &mdash; React Native</div>
+      <a class="nav-link" href="4.1-rn-einfuehrung.html"><span class="ln">4.1</span>Einführung React Native</a>
+      <a class="nav-link" href="4.2-rn-komponenten.html"><span class="ln">4.2</span>Native Komponenten &amp; Styling</a>
+      <a class="nav-link" href="4.3-rn-navigation.html"><span class="ln">4.3</span>Navigation &amp; State</a>
+    </div>
+  </nav>
+</aside>
+
+<main class="main-content">
+  <header class="lesson-header">
+    <p class="lesson-eyebrow">Lektion 1.2 &mdash; Teil 1: React Einführung</p>
+    <h1>Einf&uuml;hrung &amp; Umgebung</h1>
+    <div class="lesson-tags">
+      <span class="tag tag-react">React</span>
+      <span class="tag tag-time">ca. 90 min</span>
+      <span class="tag tag-level">Einstieg</span>
+    </div>
+  </header>
+
+  <div class="content-area">
+
+    <section class="section section-lernziele">
+      <h2>Lernziele</h2>
+      <ul class="lernziele-list">
+        <li>Verstehen, was React ist und warum es f&uuml;r UI-Entwicklung eingesetzt wird</li>
+        <li>Node.js, npm und Vite installieren und konfigurieren</li>
+        <li>Ein neues React+TypeScript-Projekt mit Vite erstellen</li>
+        <li>Die Projektstruktur und wichtigsten Dateien kennenlernen</li>
+        <li>JSX-Syntax verstehen und erste Elemente erstellen</li>
+        <li>Den Entwicklungsserver starten und die App im Browser sehen</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>Was ist React?</h2>
+      <p>
+        React ist eine <strong>JavaScript-Bibliothek</strong> (kein vollst&auml;ndiges Framework!) zur Erstellung von
+        Benutzeroberflächen. Sie wurde von Meta (damals Facebook) entwickelt und 2013 als Open-Source-Projekt
+        ver&ouml;ffentlicht. Heute geh&ouml;rt React zu den meistgenutzten Frontend-Technologien weltweit.
+      </p>
+      <p>
+        Das Kernkonzept von React basiert auf drei S&auml;ulen:
+      </p>
+      <ul>
+        <li>
+          <strong>Deklarative Programmierung:</strong> Du beschreibst <em>WAS</em> die UI darstellen soll &ndash;
+          React k&uuml;mmert sich um das <em>WIE</em>. Anstatt DOM-Elemente manuell zu manipulieren, definierst du
+          den gew&uuml;nschten Zustand und React aktualisiert die Seite automatisch.
+        </li>
+        <li>
+          <strong>Komponentenbasiert:</strong> Die UI wird in wiederverwendbare, eigenst&auml;ndige Bausteine
+          &ndash; sogenannte Komponenten &ndash; zerlegt. Jede Komponente hat ihre eigene Logik und Darstellung.
+          Aus kleinen Komponenten lassen sich komplexe UIs zusammenbauen.
+        </li>
+        <li>
+          <strong>Virtueller DOM:</strong> React pflegt intern eine leichtgewichtige Repr&auml;sentation des echten
+          DOM. Bei &Auml;nderungen berechnet React (Diffing-Algorithmus) zuerst was sich ge&auml;ndert hat und
+          aktualisiert dann nur die betroffenen Teile des echten DOM &ndash; das ist sehr effizient.
+        </li>
+      </ul>
+      <div class="callout callout-info">
+        <div class="callout-icon">&#8505;</div>
+        <div class="callout-body">
+          <div class="callout-title">React vs. Framework</div>
+          <p>
+            React ist bewusst als Bibliothek (nicht Framework) konzipiert. Es k&uuml;mmert sich nur um die
+            View-Schicht. F&uuml;r Routing, State-Management, Datenabruf etc. kombiniert man React mit
+            spezialisierten Bibliotheken (React Router, Zustand, TanStack Query usw.) &ndash; oder man verwendet
+            ein vollst&auml;ndiges Framework wie <strong>Next.js</strong>, das React als Basis nutzt (Teil 2
+            dieses Kurses).
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Toolchain einrichten</h2>
+      <p>
+        Bevor wir starten, ben&ouml;tigen wir <strong>Node.js</strong> (mindestens Version 18) und
+        <strong>npm</strong>. Vite &uuml;bernimmt das Build-Setup f&uuml;r uns &ndash; es ist deutlich schneller
+        als das &auml;ltere Create React App und bietet hervorragende TypeScript-Unterst&uuml;tzung.
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Terminal</span>
+          <span class="code-lang">Bash</span>
+        </div>
+        <pre><code class="language-bash"># Node.js-Version pr&uuml;fen (>= 18 wird ben&ouml;tigt)
+node --version
+npm --version
+
+# Neues Projekt mit Vite erstellen
+# Das Flag --template react-ts w&auml;hlt React + TypeScript
+npm create vite@latest flugboard -- --template react-ts
+
+# In den Projektordner wechseln und Abh&auml;ngigkeiten installieren
+cd flugboard
+npm install
+
+# Entwicklungsserver starten (l&auml;uft auf http://localhost:5173)
+npm run dev</code></pre>
+      </div>
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#10003;</div>
+        <div class="callout-body">
+          <div class="callout-title">Vite vs. Create React App</div>
+          <p>
+            Vite nutzt native ES-Module im Browser und startet daher in Millisekunden. Create React App
+            (CRA) b&uuml;ndelt beim Start alles &ndash; bei gr&ouml;&szlig;eren Projekten kann das Minuten dauern.
+            F&uuml;r neue Projekte ist Vite die empfohlene Wahl.
+          </p>
+        </div>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">&#8505;</div>
+        <div class="callout-body">
+          <div class="callout-title">React Developer Tools (empfohlen)</div>
+          <p>
+            Wenn du die App im Browser startest, siehst du in der Konsole oft den Hinweis,
+            die React Developer Tools zu installieren. Das ist sinnvoll, aber optional.
+            Mit der Erweiterung kannst du Komponenten, Props, State und Re-Renders direkt
+            im Browser inspizieren &ndash; sehr hilfreich beim Debugging ab den n&auml;chsten Lektionen.
+          </p>
+          <p>
+            Chrome: <code>React Developer Tools</code> im Chrome Web Store<br>
+            Firefox: <code>React Developer Tools</code> bei den Firefox Add-ons
+          </p>
+          <img
+            src="misc/react_devtools_console_hint.png"
+            alt="Browser-Konsole mit Hinweis auf React Developer Tools"
+            style="display:block;width:100%;max-width:620px;border:1px solid var(--border);border-radius:8px;margin-top:0.6rem;"
+          >
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Projektstruktur verstehen</h2>
+      <p>
+        Nach <code>npm create vite@latest</code> entsteht folgende Ordnerstruktur. Es ist wichtig, die Aufgabe
+        jeder Datei zu kennen:
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Projektstruktur</span>
+          <span class="code-lang">Bash</span>
+        </div>
+        <pre><code class="language-bash">flugboard/
+├── public/            # Statische Assets (favicon, Bilder) &ndash; werden 1:1 kopiert
+├── src/
+│   ├── main.tsx       # Einstiegspunkt &ndash; rendert &lt;App /&gt; in das #root-Element
+│   ├── App.tsx        # Haupt-Komponente der Anwendung
+│   ├── App.css        # Styles speziell f&uuml;r App.tsx
+│   ├── index.css      # Globale CSS-Styles (wird in main.tsx importiert)
+│   └── vite-env.d.ts  # TypeScript-Typdefinitionen f&uuml;r Vite (z.B. import.meta)
+├── index.html         # HTML-Vorlage &ndash; enth&auml;lt &lt;div id="root"&gt;&lt;/div&gt;
+├── package.json       # Projektmetadaten, Abh&auml;ngigkeiten &amp; npm-Scripts
+├── tsconfig.json      # TypeScript-Konfiguration
+└── vite.config.ts     # Vite-Konfiguration (Plugins, Build-Optionen)</code></pre>
+      </div>
+      <p>
+        Die wichtigste Datei zum Start ist <code>src/main.tsx</code>. Sie verbindet React mit dem HTML-Dokument:
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">src/main.tsx</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">// Einstiegspunkt: Verbindet React mit dem Browser-DOM
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import './index.css';
+import App from './App';
+
+// document.getElementById('root') findet &lt;div id="root"&gt; in index.html
+// Das Ausrufezeichen (!) sagt TypeScript: "Dieses Element existiert garantiert"
+createRoot(document.getElementById('root')!).render(
+  &lt;StrictMode&gt;
+    &lt;App /&gt;
+  &lt;/StrictMode&gt;
+);
+
+// StrictMode aktiviert zus&auml;tzliche Warnungen und Checks in der Entwicklung.
+// In der Produktionsversion hat StrictMode keinen Einfluss auf das Verhalten.</code></pre>
+      </div>
+      <div class="callout callout-info">
+        <div class="callout-icon">&#8505;</div>
+        <div class="callout-body">
+          <div class="callout-title">Was ist StrictMode?</div>
+          <p>
+            <code>&lt;StrictMode&gt;</code> ist ein Entwicklungs-Hilfsmittel von React. Es rendert Komponenten
+            im Entwicklungsmodus <em>zweimal</em>, um Nebeneffekte aufzudecken. In der Produktionsversion
+            (nach <code>npm run build</code>) wird die Komponente nur einmal gerendert.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>JSX verstehen</h2>
+      <p>
+        JSX (JavaScript XML) ist eine Syntaxerweiterung f&uuml;r JavaScript/TypeScript, die es erm&ouml;glicht,
+        HTML-&auml;hnlichen Code direkt in TypeScript zu schreiben. JSX wird vom Compiler (Babel oder SWC bei Vite)
+        in gew&ouml;hnliche JavaScript-Funktionsaufrufe umgewandelt.
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">JSX vs. React.createElement</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">// JSX &ndash; was wir schreiben (lesbar, HTML-&auml;hnlich)
+const element = &lt;h1 className="title"&gt;Hallo Welt&lt;/h1&gt;;
+
+// Was der Compiler daraus macht (React.createElement)
+const element = React.createElement('h1', { className: 'title' }, 'Hallo Welt');
+
+// Verschachteltes JSX
+const card = (
+  &lt;div className="card"&gt;
+    &lt;h2&gt;FlugBoard&lt;/h2&gt;
+    &lt;p&gt;Wien International&lt;/p&gt;
+  &lt;/div&gt;
+);
+
+// Ausdr&uuml;cke in JSX (geschweifte Klammern f&uuml;r JavaScript)
+const flughafen = 'Wien-Schwechat';
+const anzeige = &lt;p&gt;Flughafen: {flughafen}&lt;/p&gt;;
+const summe   = &lt;p&gt;Summe: {2 + 3}&lt;/p&gt;;   // Ergibt: "Summe: 5"</code></pre>
+      </div>
+      <h3>Wichtige JSX-Regeln</h3>
+      <p>JSX unterscheidet sich in einigen Punkten von HTML. Diese Regeln sind zu beachten:</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">JSX-Regeln</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">// 1. className statt class (class ist ein reserviertes Wort in JS)
+&lt;div className="container"&gt;Inhalt&lt;/div&gt;
+
+// 2. Selbstschlie&szlig;ende Tags ben&ouml;tigen /&gt;
+&lt;img src="logo.png" alt="Logo" /&gt;
+&lt;br /&gt;
+&lt;input type="text" /&gt;
+
+// 3. Nur EIN Root-Element &ndash; oder Fragment verwenden
+// FALSCH:
+// return &lt;h1&gt;Titel&lt;/h1&gt;&lt;p&gt;Text&lt;/p&gt;;
+
+// RICHTIG &ndash; Fragment (kein extra DOM-Element):
+return (
+  &lt;&gt;
+    &lt;h1&gt;Titel&lt;/h1&gt;
+    &lt;p&gt;Text&lt;/p&gt;
+  &lt;/&gt;
+);
+
+// 4. Kommentare in JSX
+return (
+  &lt;div&gt;
+    {/* Das ist ein JSX-Kommentar */}
+    &lt;p&gt;Inhalt&lt;/p&gt;
+  &lt;/div&gt;
+);
+
+// 5. htmlFor statt for (f&uuml;r Label-Elemente)
+&lt;label htmlFor="email"&gt;E-Mail:&lt;/label&gt;
+&lt;input id="email" type="email" /&gt;
+
+// 6. Inline-Styles als Objekt (nicht als String)
+&lt;div style={{ color: 'red', fontSize: '1rem' }}&gt;Text&lt;/div&gt;</code></pre>
+      </div>
+      <div class="callout callout-warning">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">Doppelte geschweifte Klammern bei Inline-Styles</div>
+          <p>
+            Bei Inline-Styles sieht man oft <code style="background:rgba(0,0,0,0.2);padding:2px 4px;border-radius:3px;">style=&#123;&#123; color: 'red' &#125;&#125;</code>.
+            Die &auml;u&szlig;eren Klammern stehen f&uuml;r den JSX-Ausdruck, die inneren f&uuml;r das JavaScript-Objekt.
+            CSS-Eigenschaften werden in camelCase geschrieben: <code>backgroundColor</code> statt <code>background-color</code>.
+            Im Kurs gilt: Standardm&auml;&szlig;ig arbeiten wir mit <code>className</code> + separater CSS-Datei;
+            Inline-Styles verwenden wir nur f&uuml;r dynamische Laufzeitwerte.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-projekt">
+      <h2>Projektschritt</h2>
+      <div class="projekt-box">
+        <div class="projekt-box-header">
+          <span class="projekt-step">Projektschritt 1.2</span>
+          <h3>Statische Fluganzeigetafel</h3>
+        </div>
+        <p>
+          Wir erstellen unsere erste React-App: eine statische Fluganzeigetafel mit hartkodierten Daten.
+          Noch keine Komponenten, kein State &ndash; nur JSX mit klarer Struktur. Das Styling liegt wie in
+          einer Standard-React-App in <code>App.css</code> und wird in <code>App.tsx</code> importiert.
+        </p>
+        <p>
+          Ersetze den Inhalt von <code>src/App.tsx</code> und <code>src/App.css</code>
+          mit folgendem Code:
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">src/App.tsx</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">import './App.css';
+
+const App = () => {
+  return (
+    &lt;div className="app-page"&gt;
+      &lt;h1 className="app-heading"&gt;&amp;#9992; FlugBoard L01&lt;/h1&gt;
+      &lt;p className="app-subheading"&gt;Flughafen Wien-Schwechat&lt;/p&gt;
+
+      &lt;section&gt;
+        &lt;h2 className="section-heading"&gt;Abfl&uuml;ge&lt;/h2&gt;
+        &lt;table className="flight-table"&gt;
+          &lt;thead&gt;
+            &lt;tr&gt;
+              &lt;th&gt;Flug&lt;/th&gt;
+              &lt;th&gt;Airline&lt;/th&gt;
+              &lt;th&gt;Ziel&lt;/th&gt;
+              &lt;th&gt;Zeit&lt;/th&gt;
+              &lt;th&gt;Status&lt;/th&gt;
+            &lt;/tr&gt;
+          &lt;/thead&gt;
+          &lt;tbody&gt;
+            &lt;tr&gt;
+              &lt;td&gt;OS123&lt;/td&gt;
+              &lt;td&gt;Austrian Airlines&lt;/td&gt;
+              &lt;td&gt;London Heathrow (LHR)&lt;/td&gt;
+              &lt;td&gt;10:30&lt;/td&gt;
+              &lt;td&gt;
+                &lt;span className="status-badge status-boarding"&gt;
+                  Boarding
+                &lt;/span&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+
+            &lt;tr&gt;
+              &lt;td&gt;LH456&lt;/td&gt;
+              &lt;td&gt;Lufthansa&lt;/td&gt;
+              &lt;td&gt;Frankfurt (FRA)&lt;/td&gt;
+              &lt;td&gt;11:15&lt;/td&gt;
+              &lt;td&gt;
+                &lt;span className="status-badge status-delayed"&gt;
+                  Versp&auml;tet
+                &lt;/span&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+
+            &lt;tr&gt;
+              &lt;td&gt;BA234&lt;/td&gt;
+              &lt;td&gt;British Airways&lt;/td&gt;
+              &lt;td&gt;London Heathrow (LHR)&lt;/td&gt;
+              &lt;td&gt;12:00&lt;/td&gt;
+              &lt;td&gt;
+                &lt;span className="status-badge status-on-time"&gt;
+                  P&uuml;nktlich
+                &lt;/span&gt;
+              &lt;/td&gt;
+            &lt;/tr&gt;
+          &lt;/tbody&gt;
+        &lt;/table&gt;
+      &lt;/section&gt;
+    &lt;/div&gt;
+  );
+};
+
+export default App;</code></pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">src/App.css</span>
+            <span class="code-lang">CSS</span>
+          </div>
+          <pre><code class="language-css">.app-page {
+  background: #0d1117;
+  color: #e6edf3;
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.app-heading {
+  color: #61dafb;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.app-subheading {
+  color: #8b949e;
+  font-size: 1rem;
+  margin-bottom: 2rem;
+}
+
+.section-heading {
+  color: #e6edf3;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.flight-table {
+  background: #1c2128;
+  border-collapse: collapse;
+  border-radius: 8px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.flight-table th {
+  background: #161b22;
+  border-bottom: 1px solid #30363d;
+  color: #8b949e;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  padding: 0.6rem 1rem;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.flight-table td {
+  border-bottom: 1px solid #30363d;
+  color: #e6edf3;
+  padding: 0.7rem 1rem;
+}
+
+.status-badge {
+  border-radius: 4px;
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+
+.status-boarding {
+  background: #0a2a3a;
+  color: #61dafb;
+}
+
+.status-delayed {
+  background: #3a2a0a;
+  color: #d29922;
+}
+
+.status-on-time {
+  background: #1a3a1a;
+  color: #3fb950;
+}</code></pre>
+        </div>
+        <div class="callout callout-info">
+          <div class="callout-icon">&#8505;</div>
+          <div class="callout-body">
+            <div class="callout-title">Warum App.css statt Inline-Styles?</div>
+            <p>
+              Wir verwenden von Anfang an die &uuml;bliche React-Struktur mit
+              <code>import './App.css'</code>. Damit bleibt <code>App.tsx</code>
+              auf Logik und JSX fokussiert, w&auml;hrend das Styling zentral in CSS
+              gepflegt wird.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-fehler">
+      <h2>H&auml;ufige Fehler</h2>
+
+      <div class="fehler-item">
+        <div class="fehler-title">Fehler: <code>class</code> statt <code>className</code> in JSX</div>
+        <p>
+          In HTML schreibt man <code>class="container"</code>. In JSX ist <code>class</code> jedoch ein
+          reserviertes Schl&uuml;sselwort in JavaScript (f&uuml;r Klassen-Definitionen). React verwendet daher
+          <code>className</code>. Der TypeScript-Compiler meldet sofort einen Fehler.
+        </p>
+        <p class="fehler-fix">Verwende immer <code>className</code> statt <code>class</code> in JSX-Ausdr&uuml;cken.</p>
+      </div>
+
+      <div class="fehler-item">
+        <div class="fehler-title">Fehler: Datei als <code>.ts</code> statt <code>.tsx</code> gespeichert</div>
+        <p>
+          TypeScript-Dateien mit JSX-Inhalt m&uuml;ssen die Endung <code>.tsx</code> haben. Bei <code>.ts</code>
+          versteht der Compiler die spitzen Klammern nicht und wirft Syntaxfehler.
+        </p>
+        <p class="fehler-fix">Alle Dateien mit JSX-Inhalt (also mit <code>&lt;</code>-Tags) m&uuml;ssen <code>.tsx</code> hei&szlig;en.</p>
+      </div>
+
+      <div class="fehler-item">
+        <div class="fehler-title">Fehler: Mehrere Root-Elemente ohne Fragment</div>
+        <p>
+          Eine Komponente darf nur <em>ein</em> Root-Element zur&uuml;ckgeben. Mehrere nebeneinander stehende
+          Elemente f&uuml;hren zu einem Syntaxfehler: <em>"Adjacent JSX elements must be wrapped in an
+          enclosing tag."</em>
+        </p>
+        <p class="fehler-fix">
+          Verwende ein Fragment <code>&lt;&gt;...&lt;/&gt;</code> oder <code>&lt;React.Fragment&gt;...&lt;/React.Fragment&gt;</code>
+          als Wrapper, wenn du kein zus&auml;tzliches DOM-Element erzeugen willst.
+        </p>
+      </div>
+
+      <div class="fehler-item">
+        <div class="fehler-title">Fehler: <code>export default</code> vergessen</div>
+        <p>
+          Wenn eine Komponente nicht exportiert wird, kann sie nicht in anderen Dateien importiert werden.
+          Der Importfehler lautet dann: <em>"The requested module does not provide an export named 'default'."</em>
+        </p>
+        <p class="fehler-fix">Jede Komponenten-Datei ben&ouml;tigt <code>export default KomponentenName;</code> am Ende.</p>
+      </div>
+    </section>
+
+    <section class="section section-aufgaben">
+      <h2>Aufgaben</h2>
+      <div class="aufgaben-list">
+
+        <div class="aufgabe">
+          <div class="aufgabe-header">
+            <span class="aufgabe-num">Aufgabe 1</span>
+            <span class="aufgabe-title">Projekt erstellen &amp; starten</span>
+          </div>
+          <p>
+            Erstelle ein neues Vite-Projekt namens <code>flugboard</code> mit dem React-TypeScript-Template.
+            Starte den Entwicklungsserver und &uuml;berzeuge dich, dass die App im Browser erreichbar ist.
+          </p>
+          <ul>
+            <li>F&uuml;hre <code>npm create vite@latest flugboard -- --template react-ts</code> aus</li>
+            <li>Installiere die Abh&auml;ngigkeiten mit <code>npm install</code></li>
+            <li>Starte den Server mit <code>npm run dev</code></li>
+            <li>Ersetze den Standard-Inhalt in <code>App.tsx</code> durch eine einfache Begr&uuml;&szlig;ung mit dem Flughafen-Namen</li>
+            <li>Zeige mindestens: einen Titel, einen Untertitel und eine kurze Beschreibung</li>
+          </ul>
+        </div>
+
+        <div class="aufgabe">
+          <div class="aufgabe-header">
+            <span class="aufgabe-num">Aufgabe 2</span>
+            <span class="aufgabe-title">Ankunftstabelle erg&auml;nzen</span>
+          </div>
+          <p>
+            F&uuml;ge unterhalb der Abflugtabelle eine zweite Tabelle f&uuml;r Ank&uuml;nfte (Arrivals) mit
+            3 hartkodierten Fl&uuml;gen hinzu. Orientiere dich am Datenmodell aus der Kurs&uuml;bersicht.
+          </p>
+          <ul>
+            <li>Spalten: Flugnummer, Airline, Herkunftsflughafen, geplante Ankunftszeit, Terminal, Status</li>
+            <li>Verwende diese 3 Fl&uuml;ge: EK789 (Emirates, Dubai, 09:45, gelandet), TK567 (Turkish Airlines, Istanbul, 13:20, versp&auml;tet), WZ112 (Wizz Air, Budapest, 15:30, p&uuml;nktlich)</li>
+            <li>F&auml;rbe den Status je nach Wert unterschiedlich ein (gelandet = grau, versp&auml;tet = gelb, p&uuml;nktlich = blau)</li>
+          </ul>
+        </div>
+
+        <div class="aufgabe">
+          <div class="aufgabe-header">
+            <span class="aufgabe-num">Aufgabe 3</span>
+            <span class="aufgabe-title">JSX vs. HTML &ndash; Unterschiede dokumentieren</span>
+          </div>
+          <p>
+            Erkl&auml;re in einem Block-Kommentar am Anfang von <code>App.tsx</code> die Unterschiede zwischen
+            JSX und HTML. Nenne mindestens 5 konkrete Unterschiede mit je einem kurzen Codebeispiel.
+          </p>
+          <ul>
+            <li>Tipp: Denke an Attribute-Namen, Kommentare, Ausdr&uuml;cke, Styles, Root-Element</li>
+            <li>Der Kommentar soll als kurze Referenz dienen &ndash; klar und pr&auml;gnant formuliert</li>
+          </ul>
+        </div>
+
+        <div class="aufgabe aufgabe-bonus">
+          <div class="aufgabe-header">
+            <span class="aufgabe-num">Bonus</span>
+            <span class="aufgabe-title">Aktuelle Uhrzeit anzeigen</span>
+          </div>
+          <p>
+            F&uuml;ge in der Titelzeile eine statische Anzeige der aktuellen Uhrzeit hinzu (noch kein State,
+            also aktualisiert sie sich nicht automatisch). Verwende <code>new Date().toLocaleTimeString('de-AT')</code>
+            direkt im JSX-Ausdruck. Positioniere die Uhrzeit rechts neben dem Titel (z.B. mit Flexbox und
+            <code>justifyContent: 'space-between'</code>).
+          </p>
+          <p>
+            <strong>Denk&uuml;bung:</strong> Warum aktualisiert sich die Uhrzeit nicht, wenn du die Seite
+            nicht neu l&auml;dst? Was br&auml;uchte man daf&uuml;r? (Antwort: State + useEffect &ndash; kommt in Lektion 6!)
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+  </div><!-- /content-area -->
+
+        <nav class="lesson-nav">
+    <span class="nav-btn nav-btn-disabled">&larr; Keine vorherige Lektion</span>
+    <span class="nav-center-info">Lektion 1.2</span>
+    <a class="nav-btn primary" href="1.3-komponenten-props-einfach.html">Lektion 1.3: Komponenten &amp; Props (einfach) &rarr;</a>
+  </nav>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+<script>
+  // Hamburger menu
+  const ham = document.getElementById('hamburger');
+  const sb  = document.getElementById('sidebar');
+  const ov  = document.getElementById('overlay');
+  ham.addEventListener('click', () => { sb.classList.toggle('open'); ov.classList.toggle('visible'); });
+  ov.addEventListener('click',  () => { sb.classList.remove('open'); ov.classList.remove('visible'); });
+  // Active nav link
+  const cur = window.location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.nav-link').forEach(l => {
+    if (l.getAttribute('href') === cur) l.classList.add('active');
+  });
+  // Theme toggle — einfach & robust (kein CSS-Swap nötig)
+  const themeBtn = document.getElementById('theme-toggle');
+  const applyTheme = (t) => {
+    document.documentElement.setAttribute('data-theme', t);
+    if (themeBtn) themeBtn.innerHTML = t === 'dark' ? '&#9728;' : '&#9790;';
+  };
+  // Theme aus localStorage laden (alle Seiten teilen denselben Key)
+  applyTheme(localStorage.getItem('kurs-theme') || 'dark');
+  // Transitions erst nach dem initialen Render aktivieren (verhindert Flash)
+  setTimeout(() => document.documentElement.classList.add('theme-transitions'), 50);
+  if (themeBtn) themeBtn.addEventListener('click', () => {
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('kurs-theme', next);
+    applyTheme(next);
+  });
+  hljs.highlightAll();
+</script>
+</body>
+</html>

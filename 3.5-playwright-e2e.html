@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3.5 &ndash; Playwright E2E | React Kurs</title>
+  <script>(function(){var t=localStorage.getItem('kurs-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
+  <link rel="stylesheet" href="assets/kurs.css">
+  <link rel="stylesheet" id="hljs-theme" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+<body>
+
+<button class="hamburger" id="hamburger" aria-label="Navigation &ouml;ffnen">&#9776;</button>
+<div class="sidebar-overlay" id="overlay"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html">
+      <span class="brand-icon">&#9992;</span>
+      <div>
+        <div class="brand-name">React Kurs</div>
+        <div class="brand-sub">Web &amp; Mobile</div>
+      </div>
+    </a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Dark/Light Mode" title="Theme wechseln">&#9728;</button>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-label react-label">Teil 1 &mdash; React Einführung</div>
+      <a class="nav-link" href="1.1-einfuehrung-spa.html"><span class="ln">1.1</span>Motivation &amp; SPA</a>
+      <a class="nav-link" href="1.2-einfuehrung.html"><span class="ln">1.2</span>Einführung &amp; Umgebung</a>
+      <a class="nav-link" href="1.3-komponenten-props-einfach.html"><span class="ln">1.3</span>Komponenten &amp; Props (einfach)</a>
+      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten &amp; Props (Vertiefung)</a>
+      <a class="nav-link" href="1.5-state-events.html"><span class="ln">1.5</span>State &amp; Events</a>
+      <a class="nav-link" href="1.6-listen-conditional.html"><span class="ln">1.6</span>Listen &amp; Conditional Rendering</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label react-label">Teil 2 &mdash; React Praxis</div>
+      <a class="nav-link" href="2.1-formulare.html"><span class="ln">2.1</span>Formulare &amp; Inputs</a>
+      <a class="nav-link" href="2.2-useeffect-api.html"><span class="ln">2.2</span>useEffect &amp; API</a>
+      <a class="nav-link" href="2.3-kommunikation.html"><span class="ln">2.3</span>Komponentenkommunikation</a>
+      <a class="nav-link" href="2.4-context.html"><span class="ln">2.4</span>Context API</a>
+      <a class="nav-link" href="2.5-custom-hooks.html"><span class="ln">2.5</span>Custom Hooks</a>
+      <a class="nav-link" href="2.6-testen-vitest-rtl.html"><span class="ln">2.6</span>Testen mit Vitest + RTL</a>
+      <a class="nav-link" href="2.7-react-router.html"><span class="ln">2.7</span>React Router</a>
+      <a class="nav-link" href="2.8-datenbank-drizzle-sqlite.html"><span class="ln">2.8</span>Datenbankzugriff mit Drizzle + SQLite</a>
+      <a class="nav-link" href="2.9-redux-state-management.html"><span class="ln">2.9</span>State Management mit Redux (Überblick)</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label next-label">Teil 3 &mdash; Next.js</div>
+      <a class="nav-link" href="3.1-nextjs-einfuehrung.html"><span class="ln">3.1</span>Einführung Next.js</a>
+      <a class="nav-link" href="3.2-nextjs-routing.html"><span class="ln">3.2</span>Routing &amp; Layouts</a>
+      <a class="nav-link" href="3.3-server-client.html"><span class="ln">3.3</span>Server &amp; Client Components</a>
+      <a class="nav-link" href="3.4-api-routes.html"><span class="ln">3.4</span>API Routes &amp; Datenabruf</a>
+      <a class="nav-link" href="3.5-playwright-e2e.html"><span class="ln">3.5</span>Playwright E2E</a>
+      <a class="nav-link" href="3.6-deployment.html"><span class="ln">3.6</span>Deployment</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label rn-label">Teil 4 &mdash; React Native</div>
+      <a class="nav-link" href="4.1-rn-einfuehrung.html"><span class="ln">4.1</span>Einführung React Native</a>
+      <a class="nav-link" href="4.2-rn-komponenten.html"><span class="ln">4.2</span>Native Komponenten &amp; Styling</a>
+      <a class="nav-link" href="4.3-rn-navigation.html"><span class="ln">4.3</span>Navigation &amp; State</a>
+    </div>
+  </nav>
+</aside>
+
+<main class="main-content">
+  <header class="lesson-header">
+    <p class="lesson-eyebrow">Lektion 3.5 &mdash; Teil 3: Next.js</p>
+    <h1>Playwright End-to-End Tests</h1>
+    <div class="lesson-tags">
+      <span class="tag tag-next">Next.js</span>
+      <span class="tag tag-time">ca. 75 min</span>
+    </div>
+  </header>
+
+  <div class="content-area">
+    <section class="section section-lernziele">
+      <h2>Lernziele</h2>
+      <ul>
+        <li>E2E-Tests von Unit- und Integrationstests abgrenzen</li>
+        <li>Playwright in einem Next.js-Projekt einrichten</li>
+        <li>Wichtige User-Flows als stabile E2E-Szenarien formulieren</li>
+        <li>Locators und Assertions robust verwenden</li>
+        <li>Headless/Headed-Modus und Debugging-Tools nutzen</li>
+        <li>Tests in CI-Umgebungen einbinden</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>1. Was ist E2E-Testen?</h2>
+      <p>
+        End-to-End-Tests validieren komplette Benutzerfl&uuml;sse im Browser. Anders als
+        Komponententests pr&uuml;fen sie nicht einzelne Bausteine, sondern die reale
+        Integration aus Routing, Formularen, Netzwerk, Rendering und Navigation.
+      </p>
+      <p>
+        Gute E2E-Tests sind wenige, aber zentral: Login, Hauptnavigation,
+        Kern-CRUD-Aktionen und kritische Fehlerpfade.
+      </p>
+    </section>
+
+    <section class="section">
+      <h2>2. Playwright Setup</h2>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Terminal</span>
+          <span class="code-lang">Bash</span>
+        </div>
+        <pre><code class="language-bash">npm init playwright@latest
+
+# empfohlen im Kurs:
+# - TypeScript
+# - tests/ als Ordner
+# - GitHub Actions optional
+# - Chromium als Startbrowser</code></pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">playwright.config.ts</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import { defineConfig, devices } from '@playwright/test';
+
+export default defineConfig({
+  testDir: './tests',
+  retries: process.env.CI ? 2 : 0,
+  use: {
+    baseURL: 'http://127.0.0.1:3000',
+    trace: 'on-first-retry',
+  },
+  webServer: {
+    command: 'npm run dev',
+    url: 'http://127.0.0.1:3000',
+    reuseExistingServer: !process.env.CI,
+  },
+  projects: [
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+  ],
+});</code></pre>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>3. Erster E2E-Test f&uuml;r FlugBoard</h2>
+      <p>
+        Der erste Test sollte einen Kernfluss abdecken: Startseite laden,
+        Suchfeld benutzen, Ergebnisliste validieren.
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">tests/flight-search.spec.ts</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import { test, expect } from '@playwright/test';
+
+test('filtert die Flugliste auf der Startseite', async ({ page }) =&gt; {
+  await page.goto('/');
+
+  await expect(page.getByRole('heading', { name: /flugboard/i })).toBeVisible();
+
+  await page.getByRole('searchbox', { name: /suche/i }).fill('LH');
+
+  await expect(page.getByText('LH123')).toBeVisible();
+  await expect(page.getByText('OS404')).toHaveCount(0);
+});</code></pre>
+      </div>
+
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#128161;</div>
+        <div class="callout-body">
+          <div class="callout-title">Locators statt CSS-Selektoren</div>
+          <p>
+            Nutze bevorzugt <code>getByRole</code>, <code>getByLabel</code> und
+            <code>getByText</code>. Das macht Tests robuster gegen Layout-&Auml;nderungen.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>4. Debugging und Stabilit&auml;t</h2>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">N&uuml;tzliche Befehle</span>
+          <span class="code-lang">Bash</span>
+        </div>
+        <pre><code class="language-bash"># Headed-Modus (Browser sichtbar)
+npx playwright test --headed
+
+# Nur ein Testfile
+npx playwright test tests/flight-search.spec.ts
+
+# UI Modus zum iterativen Debugging
+npx playwright test --ui
+
+# HTML Report anzeigen
+npx playwright show-report</code></pre>
+      </div>
+
+      <div class="callout callout-warning">
+        <div class="callout-icon">&#9888;</div>
+        <div class="callout-body">
+          <div class="callout-title">Flaky Tests vermeiden</div>
+          <p>
+            Keine festen Sleeps mit <code>waitForTimeout</code> einbauen. Nutze stattdessen
+            Assertions, die auf sichtbare Zust&auml;nde warten.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-projekt">
+      <h2>Projektschritt</h2>
+      <div class="projekt-box">
+        <div class="projekt-box-header">
+          <span class="projekt-step">Projektschritt 3.5</span>
+          <h3>E2E-Teststrecke f&uuml;r Next.js-FlugBoard aufbauen</h3>
+        </div>
+        <ol>
+          <li>Playwright initialisieren und Config mit <code>webServer</code> setzen.</li>
+          <li>Mindestens zwei Flows automatisieren: Suche und Detailnavigation.</li>
+          <li>Fehlerfall erg&auml;nzen (z.B. 404-Seite bei ung&uuml;ltiger Route).</li>
+          <li>Report lokal auswerten und mindestens einen flaky Schritt stabilisieren.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section section-fehler">
+      <h2>H&auml;ufige Fehler</h2>
+      <div class="fehler-item">
+        <div class="fehler-title">Fehler: Base URL inkonsistent</div>
+        <p>
+          Tests laufen lokal, aber in CI nicht, weil unterschiedliche Hosts/Ports
+          genutzt werden.
+        </p>
+        <p class="fehler-fix">
+          Fix: Eine zentrale <code>baseURL</code> in der Playwright-Konfiguration setzen.
+        </p>
+      </div>
+      <div class="fehler-item">
+        <div class="fehler-title">Fehler: Fragile CSS-Selektoren</div>
+        <p>
+          Tests brechen bei kleinen Refactorings, weil sie auf Klassenketten basieren.
+        </p>
+        <p class="fehler-fix">
+          Fix: Auf semantische Locators wechseln (Role, Label, Text).
+        </p>
+      </div>
+      <div class="fehler-item">
+        <div class="fehler-title">Fehler: Zu viele E2E-Szenarien</div>
+        <p>
+          Jede Kleinigkeit wird als E2E-Test geschrieben. Die Pipeline wird langsam.
+        </p>
+        <p class="fehler-fix">
+          Fix: Nur Kernfl&uuml;sse end-to-end testen; Details in Komponententests abdecken.
+        </p>
+      </div>
+    </section>
+
+    <section class="section section-aufgaben">
+      <h2>Aufgaben</h2>
+      <div class="aufgabe">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">Aufgabe 1</span>
+          <span class="aufgabe-title">Playwright installieren und starten</span>
+        </div>
+        <ul>
+          <li>Initialisiere Playwright mit TypeScript.</li>
+          <li>Pr&uuml;fe, dass der Browser-Download erfolgreich ist.</li>
+          <li>F&uuml;hre den generierten Beispieltest einmal aus.</li>
+        </ul>
+      </div>
+      <div class="aufgabe">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">Aufgabe 2</span>
+          <span class="aufgabe-title">Kernflow: Suche + Navigation</span>
+        </div>
+        <ul>
+          <li>Teste Suchfunktion auf der Startseite.</li>
+          <li>Navigiere von einem Eintrag zur Detailansicht.</li>
+          <li>Pr&uuml;fe den Zur&uuml;ck-Flow zur Liste.</li>
+        </ul>
+      </div>
+      <div class="aufgabe">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">Aufgabe 3</span>
+          <span class="aufgabe-title">CI-Vorbereitung</span>
+        </div>
+        <ul>
+          <li>Setze <code>retries</code> f&uuml;r CI auf einen sinnvollen Wert.</li>
+          <li>Aktiviere Trace bei Retry.</li>
+          <li>Dokumentiere den Testbefehl f&uuml;r Teamkollegen.</li>
+        </ul>
+      </div>
+      <div class="aufgabe aufgabe-bonus">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">Bonus</span>
+          <span class="aufgabe-title">Mobile Viewport</span>
+        </div>
+        <ul>
+          <li>Erg&auml;nze ein zweites Projekt mit mobilem Viewport.</li>
+          <li>Teste denselben Such-Flow auf kleiner Breite.</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+
+  <nav class="lesson-nav">
+    <a class="nav-btn" href="3.4-api-routes.html">&larr; Lektion 3.4: API Routes &amp; Datenabruf</a>
+    <span class="nav-center-info">Lektion 3.5</span>
+    <a class="nav-btn primary" href="3.6-deployment.html">Lektion 3.6: Deployment &rarr;</a>
+  </nav>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+<script>
+  const ham = document.getElementById('hamburger');
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('overlay');
+  ham.addEventListener('click', () => { sb.classList.toggle('open'); ov.classList.toggle('visible'); });
+  ov.addEventListener('click', () => { sb.classList.remove('open'); ov.classList.remove('visible'); });
+
+  const cur = window.location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.nav-link').forEach(l => {
+    if (l.getAttribute('href') === cur) l.classList.add('active');
+  });
+
+  const themeBtn = document.getElementById('theme-toggle');
+  const applyTheme = (t) => {
+    document.documentElement.setAttribute('data-theme', t);
+    if (themeBtn) themeBtn.innerHTML = t === 'dark' ? '&#9728;' : '&#9790;';
+  };
+  applyTheme(localStorage.getItem('kurs-theme') || 'dark');
+  setTimeout(() => document.documentElement.classList.add('theme-transitions'), 50);
+  if (themeBtn) themeBtn.addEventListener('click', () => {
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('kurs-theme', next);
+    applyTheme(next);
+  });
+  hljs.highlightAll();
+</script>
+</body>
+</html>

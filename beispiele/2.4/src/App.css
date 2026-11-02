@@ -1,0 +1,90 @@
+.app-page {
+  background: var(--app-bg);
+  color: var(--app-text);
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.toolbar {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.summary-line {
+  color: var(--app-muted);
+  font-size: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.add-btn {
+  background: #238636;
+  border: none;
+  border-radius: 6px;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 8px 18px;
+}
+
+.status-screen {
+  background: var(--app-bg);
+  min-height: 100vh;
+  padding: 4rem;
+  text-align: center;
+}
+
+.board-loading {
+  background: var(--app-card-bg);
+  border: 1px dashed var(--app-border);
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.board-loading--muted {
+  color: var(--app-muted);
+}
+
+.status-screen-loading {
+  color: var(--app-muted);
+}
+
+.status-screen-error {
+  color: #f85149;
+}
+
+.status-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.error-title {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.error-help {
+  color: var(--app-muted);
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+.backend-command {
+  background: var(--app-sidebar-bg);
+  border-radius: 4px;
+  padding: 2px 6px;
+}
+
+.retry-btn {
+  background: var(--app-card-bg);
+  border: 1px solid var(--app-border);
+  border-radius: 6px;
+  color: var(--app-text);
+  cursor: pointer;
+  padding: 0.5rem 1.5rem;
+}

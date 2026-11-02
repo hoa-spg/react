@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2.4 &ndash; Context API | React Kurs</title>
+  <script>(function () { var t = localStorage.getItem('kurs-theme') || 'dark'; document.documentElement.setAttribute('data-theme', t); })();</script>
+  <link rel="stylesheet" href="assets/kurs.css">
+  <link rel="stylesheet" id="hljs-theme"
+    href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+
+<body>
+
+  <button class="hamburger" id="hamburger" aria-label="Navigation &ouml;ffnen">&#9776;</button>
+  <div class="sidebar-overlay" id="overlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <a href="index.html">
+        <span class="brand-icon">&#9992;</span>
+        <div>
+          <div class="brand-name">React Kurs</div>
+          <div class="brand-sub">Web &amp; Mobile</div>
+        </div>
+      </a>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Dark/Light Mode"
+        title="Theme wechseln">&#9728;</button>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-group">
+        <div class="nav-group-label react-label">Teil 1 &mdash; React Einführung</div>
+        <a class="nav-link" href="1.1-einfuehrung-spa.html"><span class="ln">1.1</span>Motivation &amp; SPA</a>
+        <a class="nav-link" href="1.2-einfuehrung.html"><span class="ln">1.2</span>Einführung &amp; Umgebung</a>
+        <a class="nav-link" href="1.3-komponenten-props-einfach.html"><span class="ln">1.3</span>Komponenten &amp; Props
+          (einfach)</a>
+        <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten &amp;
+          Props (Vertiefung)</a>
+        <a class="nav-link" href="1.5-state-events.html"><span class="ln">1.5</span>State &amp; Events</a>
+        <a class="nav-link" href="1.6-listen-conditional.html"><span class="ln">1.6</span>Listen &amp; Conditional
+          Rendering</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label react-label">Teil 2 &mdash; React Praxis</div>
+        <a class="nav-link" href="2.1-formulare.html"><span class="ln">2.1</span>Formulare &amp; Inputs</a>
+        <a class="nav-link" href="2.2-useeffect-api.html"><span class="ln">2.2</span>useEffect &amp; API</a>
+        <a class="nav-link" href="2.3-kommunikation.html"><span class="ln">2.3</span>Komponentenkommunikation</a>
+        <a class="nav-link" href="2.4-context.html"><span class="ln">2.4</span>Context API</a>
+        <a class="nav-link" href="2.5-custom-hooks.html"><span class="ln">2.5</span>Custom Hooks</a>
+        <a class="nav-link" href="2.6-testen-vitest-rtl.html"><span class="ln">2.6</span>Testen mit Vitest + RTL</a>
+        <a class="nav-link" href="2.7-react-router.html"><span class="ln">2.7</span>React Router</a>
+        <a class="nav-link" href="2.8-datenbank-drizzle-sqlite.html"><span class="ln">2.8</span>Datenbankzugriff mit
+          Drizzle + SQLite</a>
+        <a class="nav-link" href="2.9-redux-state-management.html"><span class="ln">2.9</span>State Management mit Redux
+          (Überblick)</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label next-label">Teil 3 &mdash; Next.js</div>
+        <a class="nav-link" href="3.1-nextjs-einfuehrung.html"><span class="ln">3.1</span>Einführung Next.js</a>
+        <a class="nav-link" href="3.2-nextjs-routing.html"><span class="ln">3.2</span>Routing &amp; Layouts</a>
+        <a class="nav-link" href="3.3-server-client.html"><span class="ln">3.3</span>Server &amp; Client Components</a>
+        <a class="nav-link" href="3.4-api-routes.html"><span class="ln">3.4</span>API Routes &amp; Datenabruf</a>
+        <a class="nav-link" href="3.5-playwright-e2e.html"><span class="ln">3.5</span>Playwright E2E</a>
+        <a class="nav-link" href="3.6-deployment.html"><span class="ln">3.6</span>Deployment</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label rn-label">Teil 4 &mdash; React Native</div>
+        <a class="nav-link" href="4.1-rn-einfuehrung.html"><span class="ln">4.1</span>Einführung React Native</a>
+        <a class="nav-link" href="4.2-rn-komponenten.html"><span class="ln">4.2</span>Native Komponenten &amp;
+          Styling</a>
+        <a class="nav-link" href="4.3-rn-navigation.html"><span class="ln">4.3</span>Navigation &amp; State</a>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <header class="lesson-header">
+      <p class="lesson-eyebrow">Lektion 2.4 &mdash; Teil 2: React Praxis</p>
+      <h1>Context API</h1>
+      <div class="lesson-tags">
+        <span class="tag tag-react">React</span>
+        <span class="tag tag-time">ca. 90 min</span>
+      </div>
+    </header>
+
+    <div class="content-area">
+
+      <!-- LERNZIELE -->
+      <section class="section section-lernziele">
+        <h2>Lernziele</h2>
+        <ul>
+          <li>Das Problem von Prop Drilling verstehen und mit Context l&ouml;sen</li>
+          <li>Einen Context mit <code>createContext</code> erstellen</li>
+          <li>Einen Provider einrichten und Werte bereitstellen</li>
+          <li><code>useContext</code> in beliebig tief verschachtelten Komponenten verwenden</li>
+          <li>Einen Theme-Context f&uuml;r Dark/Light-Mode implementieren</li>
+        </ul>
+      </section>
+
+      <!-- SECTION 1: WAS IST CONTEXT? -->
+      <section class="section">
+        <h2>1. Was ist der React Context?</h2>
+        <p>
+          Der React Context ist ein Mechanismus, mit dem Daten &bdquo;durch den Komponentenbaum hindurch&ldquo;
+          weitergegeben werden k&ouml;nnen &ndash; ohne dass jede Zwischenebene explizit als Prop weiterreichen muss.
+          Man kann sich Context wie eine Art <em>sichtbare Umgebungsvariable</em> vorstellen, die f&uuml;r alle
+          Komponenten innerhalb eines Providers zug&auml;nglich ist.
+        </p>
+        <p>
+          React selbst verwendet Context intern, z.B. f&uuml;r die <code>SuspenseContext</code> oder den
+          Router-Context von React Router. Wir k&ouml;nnen eigene Contexts f&uuml;r anwendungsspezifische
+          Belange erstellen.
+        </p>
+
+        <p>Die Verwendung von Context besteht immer aus drei Schritten:</p>
+
+        <table style="width:100%; border-collapse: collapse; margin: 1.5rem 0;">
+          <thead>
+            <tr style="border-bottom: 2px solid #30363d;">
+              <th style="padding: 0.75rem; text-align: left; color: #8b949e;">Schritt</th>
+              <th style="padding: 0.75rem; text-align: left; color: #8b949e;">API</th>
+              <th style="padding: 0.75rem; text-align: left; color: #8b949e;">Ort</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid #21262d;">
+              <td style="padding: 0.75rem; font-weight: 600; color: #58a6ff;">1. Context erstellen</td>
+              <td style="padding: 0.75rem;"><code>createContext(defaultValue)</code></td>
+              <td style="padding: 0.75rem; color: #8b949e;">Au&szlig;erhalb der Komponente, eigene Datei</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #21262d;">
+              <td style="padding: 0.75rem; font-weight: 600; color: #3fb950;">2. Wert bereitstellen</td>
+              <td style="padding: 0.75rem;"><code>&lt;Context.Provider value={...}&gt;</code></td>
+              <td style="padding: 0.75rem; color: #8b949e;">In der Eltern- oder Root-Komponente</td>
+            </tr>
+            <tr>
+              <td style="padding: 0.75rem; font-weight: 600; color: #d29922;">3. Wert konsumieren</td>
+              <td style="padding: 0.75rem;"><code>useContext(Context)</code></td>
+              <td style="padding: 0.75rem; color: #8b949e;">In beliebig tiefer Kindkomponente</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout callout-info">
+          <div class="callout-icon">&#8505;</div>
+          <div class="callout-body">
+            <div class="callout-title">Context vs. Props</div>
+            <p>
+              Context ersetzt <em>nicht</em> alle Props. F&uuml;r Daten, die nur eine Ebene &uuml;berbr&uuml;cken,
+              sind Props die richtige Wahl &ndash; sie machen den Datenfluss explizit und leicht nachvollziehbar.
+              Context eignet sich f&uuml;r Daten, die wirklich &bdquo;global&ldquo; f&uuml;r einen Teilbaum sind.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 2: THEMECONTEXT -->
+      <section class="section">
+        <h2>2. Einfaches Beispiel: ThemeContext</h2>
+        <p>
+          Das klassische Beispiel f&uuml;r Context ist ein Theme-Switcher. Das Theme wird in der Root-Komponente
+          verwaltet und muss f&uuml;r potenziell jede Komponente im Baum verf&uuml;gbar sein.
+          Ohne Context m&uuml;sste <code>theme</code> durch alle Zwischenebenen gereicht werden.
+        </p>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">src/context/ThemeContext.tsx</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">import { createContext, useContext, useState, ReactNode } from 'react';
+
+type Theme = 'dark' | 'light';
+
+interface ThemeContextType {
+  theme: Theme;
+  toggleTheme: () =&gt; void;
+}
+
+// Schritt 1: Context erstellen mit sinnvollem Default-Wert.
+// Der Default-Wert wird nur verwendet, wenn kein Provider in der
+// Komponentenhierarchie vorhanden ist.
+const ThemeContext = createContext&lt;ThemeContextType&gt;({
+  theme: 'dark',
+  toggleTheme: () => {},
+});
+
+// Schritt 2: Provider-Komponente erstellen.
+// Diese Komponente kapselt den useState-Aufruf und den Provider.
+// "children" repr&auml;sentiert alle Kindkomponenten.
+export const ThemeProvider = ({ children }: { children: ReactNode }) =&gt; {
+  const [theme, setTheme] = useState&lt;Theme&gt;('dark');
+
+  const toggleTheme = () =&gt; setTheme(t =&gt; (t === 'dark' ? 'light' : 'dark'));
+
+  return (
+    &lt;ThemeContext.Provider value={{ theme, toggleTheme }}&gt;
+      {children}
+    &lt;/ThemeContext.Provider&gt;
+  );
+};
+
+// Schritt 3 (optional, aber empfohlen): Custom Hook f&uuml;r einfachen Zugriff.
+// So importiert jede Komponente nur diesen Hook, nicht den Context direkt.
+export const useTheme = () =&gt; useContext(ThemeContext);</code></pre>
+        </div>
+
+        <p>
+          Der <code>ThemeProvider</code> wird in <code>main.tsx</code> um die gesamte App gewickelt,
+          sodass alle Komponenten Zugriff auf den Theme-Context haben:
+        </p>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">src/main.tsx</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">import ReactDOM from 'react-dom/client';
+import { ThemeProvider } from './context/ThemeContext';
+import App from './App';
+import './index.css';
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  &lt;React.StrictMode&gt;
+    &lt;ThemeProvider&gt;
+      &lt;App /&gt;
+    &lt;/ThemeProvider&gt;
+  &lt;/React.StrictMode&gt;
+);</code></pre>
+        </div>
+
+        <p>
+          Jetzt kann jede Komponente &ndash; egal wie tief sie im Baum sitzt &ndash; auf das Theme
+          zugreifen, ohne dass irgendjemand es als Prop weiterreichen muss:
+        </p>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">src/components/FlightStatusBadge.tsx</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">import { useTheme } from '../context/ThemeContext';
+import { FlightStatus } from '../types/flight';
+
+const STATUS_CONFIG: Record&lt;FlightStatus, { label: string; darkBg: string; lightBg: string }&gt; = {
+  'on-time':   { label: 'P&uuml;nktlich',   darkBg: '#1a3a2a', lightBg: '#d1fae5' },
+  'delayed':   { label: 'Versp&auml;tet',   darkBg: '#3a2a1a', lightBg: '#fef3c7' },
+  'boarding':  { label: 'Boarding',    darkBg: '#1a2a3a', lightBg: '#dbeafe' },
+  'departed':  { label: 'Abgeflogen',  darkBg: '#1e2a1e', lightBg: '#f0fdf4' },
+  'landed':    { label: 'Gelandet',    darkBg: '#1e2a1e', lightBg: '#f0fdf4' },
+  'cancelled': { label: 'Gestrichen', darkBg: '#3a1a1a', lightBg: '#fee2e2' },
+};
+
+interface FlightStatusBadgeProps {
+  status: FlightStatus;
+}
+
+const FlightStatusBadge = ({ status }: FlightStatusBadgeProps) =&gt; {
+  // Kein Prop Drilling n&ouml;tig! Direkt aus dem Context lesen.
+  const { theme } = useTheme();
+
+  const config = STATUS_CONFIG[status];
+  const bgColor = theme === 'dark' ? config.darkBg : config.lightBg;
+
+  return (
+    &lt;span
+      style={{
+        background: bgColor,
+        padding: '0.2rem 0.6rem',
+        borderRadius: '4px',
+        fontSize: '0.85rem',
+        fontWeight: 600,
+      }}
+    &gt;
+      {config.label}
+    &lt;/span&gt;
+  );
+};</code></pre>
+        </div>
+
+        <div class="callout callout-tip">
+          <div class="callout-icon">&#128161;</div>
+          <div class="callout-body">
+            <div class="callout-title">Custom Hook statt direktem useContext</div>
+            <p>
+              Durch das Exportieren von <code>useTheme()</code> statt <code>ThemeContext</code> direkt
+              hat man einen zentralen Ort, um sp&auml;ter zus&auml;tzliche Logik hinzuzuf&uuml;gen
+              (z.B. Fehlerpr&uuml;fung, wenn kein Provider vorhanden). Die Komponenten wissen nicht,
+              wie der Context intern implementiert ist &ndash; nur dass sie <code>useTheme()</code>
+              aufrufen k&ouml;nnen.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION 3: KOMPLEXERER CONTEXT -->
+      <section class="section">
+        <h2>3. Context mit mehreren Werten</h2>
+        <p>
+          F&uuml;r komplexere Anwendungsf&auml;lle kann ein Context mehrere zusammengeh&ouml;rige Werte
+          b&uuml;ndeln. Im FlugBoard-Projekt k&ouml;nnte ein <code>FlugBoardContext</code> den
+          zentralen Anwendungszustand bereitstellen:
+        </p>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">src/context/FlugBoardContext.tsx</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">import {
+  createContext, useContext, useState,
+  useEffect, ReactNode, useMemo
+} from 'react';
+import { Flight } from '../types/flight';
+
+interface FlugBoardContextType {
+  // Daten
+  flights: Flight[];
+  isLoading: boolean;
+  error: string | null;
+  // Suche &amp; Filter
+  searchQuery: string;
+  setSearchQuery: (q: string) =&gt; void;
+  // Auswahl
+  selectedFlight: Flight | null;
+  setSelectedFlight: (f: Flight | null) =&gt; void;
+}
+
+// null als Default-Wert: Klarer Fehler wenn kein Provider vorhanden
+const FlugBoardContext = createContext&lt;FlugBoardContextType | null&gt;(null);
+
+export const FlugBoardProvider = ({ children }: { children: ReactNode }) =&gt; {
+  const [flights, setFlights]               = useState&lt;Flight[]&gt;([]);
+  const [isLoading, setIsLoading]           = useState(true);
+  const [error, setError]                   = useState&lt;string | null&gt;(null);
+  const [searchQuery, setSearchQuery]       = useState('');
+  const [selectedFlight, setSelectedFlight] = useState&lt;Flight | null&gt;(null);
+
+  useEffect(() =&gt; {
+    fetch('http://localhost:8000/api/flights')
+      .then(r =&gt; r.json())
+      .then(data =&gt; { setFlights(data); setIsLoading(false); })
+      .catch(e  =&gt; { setError(e.message); setIsLoading(false); });
+  }, []);
+
+  // useMemo verhindert, dass bei jedem Render ein neues Objekt
+  // erstellt wird – das w&uuml;rde alle Consumer unn&ouml;tig re-rendern.
+  const value = useMemo&lt;FlugBoardContextType&gt;(() =&gt; ({
+    flights, isLoading, error,
+    searchQuery, setSearchQuery,
+    selectedFlight, setSelectedFlight,
+  }), [flights, isLoading, error, searchQuery, selectedFlight]);
+
+  return (
+    &lt;FlugBoardContext.Provider value={value}&gt;
+      {children}
+    &lt;/FlugBoardContext.Provider&gt;
+  );
+};
+
+// Custom Hook mit Fehlerpr&uuml;fung
+export const useFlugBoard = (): FlugBoardContextType =&gt; {
+  const ctx = useContext(FlugBoardContext);
+  if (!ctx) {
+    throw new Error('useFlugBoard muss innerhalb von FlugBoardProvider verwendet werden');
+  }
+  return ctx;
+};</code></pre>
+        </div>
+
+        <p>
+          Durch <code>useMemo</code> wird das <code>value</code>-Objekt nur dann neu erstellt, wenn sich
+          einer der Werte tats&auml;chlich ge&auml;ndert hat. Ohne <code>useMemo</code> w&uuml;rde bei jedem
+          Render des Providers ein neues Objekt entstehen, was alle Consumer neu rendern w&uuml;rde &ndash; auch
+          wenn sich die Daten nicht ge&auml;ndert haben.
+        </p>
+      </section>
+
+      <!-- SECTION 4: WANN CONTEXT VERWENDEN -->
+      <section class="section">
+        <h2>4. Wann Context verwenden &ndash; und wann nicht</h2>
+
+        <p>
+          Context ist ein m&auml;chtiges Werkzeug, aber es ist kein Allheilmittel.
+          Eine falsche Nutzung kann zu schwer nachvollziehbarem Datenfluss und
+          unn&ouml;tigen Re-Renders f&uuml;hren.
+        </p>
+
+        <div class="callout callout-tip">
+          <div class="callout-icon">&#9989;</div>
+          <div class="callout-body">
+            <div class="callout-title">Gute Anwendungsf&auml;lle f&uuml;r Context</div>
+            <p>
+              <strong>Theme / Erscheinungsbild:</strong> Dark/Light-Mode, Farbschemas, Schriftgr&ouml;&szlig;en.<br>
+              <strong>Authentifizierter Nutzer:</strong> Nutzerprofil, Berechtigungen &ndash; wird in vielen Teilen der
+              App ben&ouml;tigt.<br>
+              <strong>Sprache / Locale:</strong> &Uuml;bersetzungen, Datumsformate, W&auml;hrungssymbole.<br>
+              <strong>Globaler App-State:</strong> Einstellungen, Feature-Flags, die selten &auml;ndern.
+            </p>
+          </div>
+        </div>
+
+        <div class="callout callout-warning">
+          <div class="callout-icon">&#9888;</div>
+          <div class="callout-body">
+            <div class="callout-title">Schlechte Anwendungsf&auml;lle f&uuml;r Context</div>
+            <p>
+              <strong>Daten, die nur 1&ndash;2 Ebenen wandern:</strong> Hier sind Props klarer und expliziter.<br>
+              <strong>H&auml;ufig &auml;ndernde Daten:</strong> Jede &Auml;nderung re-rendert alle Consumer.
+              F&uuml;r h&ouml;chst frequente Updates (z.B. Mausposition) besser <code>useRef</code> oder
+              eine externe State-Bibliothek wie Zustand oder Redux verwenden.<br>
+              <strong>Lokaler Komponenten-State:</strong> State, der wirklich nur eine Komponente betrifft,
+              geh&ouml;rt in diese Komponente &ndash; nicht in einen Context.
+            </p>
+          </div>
+        </div>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">Entscheidungsbaum: Props vs. Context</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">// Frage: Wie viele Ebenen m&uuml;ssen &uuml;berbr&uuml;ckt werden?
+
+// 1-2 Ebenen: Props verwenden (explizit, leicht nachvollziehbar)
+&lt;FlightBoard flights={flights} /&gt;          // OK: direkte Weitergabe
+&lt;FlightCard flight={flight} /&gt;             // OK: direkte Weitergabe
+
+// 3+ Ebenen mit gleichen Daten: Context verwenden
+// statt: App --theme--&gt; Board --theme--&gt; Card --theme--&gt; Badge
+// besser:
+const { theme } = useTheme();  // direkt in Badge, ohne Drilling
+
+// Alternative: Komponentenkomposition pr&uuml;fen
+// Manchmal kann man Prop Drilling durch das &Uuml;bergeben von
+// Komponenten als "children" oder Slot-Props vermeiden:
+&lt;FlightBoard&gt;
+  &lt;FlightCard flight={flight} /&gt;  {/* Badge ist schon drin */}
+&lt;/FlightBoard&gt;</code></pre>
+        </div>
+      </section>
+
+      <!-- PROJEKTSCHRITT -->
+      <section class="section section-projekt">
+        <h2>Projektschritt</h2>
+        <div class="projekt-box">
+          <div class="projekt-box-header">
+            <span class="projekt-step">Projektschritt 2.4</span>
+            <h3>Dark/Light Theme Toggle f&uuml;r FlugBoard</h3>
+          </div>
+
+          <p>
+            Wir f&uuml;gen FlugBoard einen vollst&auml;ndigen Dark/Light-Theme-Toggle hinzu, der ohne
+            Prop Drilling auskommt. Der Theme-State lebt im Context und wird &uuml;ber
+            einen Button im Header umgeschaltet.
+          </p>
+
+          <h4>Schritt 1: ThemeContext anlegen</h4>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-filename">src/context/ThemeContext.tsx</span>
+              <span class="code-lang">TypeScript</span>
+            </div>
+            <pre><code class="language-typescript">import { createContext, useContext, useState, ReactNode } from 'react';
+
+type Theme = 'dark' | 'light';
+
+interface ThemeContextType {
+  theme: Theme;
+  toggleTheme: () =&gt; void;
+}
+
+const ThemeContext = createContext&lt;ThemeContextType&gt;({
+  theme: 'dark',
+  toggleTheme: () =&gt; {},
+});
+
+export const ThemeProvider = ({ children }: { children: ReactNode }) =&gt; {
+  // Initialen Wert aus localStorage lesen (f&uuml;r Aufgabe 1)
+  const [theme, setTheme] = useState&lt;Theme&gt;(() =&gt; {
+    const saved = localStorage.getItem('flugboard-theme');
+    return (saved === 'light' ? 'light' : 'dark');
+  });
+
+  const toggleTheme = () =&gt; {
+    setTheme(t =&gt; {
+      const next = t === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('flugboard-theme', next);
+      return next;
+    });
+  };
+
+  return (
+    &lt;ThemeContext.Provider value={{ theme, toggleTheme }}&gt;
+      {children}
+    &lt;/ThemeContext.Provider&gt;
+  );
+};
+
+export const useTheme = () =&gt; useContext(ThemeContext);</code></pre>
+          </div>
+
+          <h4>Schritt 2: App in ThemeProvider einwickeln</h4>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-filename">src/main.tsx</span>
+              <span class="code-lang">TypeScript</span>
+            </div>
+            <pre><code class="language-typescript">import ReactDOM from 'react-dom/client';
+import React from 'react';
+import { ThemeProvider } from './context/ThemeContext';
+import App from './App';
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  &lt;React.StrictMode&gt;
+    &lt;ThemeProvider&gt;
+      &lt;App /&gt;
+    &lt;/ThemeProvider&gt;
+  &lt;/React.StrictMode&gt;
+);</code></pre>
+          </div>
+
+          <h4>Schritt 3: Toggle-Button im AirportHeader</h4>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-filename">src/components/AirportHeader.tsx</span>
+              <span class="code-lang">TypeScript</span>
+            </div>
+            <pre><code class="language-typescript">import { useTheme } from '../context/ThemeContext';
+
+const AirportHeader = () =&gt; {
+  const { theme, toggleTheme } = useTheme();
+
+  return (
+    &lt;header
+      style={{
+        background: theme === 'dark' ? '#161b22' : '#ffffff',
+        borderBottom: `1px solid ${theme === 'dark' ? '#30363d' : '#d0d7de'}`,
+        padding: '1rem 2rem',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+      }}
+    &gt;
+      &lt;div&gt;
+        &lt;h1 style={{ color: theme === 'dark' ? '#e6edf3' : '#1f2328' }}&gt;
+          &#9992; FlugBoard
+        &lt;/h1&gt;
+        &lt;p style={{ color: '#8b949e', margin: 0 }}&gt;
+          Internationaler Flughafen &ndash; Echtzeit-Abfahrtstafel
+        &lt;/p&gt;
+      &lt;/div&gt;
+      &lt;button
+        onClick={toggleTheme}
+        style={{
+          background: theme === 'dark' ? '#21262d' : '#f6f8fa',
+          color: theme === 'dark' ? '#e6edf3' : '#1f2328',
+          border: `1px solid ${theme === 'dark' ? '#30363d' : '#d0d7de'}`,
+          borderRadius: '6px',
+          padding: '0.5rem 1rem',
+          cursor: 'pointer',
+          fontSize: '1rem',
+        }}
+      &gt;
+        {theme === 'dark' ? '&#9728;&#65039; Hell' : '&#127769; Dunkel'}
+      &lt;/button&gt;
+    &lt;/header&gt;
+  );
+};</code></pre>
+          </div>
+
+          <h4>Schritt 4: Theme in FlightBoard und App anwenden</h4>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-filename">src/App.tsx (Theme-Integration)</span>
+              <span class="code-lang">TypeScript</span>
+            </div>
+            <pre><code class="language-typescript">import { useTheme } from './context/ThemeContext';
+
+function App() {
+  const { theme } = useTheme();
+
+  return (
+    &lt;div
+      style={{
+        minHeight: '100vh',
+        background: theme === 'dark' ? '#0d1117' : '#f6f8fa',
+        color: theme === 'dark' ? '#e6edf3' : '#1f2328',
+      }}
+    &gt;
+      &lt;AirportHeader /&gt;
+      {/* FlightBoard, FlightDetail etc. */}
+    &lt;/div&gt;
+  );
+}</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <div class="callout-icon">&#8505;</div>
+            <div class="callout-body">
+              <div class="callout-title">Warum der Provider in main.tsx und nicht in App.tsx?</div>
+              <p>
+                Der Provider k&ouml;nnte auch in <code>App.tsx</code> stehen. Das Problem: Wenn
+                <code>App</code> selbst den Theme-Context konsumieren will (f&uuml;r den Hintergrund),
+                muss der Provider &uuml;bergeordnet sein. Durch den Aufbau in <code>main.tsx</code>
+                ist die gesamte App im Provider-Scope &ndash; auch zuk&uuml;nftige Komponenten auf
+                derselben Ebene wie <code>App</code> (z.B. ein Modals-Portal).
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- H&Auml;UFIGE FEHLER -->
+      <section class="section section-fehler">
+        <h2>H&auml;ufige Fehler</h2>
+
+        <div class="fehler-item">
+          <div class="fehler-title">Fehler: Context au&szlig;erhalb des Providers verwenden</div>
+          <p>
+            Eine Komponente verwendet <code>useTheme()</code>, wird aber au&szlig;erhalb des
+            <code>ThemeProvider</code> gerendert. React gibt leise den Default-Wert zur&uuml;ck &ndash;
+            kein Fehler, aber falsches Verhalten. Besonders heimt&uuml;ckisch, wenn der Default
+            plausibel wirkt.
+          </p>
+          <p class="fehler-fix">
+            Fix: Den Custom Hook mit einer Pr&uuml;fung sch&uuml;tzen. Default-Wert auf <code>null</code>
+            setzen: <code>createContext&lt;Type | null&gt;(null)</code>. Im Custom Hook:
+            <code>if (!ctx) throw new Error('Au&szlig;erhalb des Providers!')</code>.
+            So wird der Fehler sofort w&auml;hrend der Entwicklung sichtbar.
+          </p>
+        </div>
+
+        <div class="fehler-item">
+          <div class="fehler-title">Fehler: Neues Objekt als value bei jedem Render</div>
+          <p>
+            <code>&lt;Context.Provider value={{ theme, toggleTheme }}&gt;</code> erstellt bei jedem
+            Render des Providers ein <em>neues</em> Objekt, auch wenn sich <code>theme</code> und
+            <code>toggleTheme</code> nicht ge&auml;ndert haben. React f&uuml;hrt einen Referenzvergleich
+            durch &ndash; neues Objekt bedeutet neue Referenz, bedeutet alle Consumer re-rendern.
+          </p>
+          <p class="fehler-fix">
+            Fix: Das value-Objekt mit <code>useMemo</code> memoizieren:
+            <code>const value = useMemo(() =&gt; ({ theme, toggleTheme }), [theme, toggleTheme]);</code>
+            Jetzt wird ein neues Objekt nur bei echter &Auml;nderung erstellt.
+          </p>
+        </div>
+
+        <div class="fehler-item">
+          <div class="fehler-title">Fehler: Zu viel in einem Context</div>
+          <p>
+            Alles in einen einzigen <code>AppContext</code> gepackt: Flights-Daten, Filter-State,
+            Theme, Nutzerprofil, Notifications. Jede &Auml;nderung an <em>irgendeinem</em> dieser Werte
+            l&ouml;st ein Re-Render bei <em>allen</em> Consumern aus, auch bei denen, die nur das Theme
+            brauchen.
+          </p>
+          <p class="fehler-fix">
+            Fix: Contexts nach Update-Frequenz aufteilen. Theme &auml;ndert sich selten &rarr; eigener Context.
+            Flights &auml;ndern sich h&auml;ufiger &rarr; eigener Context. So re-rendern Theme-Consumer nicht,
+            wenn sich Flights &auml;ndern.
+          </p>
+        </div>
+
+        <div class="fehler-item">
+          <div class="fehler-title">Fehler: Fehlender Default-Wert f&uuml;hrt zu TypeScript-Fehler</div>
+          <p>
+            <code>createContext&lt;ThemeContextType&gt;()</code> ohne Default-Wert ist in TypeScript
+            nicht erlaubt, da der Typ kein <code>undefined</code> enthält. Das f&uuml;hrt zu einem
+            Kompilierfehler.
+          </p>
+          <p class="fehler-fix">
+            Fix: Entweder ein echtes Default-Objekt angeben
+            <code>createContext&lt;ThemeContextType&gt;({ theme: 'dark', toggleTheme: () =&gt; {} })</code>
+            oder den Typ explizit auf <code>null</code> erweitern:
+            <code>createContext&lt;ThemeContextType | null&gt;(null)</code> und im Custom Hook pr&uuml;fen.
+          </p>
+        </div>
+      </section>
+
+      <!-- AUFGABEN -->
+      <section class="section section-aufgaben">
+        <h2>Aufgaben</h2>
+
+        <div class="aufgabe">
+          <div class="aufgabe-header">
+            <span class="aufgabe-num">Aufgabe 1</span>
+            <span class="aufgabe-title">ThemeContext mit localStorage-Persistenz</span>
+          </div>
+          <p>
+            Implementiere den vollst&auml;ndigen <code>ThemeContext</code> mit Persistenz im Browser.
+          </p>
+          <ul>
+            <li>Erstelle <code>src/context/ThemeContext.tsx</code> mit <code>ThemeProvider</code> und
+              <code>useTheme</code></li>
+            <li>Lese beim initialen Laden den gespeicherten Wert aus
+              <code>localStorage.getItem('flugboard-theme')</code></li>
+            <li>Speichere jeden Wechsel mit <code>localStorage.setItem('flugboard-theme', next)</code></li>
+            <li>Wickle <code>App</code> in <code>main.tsx</code> in den Provider ein</li>
+            <li>Teste: Nach einem Seitenneuladen soll das zuletzt gew&auml;hlte Theme aktiv sein</li>
+          </ul>
+        </div>
+
+        <div class="aufgabe">
+          <div class="aufgabe-header">
+            <span class="aufgabe-num">Aufgabe 2</span>
+            <span class="aufgabe-title">Theme in Komponenten anwenden</span>
+          </div>
+          <p>
+            Wende das Theme auf die wichtigsten Komponenten an, ohne Prop Drilling.
+          </p>
+          <ul>
+            <li>
+              <code>AirportHeader</code>: Hintergrund Dark <code>#161b22</code> / Light <code>#ffffff</code>,
+              Toggle-Button rechts
+            </li>
+            <li>
+              <code>FlightBoard</code>: Tabellen-Header Dark <code>#161b22</code> / Light <code>#f6f8fa</code>
+            </li>
+            <li>
+              <code>FlightCard</code>: Zeilen-Hover Dark <code>#1c2128</code> / Light <code>#f6f8fa</code>
+            </li>
+            <li>
+              <code>App</code>: Seitenhintergrund Dark <code>#0d1117</code> / Light <code>#ffffff</code>
+            </li>
+            <li>
+              Verwende in jeder Komponente nur <code>const { theme } = useTheme()</code> &ndash; keine Theme-Props!
+            </li>
+          </ul>
+        </div>
+
+        <div class="aufgabe">
+          <div class="aufgabe-header">
+            <span class="aufgabe-num">Aufgabe 3</span>
+            <span class="aufgabe-title">LanguageContext f&uuml;r Statustext&uuml;bersetzungen</span>
+          </div>
+          <p>
+            Erstelle einen einfachen <code>LanguageContext</code> f&uuml;r Deutsch/Englisch.
+          </p>
+          <ul>
+            <li>Erstelle <code>src/context/LanguageContext.tsx</code> mit <code>LanguageProvider</code> und
+              <code>useLanguage</code></li>
+            <li>
+              Der Context stellt <code>lang: 'de' | 'en'</code> und <code>toggleLang: () =&gt; void</code> bereit
+            </li>
+            <li>
+              &Uuml;bersetze die Statustexte in <code>FlightStatusBadge</code>:
+              <code>on-time</code> &rarr; &bdquo;P&uuml;nktlich&ldquo; / &bdquo;On Time&ldquo;,
+              <code>delayed</code> &rarr; &bdquo;Versp&auml;tet&ldquo; / &bdquo;Delayed&ldquo;,
+              <code>cancelled</code> &rarr; &bdquo;Gestrichen&ldquo; / &bdquo;Cancelled&ldquo;
+            </li>
+            <li>F&uuml;ge einen Sprache-Umschalter im Header hinzu (DE / EN)</li>
+          </ul>
+        </div>
+
+        <div class="aufgabe aufgabe-bonus">
+          <div class="aufgabe-header">
+            <span class="aufgabe-num">Bonus</span>
+            <span class="aufgabe-title">useReducer im ThemeContext</span>
+          </div>
+          <p>
+            Ersetze den <code>useState</code>-Aufruf im <code>ThemeContext</code> durch <code>useReducer</code>.
+          </p>
+          <ul>
+            <li>
+              Definiere einen <code>ThemeAction</code>-Typ:
+              <code>{ type: 'TOGGLE' } | { type: 'SET'; payload: Theme }</code>
+            </li>
+            <li>
+              Implementiere einen <code>themeReducer</code>, der beide Actions verarbeitet
+            </li>
+            <li>
+              Ersetze <code>useState&lt;Theme&gt;</code> durch <code>useReducer(themeReducer, 'dark')</code>
+            </li>
+            <li>
+              Erkl&auml;re im Code-Kommentar, wann <code>useReducer</code> gegen&uuml;ber <code>useState</code>
+              vorzuziehen ist: bei State-Logik mit mehreren Aktionen, bedingten &Uuml;berg&auml;ngen, oder wenn
+              der n&auml;chste State vom vorherigen abh&auml;ngt
+            </li>
+          </ul>
+        </div>
+      </section>
+
+    </div><!-- /.content-area -->
+
+    <nav class="lesson-nav">
+      <a class="nav-btn" href="2.3-kommunikation.html">&larr; Lektion 2.3: Komponentenkommunikation</a>
+      <span class="nav-center-info">Lektion 2.4</span>
+      <a class="nav-btn primary" href="2.5-custom-hooks.html">Lektion 2.5: Custom Hooks &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+  <script>
+    // Hamburger menu
+    const ham = document.getElementById('hamburger');
+    const sb = document.getElementById('sidebar');
+    const ov = document.getElementById('overlay');
+    ham.addEventListener('click', () => { sb.classList.toggle('open'); ov.classList.toggle('visible'); });
+    ov.addEventListener('click', () => { sb.classList.remove('open'); ov.classList.remove('visible'); });
+    // Active nav link
+    const cur = window.location.pathname.split('/').pop() || 'index.html';
+    document.querySelectorAll('.nav-link').forEach(l => {
+      if (l.getAttribute('href') === cur) l.classList.add('active');
+    });
+    // Theme toggle — einfach & robust (kein CSS-Swap nötig)
+    const themeBtn = document.getElementById('theme-toggle');
+    const applyTheme = (t) => {
+      document.documentElement.setAttribute('data-theme', t);
+      if (themeBtn) themeBtn.innerHTML = t === 'dark' ? '&#9728;' : '&#9790;';
+    };
+    // Theme aus localStorage laden (alle Seiten teilen denselben Key)
+    applyTheme(localStorage.getItem('kurs-theme') || 'dark');
+    // Transitions erst nach dem initialen Render aktivieren (verhindert Flash)
+    setTimeout(() => document.documentElement.classList.add('theme-transitions'), 50);
+    if (themeBtn) themeBtn.addEventListener('click', () => {
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('kurs-theme', next);
+      applyTheme(next);
+    });
+    hljs.highlightAll();
+  </script>
+</body>
+
+</html>

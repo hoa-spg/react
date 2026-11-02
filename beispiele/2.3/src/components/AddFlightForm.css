@@ -1,0 +1,80 @@
+.add-form {
+  margin-bottom: 1.5rem;
+  padding: 1.5rem 2rem;
+  border: 1px solid #30363d;
+  border-radius: 12px;
+  background: #1c2128;
+}
+
+.add-form-title {
+  margin-bottom: 1.25rem;
+  color: #61dafb;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.add-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-label {
+  color: #8b949e;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.form-input,
+.form-select {
+  padding: 7px 10px;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  background: #21262d;
+  color: #e6edf3;
+  font-size: 0.875rem;
+}
+
+.form-input--error {
+  border-color: #f85149;
+}
+
+.form-error {
+  color: #f85149;
+  font-size: 0.75rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.btn-submit {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 6px;
+  background: #238636;
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-cancel {
+  padding: 8px 20px;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  background: #21262d;
+  color: #e6edf3;
+  font-size: 0.875rem;
+  cursor: pointer;
+}

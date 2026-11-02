@@ -1,0 +1,30 @@
+.airport-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.airport-header-title-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.airport-header-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #61dafb;
+}
+
+.airport-header-subtitle {
+  color: #8b949e;
+  font-size: 1rem;
+}
+
+.airport-header-updated {
+  color: #8b949e;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}

@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3.2 &ndash; Routing &amp; Layouts | React Kurs</title>
+  <script>(function(){var t=localStorage.getItem('kurs-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
+  <link rel="stylesheet" href="assets/kurs.css">
+  <link rel="stylesheet" id="hljs-theme" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+<body>
+
+<button class="hamburger" id="hamburger" aria-label="Navigation &ouml;ffnen">&#9776;</button>
+<div class="sidebar-overlay" id="overlay"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html">
+      <span class="brand-icon">&#9992;</span>
+      <div>
+        <div class="brand-name">React Kurs</div>
+        <div class="brand-sub">Web &amp; Mobile</div>
+      </div>
+    </a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Dark/Light Mode" title="Theme wechseln">&#9728;</button>
+  </div>
+        <nav class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-label react-label">Teil 1 &mdash; React Einführung</div>
+      <a class="nav-link" href="1.1-einfuehrung-spa.html"><span class="ln">1.1</span>Motivation &amp; SPA</a>
+      <a class="nav-link" href="1.2-einfuehrung.html"><span class="ln">1.2</span>Einführung &amp; Umgebung</a>
+      <a class="nav-link" href="1.3-komponenten-props-einfach.html"><span class="ln">1.3</span>Komponenten &amp; Props (einfach)</a>
+      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten &amp; Props (Vertiefung)</a>
+      <a class="nav-link" href="1.5-state-events.html"><span class="ln">1.5</span>State &amp; Events</a>
+      <a class="nav-link" href="1.6-listen-conditional.html"><span class="ln">1.6</span>Listen &amp; Conditional Rendering</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label react-label">Teil 2 &mdash; React Praxis</div>
+      <a class="nav-link" href="2.1-formulare.html"><span class="ln">2.1</span>Formulare &amp; Inputs</a>
+      <a class="nav-link" href="2.2-useeffect-api.html"><span class="ln">2.2</span>useEffect &amp; API</a>
+      <a class="nav-link" href="2.3-kommunikation.html"><span class="ln">2.3</span>Komponentenkommunikation</a>
+      <a class="nav-link" href="2.4-context.html"><span class="ln">2.4</span>Context API</a>
+      <a class="nav-link" href="2.5-custom-hooks.html"><span class="ln">2.5</span>Custom Hooks</a>
+      <a class="nav-link" href="2.6-testen-vitest-rtl.html"><span class="ln">2.6</span>Testen mit Vitest + RTL</a>
+      <a class="nav-link" href="2.7-react-router.html"><span class="ln">2.7</span>React Router</a>
+      <a class="nav-link" href="2.8-datenbank-drizzle-sqlite.html"><span class="ln">2.8</span>Datenbankzugriff mit Drizzle + SQLite</a>
+      <a class="nav-link" href="2.9-redux-state-management.html"><span class="ln">2.9</span>State Management mit Redux (Überblick)</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label next-label">Teil 3 &mdash; Next.js</div>
+      <a class="nav-link" href="3.1-nextjs-einfuehrung.html"><span class="ln">3.1</span>Einführung Next.js</a>
+      <a class="nav-link" href="3.2-nextjs-routing.html"><span class="ln">3.2</span>Routing &amp; Layouts</a>
+      <a class="nav-link" href="3.3-server-client.html"><span class="ln">3.3</span>Server &amp; Client Components</a>
+      <a class="nav-link" href="3.4-api-routes.html"><span class="ln">3.4</span>API Routes &amp; Datenabruf</a>
+      <a class="nav-link" href="3.5-playwright-e2e.html"><span class="ln">3.5</span>Playwright E2E</a>
+      <a class="nav-link" href="3.6-deployment.html"><span class="ln">3.6</span>Deployment</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label rn-label">Teil 4 &mdash; React Native</div>
+      <a class="nav-link" href="4.1-rn-einfuehrung.html"><span class="ln">4.1</span>Einführung React Native</a>
+      <a class="nav-link" href="4.2-rn-komponenten.html"><span class="ln">4.2</span>Native Komponenten &amp; Styling</a>
+      <a class="nav-link" href="4.3-rn-navigation.html"><span class="ln">4.3</span>Navigation &amp; State</a>
+    </div>
+  </nav>
+</aside>
+
+<main class="main-content">
+
+  <header class="lesson-header">
+    <p class="lesson-eyebrow">Lektion 3.2 &mdash; Teil 3: Next.js</p>
+    <h1>Routing &amp; Layouts</h1>
+    <div class="lesson-tags">
+      <span class="tag tag-next">Next.js</span>
+      <span class="tag tag-time">ca. 90 min</span>
+    </div>
+  </header>
+
+  <div class="content-area">
+
+  <!-- LERNZIELE -->
+  <section class="section section-lernziele">
+    <h2>Lernziele</h2>
+    <p>Nach dieser Lektion kannst du folgendes:</p>
+    <ul>
+      <li>Alle speziellen Dateikonventionen des App Routers benennen und erkl&auml;ren</li>
+      <li>Verschachtelte Layouts mit Route Groups organisieren</li>
+      <li><code>loading.tsx</code> f&uuml;r automatisches Suspense-Handling einsetzen</li>
+      <li><code>error.tsx</code> als Error Boundary f&uuml;r einzelne Routen implementieren</li>
+      <li>Dynamische Routen mit <code>[id]</code> und den <code>params</code>-Prop nutzen</li>
+      <li><code>generateMetadata</code> f&uuml;r dynamische SEO-Metadaten verwenden</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 1 -->
+  <section class="section">
+    <h2>1 &mdash; Dateikonventionen im App Router</h2>
+    <p>
+      Der App Router erkennt bestimmte Dateinamen und gibt ihnen automatisch eine besondere Rolle.
+      Diese <em>Dateikonventionen</em> m&uuml;ssen exakt eingehalten werden &mdash; Gro&szlig;- und
+      Kleinschreibung inklusive.
+    </p>
+
+    <div style="overflow-x:auto;">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Dateiname</th>
+            <th>Rolle</th>
+            <th>Besonderheit</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>page.tsx</code></td>
+            <td>&Ouml;ffentliche UI der Route</td>
+            <td>Wird zur URL; ohne diese Datei keine &ouml;ffentliche Seite</td>
+          </tr>
+          <tr>
+            <td><code>layout.tsx</code></td>
+            <td>Gemeinsames Layout f&uuml;r Unterseiten</td>
+            <td>Persistiert bei Navigation &mdash; wird nicht neu gemountet</td>
+          </tr>
+          <tr>
+            <td><code>loading.tsx</code></td>
+            <td>Lade-UI</td>
+            <td>Automatisch in <code>&lt;Suspense&gt;</code> eingebettet</td>
+          </tr>
+          <tr>
+            <td><code>error.tsx</code></td>
+            <td>Fehlerbehandlung</td>
+            <td>Muss Client Component sein (<code>'use client'</code>)</td>
+          </tr>
+          <tr>
+            <td><code>not-found.tsx</code></td>
+            <td>404-Seite</td>
+            <td>Wird durch <code>notFound()</code> ausgel&ouml;st</td>
+          </tr>
+          <tr>
+            <td><code>route.ts</code></td>
+            <td>API-Endpunkt</td>
+            <td>Kein JSX &mdash; gibt <code>NextResponse</code> zur&uuml;ck</td>
+          </tr>
+          <tr>
+            <td><code>template.tsx</code></td>
+            <td>Wie Layout, aber ohne Persistenz</td>
+            <td>Wird bei jeder Navigation neu gemountet</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Ordner-Konventionen</h3>
+    <div style="overflow-x:auto;">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Ordnername</th>
+            <th>Bedeutung</th>
+            <th>Beispiel URL</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>departures/</code></td>
+            <td>Normales URL-Segment</td>
+            <td><code>/departures</code></td>
+          </tr>
+          <tr>
+            <td><code>[id]/</code></td>
+            <td>Dynamisches Segment</td>
+            <td><code>/flight/1</code> &rarr; <code>id = '1'</code></td>
+          </tr>
+          <tr>
+            <td><code>(board)/</code></td>
+            <td>Route Group (unsichtbar in URL)</td>
+            <td>kein Einfluss auf URL</td>
+          </tr>
+          <tr>
+            <td><code>_components/</code></td>
+            <td>Private Ordner (kein Routing)</td>
+            <td>nicht erreichbar</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SECTION 2 -->
+  <section class="section">
+    <h2>2 &mdash; Verschachtelte Layouts mit Route Groups</h2>
+    <p>
+      Route Groups erlauben dir, mehrere Seiten unter ein gemeinsames Layout zu stellen,
+      <em>ohne</em> dieses Segment in der URL sichtbar zu machen. F&uuml;r FlugBoard bietet
+      sich eine <code>(board)</code>-Gruppe an, die <code>/departures</code> und
+      <code>/arrivals</code> mit einer geteilten Navigationsleiste verbindet.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">Verzeichnisstruktur mit Route Group</span>
+        <span class="code-lang">Bash</span>
+      </div>
+      <pre><code class="language-bash">src/app/
+├── layout.tsx              ← Globales Layout (alle Seiten)
+├── page.tsx                ← Startseite: /
+├── (board)/
+│   ├── layout.tsx          ← Board-Layout: nur /departures + /arrivals
+│   ├── departures/
+│   │   ├── page.tsx        ← /departures
+│   │   ├── loading.tsx     ← Lade-UI für /departures
+│   │   └── error.tsx       ← Fehler-UI für /departures
+│   └── arrivals/
+│       ├── page.tsx        ← /arrivals
+│       ├── loading.tsx
+│       └── error.tsx
+└── flight/
+    └── [id]/
+        └── page.tsx        ← /flight/1</code></pre>
+    </div>
+
+    <p>
+      Die Route Group <code>(board)</code> erscheint <strong>nicht</strong> in der URL.
+      <code>/departures</code> bleibt <code>/departures</code> &mdash; nicht <code>/board/departures</code>.
+    </p>
+
+    <h3>Das geteilte Board-Layout</h3>
+    <p>
+      Das Layout f&uuml;r die <code>(board)</code>-Gruppe zeigt eine Tab-Navigation, die zwischen
+      Abfl&uuml;gen und Ank&uuml;nften wechselt. Diese Leiste bleibt bei der Navigation zwischen
+      den Tabs bestehen &mdash; kein Flackern, kein Neu-Laden.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">src/app/(board)/layout.tsx</span>
+        <span class="code-lang">TypeScript</span>
+      </div>
+      <pre><code class="language-typescript">import Link from 'next/link';
+
+export default function BoardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    &lt;div className="board-layout"&gt;
+      &lt;header className="board-header"&gt;
+        &lt;Link href="/" className="board-logo"&gt;
+          &#9992; FlugBoard M&uuml;nchen
+        &lt;/Link&gt;
+        &lt;nav className="board-tabs"&gt;
+          &lt;Link href="/departures" className="board-tab"&gt;
+            &#10132; Abfl&uuml;ge
+          &lt;/Link&gt;
+          &lt;Link href="/arrivals" className="board-tab"&gt;
+            &#10132; Ank&uuml;nfte
+          &lt;/Link&gt;
+        &lt;/nav&gt;
+      &lt;/header&gt;
+      &lt;main className="board-content"&gt;
+        {children}
+      &lt;/main&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+    </div>
+
+    <div class="callout callout-info">
+      <div class="callout-icon">&#8505;</div>
+      <div class="callout-body">
+        <div class="callout-title">Layouts persistieren</div>
+        <p>
+          Wenn du von <code>/departures</code> zu <code>/arrivals</code> navigierst, wird
+          <code>(board)/layout.tsx</code> <strong>nicht</strong> neu gemountet. Das ist ein
+          wichtiger Unterschied zu React Router &mdash; der Header und alle Zust&auml;nde
+          im Layout bleiben vollst&auml;ndig erhalten.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3 -->
+  <section class="section">
+    <h2>3 &mdash; <code>loading.tsx</code> f&uuml;r automatisches Suspense</h2>
+    <p>
+      In React m&uuml;sstest du manuell einen <code>isLoading</code>-State verwalten und
+      Ladeanimationen bedingt rendern. Next.js erledigt das automatisch: Wenn du
+      <code>loading.tsx</code> in einem Ordner anlegst, umh&uuml;llt Next.js die
+      <code>page.tsx</code> automatisch mit einem <code>&lt;Suspense&gt;</code>-Boundary und
+      zeigt dein Loading-UI, solange die Seite l&auml;dt.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">src/app/(board)/departures/loading.tsx</span>
+        <span class="code-lang">TypeScript</span>
+      </div>
+      <pre><code class="language-typescript">export default function Loading() {
+  return (
+    &lt;div className="board-loading board-loading--muted"&gt;
+      &lt;div className="state-icon"&gt;&#9992;&lt;/div&gt;
+      &lt;p&gt;Flugdaten werden geladen&hellip;&lt;/p&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+    </div>
+
+    <p>
+      Da Next.js das Suspense automatisch einf&uuml;gt, musst du nichts an
+      <code>page.tsx</code> &auml;ndern. Das Loading-UI erscheint sofort beim Navigieren
+      und verschwindet, sobald die Seite fertig gerendert ist.
+    </p>
+
+    <div class="callout callout-tip">
+      <div class="callout-icon">&#10003;</div>
+      <div class="callout-body">
+        <div class="callout-title">Skeleton-Loading statt Spinner</div>
+        <p>
+          F&uuml;r eine bessere User Experience kannst du statt eines einfachen Spinners
+          sogenannte <em>Skeleton Screens</em> einsetzen: Platzhalter-Bl&ouml;cke in der Form
+          der sp&auml;teren Inhalte. Nutze CSS-Animationen mit <code>animation: pulse</code>,
+          um die Skelett-Elemente sanft aufleuchten zu lassen.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4 -->
+  <section class="section">
+    <h2>4 &mdash; <code>error.tsx</code> als Error Boundary</h2>
+    <p>
+      Wenn beim Laden einer Seite ein Fehler auftritt (z.&nbsp;B. API nicht erreichbar),
+      f&auml;ngt <code>error.tsx</code> diesen Fehler auf und zeigt eine benutzerfreundliche
+      Fehlermeldung &mdash; anstatt die gesamte Anwendung abst&uuml;rzen zu lassen.
+    </p>
+
+    <div class="callout callout-warning">
+      <div class="callout-icon">&#9888;</div>
+      <div class="callout-body">
+        <div class="callout-title"><code>error.tsx</code> muss eine Client Component sein</div>
+        <p>
+          Im Gegensatz zu <code>loading.tsx</code> und <code>page.tsx</code> <em>muss</em>
+          <code>error.tsx</code> mit <code>'use client'</code> markiert werden. Das liegt daran,
+          dass Error Boundaries in React nur in Client-seitigem Code funktionieren.
+        </p>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">src/app/(board)/departures/error.tsx</span>
+        <span class="code-lang">TypeScript</span>
+      </div>
+      <pre><code class="language-typescript">'use client';
+
+import { useEffect } from 'react';
+
+interface ErrorProps {
+  error: Error &amp; { digest?: string };
+  reset: () =&gt; void;
+}
+
+export default function DeparturesError({ error, reset }: ErrorProps) {
+  useEffect(() =&gt; {
+    // Fehler in einem Logging-Service erfassen
+    console.error('Fehler beim Laden der Abfl&uuml;ge:', error);
+  }, [error]);
+
+  return (
+    &lt;div className="error-container"&gt;
+      &lt;div className="error-icon"&gt;&#9888;&lt;/div&gt;
+      &lt;h2&gt;Fl&uuml;ge konnten nicht geladen werden&lt;/h2&gt;
+      &lt;p className="error-message"&gt;
+        {error.message || 'Ein unbekannter Fehler ist aufgetreten.'}
+      &lt;/p&gt;
+      &lt;button
+        className="error-reset-btn"
+        onClick={reset}
+      &gt;
+        Erneut versuchen
+      &lt;/button&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+    </div>
+
+    <p>
+      Der <code>reset</code>-Prop ist eine Funktion, die Next.js bereitstellt. Beim Klick
+      auf &bdquo;Erneut versuchen&ldquo; wird die Seite neu gerendert &mdash; ohne vollst&auml;ndigen
+      Seiten-Reload.
+    </p>
+  </section>
+
+  <!-- SECTION 5 -->
+  <section class="section">
+    <h2>5 &mdash; Dynamische Routen und <code>params</code></h2>
+    <p>
+      Dynamische Segmente in eckigen Klammern (<code>[id]</code>) erlauben es, beliebige
+      Werte als URL-Parameter zu empfangen. Die Flugdetailseite nutzt das, um den
+      konkreten Flug anhand der ID zu laden.
+    </p>
+
+    <div class="callout callout-warning">
+      <div class="callout-icon">&#9888;</div>
+      <div class="callout-body">
+        <div class="callout-title">Next.js 15: <code>params</code> ist ein Promise!</div>
+        <p>
+          Ab Next.js&nbsp;15 ist <code>params</code> (und <code>searchParams</code>) ein
+          <code>Promise</code>. Du musst es explizit mit <code>await</code> aufl&ouml;sen,
+          bevor du auf die Werte zugreifen kannst. In &auml;lteren Next.js-Versionen war
+          <code>params</code> ein direktes Objekt.
+        </p>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">src/app/flight/[id]/page.tsx</span>
+        <span class="code-lang">TypeScript</span>
+      </div>
+      <pre><code class="language-typescript">import { notFound } from 'next/navigation';
+import { listFlights } from '@/lib/flights-db';
+import type { Metadata } from 'next';
+
+interface PageProps {
+  params: Promise&lt;{ id: string }&gt;;
+}
+
+export default async function FlightDetailPage({ params }: PageProps) {
+  // params MUSS in Next.js 15 awaited werden
+  const { id } = await params;
+
+  const flight = listFlights().find(f =&gt; f.id === Number(id));
+
+  if (!flight) {
+    // Löst die not-found.tsx aus
+    notFound();
+  }
+
+  return (
+    &lt;article className="flight-detail"&gt;
+      &lt;h1&gt;Flug {flight.flightNumber}&lt;/h1&gt;
+      &lt;dl className="flight-detail-grid"&gt;
+        &lt;dt&gt;Airline&lt;/dt&gt;
+        &lt;dd&gt;{flight.airline}&lt;/dd&gt;
+        &lt;dt&gt;Typ&lt;/dt&gt;
+        &lt;dd&gt;{flight.type}&lt;/dd&gt;
+        &lt;dt&gt;Airport&lt;/dt&gt;
+        &lt;dd&gt;{flight.airport}&lt;/dd&gt;
+        &lt;dt&gt;Geplant&lt;/dt&gt;
+        &lt;dd&gt;{flight.scheduledTime}&lt;/dd&gt;
+        &lt;dt&gt;Status&lt;/dt&gt;
+        &lt;dd className={`status status-${flight.status}`}&gt;
+          {flight.status}
+        &lt;/dd&gt;
+        {flight.gate &amp;&amp; (
+          &lt;&gt;
+            &lt;dt&gt;Gate&lt;/dt&gt;
+            &lt;dd&gt;{flight.gate}&lt;/dd&gt;
+          &lt;/&gt;
+        )}
+      &lt;/dl&gt;
+    &lt;/article&gt;
+  );
+}</code></pre>
+    </div>
+  </section>
+
+  <!-- SECTION 6 -->
+  <section class="section">
+    <h2>6 &mdash; Dynamische Metadaten mit <code>generateMetadata</code></h2>
+    <p>
+      F&uuml;r dynamische Seiten (wie die Flugdetailseite) reicht ein statisches
+      <code>metadata</code>-Objekt nicht aus &mdash; der Seitentitel soll die konkrete
+      Flugnummer enthalten. <code>generateMetadata</code> l&ouml;st dieses Problem:
+      die Funktion erh&auml;lt dieselben Props wie die Seitenkomponente und kann
+      asynchron Daten laden.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">src/app/flight/[id]/page.tsx &mdash; mit generateMetadata</span>
+        <span class="code-lang">TypeScript</span>
+      </div>
+      <pre><code class="language-typescript">import { notFound } from 'next/navigation';
+import { listFlights } from '@/lib/flights-db';
+import type { Metadata } from 'next';
+
+interface PageProps {
+  params: Promise&lt;{ id: string }&gt;;
+}
+
+// Wird VOR dem Rendern aufgerufen und setzt &lt;title&gt; + &lt;meta&gt;
+export async function generateMetadata(
+  { params }: PageProps
+): Promise&lt;Metadata&gt; {
+  const { id } = await params;
+  const flight = listFlights().find(f =&gt; f.id === Number(id));
+
+  if (!flight) {
+    return { title: 'Flug nicht gefunden' };
+  }
+
+  return {
+    title: `Flug ${flight.flightNumber} – ${flight.airport}`,
+    description: `Details zu Flug ${flight.flightNumber} (${flight.type}) am Flughafen Wien.`,
+  };
+}
+
+export default async function FlightDetailPage({ params }: PageProps) {
+  const { id } = await params;
+  const flight = listFlights().find(f =&gt; f.id === Number(id));
+
+  if (!flight) notFound();
+
+  return (
+    &lt;article className="flight-detail"&gt;
+      &lt;h1&gt;{flight.flightNumber}&lt;/h1&gt;
+      {/* ... Restliche Anzeige */}
+    &lt;/article&gt;
+  );
+}</code></pre>
+    </div>
+
+    <div class="callout callout-info">
+      <div class="callout-icon">&#8505;</div>
+      <div class="callout-body">
+        <div class="callout-title">Daten-Deduplication</div>
+        <p>
+          Wenn <code>generateMetadata</code> und die Seitenkomponente denselben
+          <code>fetch</code>-Aufruf machen, dedupliziert Next.js die Anfrage automatisch.
+          Die API wird also nur <em>einmal</em> aufgerufen, nicht zweimal.
+          Bei direktem Datenimport (wie hier mit <code>listFlights().find()</code>) entf&auml;llt
+          dieses Problem vollst&auml;ndig.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJEKTSCHRITT -->
+  <section class="section section-projekt">
+    <h2>Projektschritt</h2>
+    <div class="projekt-box">
+      <div class="projekt-box-header">
+        <span class="projekt-step">Projektschritt 3.2</span>
+        <h3>Routing-Struktur und Layouts aufbauen</h3>
+      </div>
+      <p>
+        In diesem Projektschritt baust du die vollst&auml;ndige Routing-Architektur f&uuml;r
+        FlugBoard auf &mdash; mit Route Groups, geteiltem Layout, Lade-UIs und einer
+        vollst&auml;ndigen Detailseite.
+      </p>
+      <ol>
+        <li>
+          <strong>Route Group erstellen:</strong> Lege den Ordner <code>src/app/(board)/</code>
+          an und verschiebe <code>departures/</code> und <code>arrivals/</code> hinein.
+          Pr&uuml;fe, dass die URLs gleich bleiben.
+        </li>
+        <li>
+          <strong>Board-Layout:</strong> Erstelle <code>src/app/(board)/layout.tsx</code> mit
+          dem Header und der Tab-Navigation (Abfl&uuml;ge / Ank&uuml;nfte).
+        </li>
+        <li>
+          <strong>loading.tsx hinzuf&uuml;gen:</strong> Erstelle <code>loading.tsx</code> f&uuml;r
+          <code>departures/</code> und <code>arrivals/</code> mit einem Lade-Indikator.
+        </li>
+        <li>
+          <strong>error.tsx hinzuf&uuml;gen:</strong> Erstelle <code>error.tsx</code> (mit
+          <code>'use client'</code>) f&uuml;r beide Seiten mit Reset-Button.
+        </li>
+        <li>
+          <strong>Detailseite:</strong> Erstelle <code>src/app/flight/[id]/page.tsx</code>
+          mit <code>generateMetadata</code> und <code>notFound()</code>-Aufruf.
+        </li>
+        <li>
+          <strong>Testen:</strong> Rufe <code>/flight/1</code> auf, pr&uuml;fe den
+          Seitentitel im Browser-Tab, und teste eine nicht-existierende ID.
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- FEHLER -->
+  <section class="section section-fehler">
+    <h2>H&auml;ufige Fehler</h2>
+
+    <div class="fehler-item">
+      <div class="fehler-title">Fehler: <code>params</code> nicht awaited</div>
+      <p>
+        Du schreibst <code>const { id } = params;</code> anstatt <code>const { id } = await params;</code>.
+        TypeScript zeigt keinen Fehler, aber <code>id</code> ist ein unaufgel&ouml;stes
+        Promise-Objekt &mdash; dein <code>find()</code>-Aufruf findet nichts und die Seite
+        zeigt immer &bdquo;Flug nicht gefunden&ldquo;.
+      </p>
+      <p class="fehler-fix">
+        <strong>Fix:</strong> Markiere die Komponente als <code>async</code> und
+        verwende <code>const { id } = await params;</code>. Dies gilt in Next.js&nbsp;15
+        sowohl f&uuml;r <code>params</code> als auch f&uuml;r <code>searchParams</code>.
+      </p>
+    </div>
+
+    <div class="fehler-item">
+      <div class="fehler-title">Fehler: <code>error.tsx</code> ohne <code>'use client'</code></div>
+      <p>
+        Du vergisst <code>'use client'</code> in <code>error.tsx</code>. Next.js zeigt
+        beim Build einen Fehler: <em>&bdquo;Error boundaries require 'use client'&ldquo;</em>.
+      </p>
+      <p class="fehler-fix">
+        <strong>Fix:</strong> F&uuml;ge <code>'use client';</code> als allererste Zeile
+        in <code>error.tsx</code> ein. Das ist die einzige Datei im App Router, die
+        zwingend eine Client Component sein muss.
+      </p>
+    </div>
+
+    <div class="fehler-item">
+      <div class="fehler-title">Fehler: Layout-Verschachtelung vergessen</div>
+      <p>
+        Du erstellst <code>(board)/layout.tsx</code>, aber die Seiten befinden sich noch
+        im alten <code>departures/</code>-Ordner au&szlig;erhalb der Route Group.
+        Das geteilte Layout wird nie angezeigt.
+      </p>
+      <p class="fehler-fix">
+        <strong>Fix:</strong> Verschiebe die Seiten-Ordner <em>in</em> den
+        <code>(board)/</code>-Ordner: <code>src/app/(board)/departures/</code>.
+        Pr&uuml;fe die Struktur mit <code>ls src/app/(board)/</code>.
+      </p>
+    </div>
+
+    <div class="fehler-item">
+      <div class="fehler-title">Fehler: <code>(board)</code> erscheint in der URL</div>
+      <p>
+        Du erwartest, dass die URL <code>/departures</code> lautet, aber der Browser
+        zeigt <code>/(board)/departures</code> &mdash; das ist ein Zeichen, dass der
+        Ordner ohne runde Klammern angelegt wurde.
+      </p>
+      <p class="fehler-fix">
+        <strong>Fix:</strong> Achte auf die runden Klammern: der Ordner muss exakt
+        <code>(board)</code> hei&szlig;en. Ohne Klammern ist es ein normales URL-Segment.
+        Benenne den Ordner um und starte den Dev-Server neu.
+      </p>
+    </div>
+  </section>
+
+  <!-- AUFGABEN -->
+  <section class="section section-aufgaben">
+    <h2>Aufgaben</h2>
+    <div class="aufgaben-list">
+
+      <div class="aufgabe">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">Aufgabe 1</span>
+          <span class="aufgabe-title">Route Group und geteiltes Layout</span>
+        </div>
+        <p>
+          Organisiere die Routing-Struktur mit einer Route Group und einem gemeinsamen Layout.
+        </p>
+        <ul>
+          <li>Erstelle den Ordner <code>src/app/(board)/</code></li>
+          <li>Verschiebe <code>departures/</code> und <code>arrivals/</code> in die Route Group</li>
+          <li>Erstelle <code>(board)/layout.tsx</code> mit Header und Tab-Navigation</li>
+          <li>Hebe den aktiven Tab visuell hervor (verwende <code>usePathname()</code>)</li>
+        </ul>
+      </div>
+
+      <div class="aufgabe">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">Aufgabe 2</span>
+          <span class="aufgabe-title"><code>loading.tsx</code> und <code>error.tsx</code> implementieren</span>
+        </div>
+        <p>
+          F&uuml;ge automatisches Lade- und Fehler-Handling zu beiden Board-Seiten hinzu.
+        </p>
+        <ul>
+          <li>Erstelle <code>loading.tsx</code> f&uuml;r Abfl&uuml;ge und Ank&uuml;nfte</li>
+          <li>Erstelle <code>error.tsx</code> f&uuml;r beide Seiten (nicht vergessen: <code>'use client'</code>)</li>
+          <li>Teste das Fehler-UI, indem du einen <code>throw new Error()</code> in <code>page.tsx</code> einf&uuml;gst</li>
+          <li>Pr&uuml;fe, ob der Reset-Button die Seite korrekt neu l&auml;dt</li>
+        </ul>
+      </div>
+
+      <div class="aufgabe">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">Aufgabe 3</span>
+          <span class="aufgabe-title">Flugdetailseite mit <code>params</code> und <code>notFound()</code></span>
+        </div>
+        <p>
+          Implementiere die dynamische Flugdetailseite vollst&auml;ndig.
+        </p>
+        <ul>
+          <li>Erstelle <code>src/app/flight/[id]/page.tsx</code></li>
+          <li>Awaite <code>params</code> korrekt und lese <code>id</code> aus</li>
+          <li>Zeige alle Flugdetails an (Flugnummer, Airline, Route, Status, Gate)</li>
+          <li>Rufe <code>notFound()</code> auf, wenn kein Flug gefunden wurde</li>
+          <li>F&uuml;ge von den Abflug-Listenseiten Links zu <code>/flight/{'{flight.id}'}</code> hinzu</li>
+        </ul>
+      </div>
+
+      <div class="aufgabe aufgabe-bonus">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">Aufgabe 4 &mdash; Bonus</span>
+          <span class="aufgabe-title"><code>generateStaticParams</code> f&uuml;r statisches Vorrendern</span>
+        </div>
+        <p>
+          Mit <code>generateStaticParams</code> kannst du alle m&ouml;glichen Routen beim Build
+          vorrendern lassen &mdash; maximale Performance ohne dynamisches Rendering.
+        </p>
+        <ul>
+          <li>Exportiere <code>generateStaticParams</code> aus <code>flight/[id]/page.tsx</code></li>
+          <li>Gib alle Flug-IDs aus der SQLite-Datenquelle als <code>{ id: string }[]</code> zur&uuml;ck</li>
+          <li>F&uuml;hre <code>npm run build</code> aus und beobachte, welche Routen als &bdquo;Static&ldquo; markiert werden</li>
+          <li>Erkl&auml;re: Wann ist <code>generateStaticParams</code> sinnvoll, wann nicht?</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- LESSON NAV -->
+
+  </div><!-- /content-area -->
+
+        <nav class="lesson-nav">
+    <a class="nav-btn" href="3.1-nextjs-einfuehrung.html">&larr; Lektion 3.1: Einführung Next.js</a>
+    <span class="nav-center-info">Lektion 3.2</span>
+    <a class="nav-btn primary" href="3.3-server-client.html">Lektion 3.3: Server &amp; Client Components &rarr;</a>
+  </nav>
+
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+<script>
+  // Hamburger menu
+  const ham = document.getElementById('hamburger');
+  const sb  = document.getElementById('sidebar');
+  const ov  = document.getElementById('overlay');
+  ham.addEventListener('click', () => { sb.classList.toggle('open'); ov.classList.toggle('visible'); });
+  ov.addEventListener('click',  () => { sb.classList.remove('open'); ov.classList.remove('visible'); });
+  // Active nav link
+  const cur = window.location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.nav-link').forEach(l => {
+    if (l.getAttribute('href') === cur) l.classList.add('active');
+  });
+  // Theme toggle — einfach & robust (kein CSS-Swap nötig)
+  const themeBtn = document.getElementById('theme-toggle');
+  const applyTheme = (t) => {
+    document.documentElement.setAttribute('data-theme', t);
+    if (themeBtn) themeBtn.innerHTML = t === 'dark' ? '&#9728;' : '&#9790;';
+  };
+  // Theme aus localStorage laden (alle Seiten teilen denselben Key)
+  applyTheme(localStorage.getItem('kurs-theme') || 'dark');
+  // Transitions erst nach dem initialen Render aktivieren (verhindert Flash)
+  setTimeout(() => document.documentElement.classList.add('theme-transitions'), 50);
+  if (themeBtn) themeBtn.addEventListener('click', () => {
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('kurs-theme', next);
+    applyTheme(next);
+  });
+  hljs.highlightAll();
+</script>
+</body>
+</html>

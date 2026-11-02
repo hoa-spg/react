@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3.4 &ndash; API Routes &amp; Datenabruf | React Kurs</title>
+  <script>(function(){var t=localStorage.getItem('kurs-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
+  <link rel="stylesheet" href="assets/kurs.css">
+  <link rel="stylesheet" id="hljs-theme" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+<body>
+
+<button class="hamburger" id="hamburger" aria-label="Navigation &ouml;ffnen">&#9776;</button>
+<div class="sidebar-overlay" id="overlay"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html">
+      <span class="brand-icon">&#9992;</span>
+      <div>
+        <div class="brand-name">React Kurs</div>
+        <div class="brand-sub">Web &amp; Mobile</div>
+      </div>
+    </a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Dark/Light Mode" title="Theme wechseln">&#9728;</button>
+  </div>
+        <nav class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-label react-label">Teil 1 &mdash; React Einführung</div>
+      <a class="nav-link" href="1.1-einfuehrung-spa.html"><span class="ln">1.1</span>Motivation &amp; SPA</a>
+      <a class="nav-link" href="1.2-einfuehrung.html"><span class="ln">1.2</span>Einführung &amp; Umgebung</a>
+      <a class="nav-link" href="1.3-komponenten-props-einfach.html"><span class="ln">1.3</span>Komponenten &amp; Props (einfach)</a>
+      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten &amp; Props (Vertiefung)</a>
+      <a class="nav-link" href="1.5-state-events.html"><span class="ln">1.5</span>State &amp; Events</a>
+      <a class="nav-link" href="1.6-listen-conditional.html"><span class="ln">1.6</span>Listen &amp; Conditional Rendering</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label react-label">Teil 2 &mdash; React Praxis</div>
+      <a class="nav-link" href="2.1-formulare.html"><span class="ln">2.1</span>Formulare &amp; Inputs</a>
+      <a class="nav-link" href="2.2-useeffect-api.html"><span class="ln">2.2</span>useEffect &amp; API</a>
+      <a class="nav-link" href="2.3-kommunikation.html"><span class="ln">2.3</span>Komponentenkommunikation</a>
+      <a class="nav-link" href="2.4-context.html"><span class="ln">2.4</span>Context API</a>
+      <a class="nav-link" href="2.5-custom-hooks.html"><span class="ln">2.5</span>Custom Hooks</a>
+      <a class="nav-link" href="2.6-testen-vitest-rtl.html"><span class="ln">2.6</span>Testen mit Vitest + RTL</a>
+      <a class="nav-link" href="2.7-react-router.html"><span class="ln">2.7</span>React Router</a>
+      <a class="nav-link" href="2.8-datenbank-drizzle-sqlite.html"><span class="ln">2.8</span>Datenbankzugriff mit Drizzle + SQLite</a>
+      <a class="nav-link" href="2.9-redux-state-management.html"><span class="ln">2.9</span>State Management mit Redux (Überblick)</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label next-label">Teil 3 &mdash; Next.js</div>
+      <a class="nav-link" href="3.1-nextjs-einfuehrung.html"><span class="ln">3.1</span>Einführung Next.js</a>
+      <a class="nav-link" href="3.2-nextjs-routing.html"><span class="ln">3.2</span>Routing &amp; Layouts</a>
+      <a class="nav-link" href="3.3-server-client.html"><span class="ln">3.3</span>Server &amp; Client Components</a>
+      <a class="nav-link" href="3.4-api-routes.html"><span class="ln">3.4</span>API Routes &amp; Datenabruf</a>
+      <a class="nav-link" href="3.5-playwright-e2e.html"><span class="ln">3.5</span>Playwright E2E</a>
+      <a class="nav-link" href="3.6-deployment.html"><span class="ln">3.6</span>Deployment</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label rn-label">Teil 4 &mdash; React Native</div>
+      <a class="nav-link" href="4.1-rn-einfuehrung.html"><span class="ln">4.1</span>Einführung React Native</a>
+      <a class="nav-link" href="4.2-rn-komponenten.html"><span class="ln">4.2</span>Native Komponenten &amp; Styling</a>
+      <a class="nav-link" href="4.3-rn-navigation.html"><span class="ln">4.3</span>Navigation &amp; State</a>
+    </div>
+  </nav>
+</aside>
+
+<main class="main-content">
+
+  <header class="lesson-header">
+    <p class="lesson-eyebrow">Lektion 3.4 &mdash; Teil 3: Next.js</p>
+    <h1>API Routes &amp; Datenabruf</h1>
+    <div class="lesson-tags">
+      <span class="tag tag-next">Next.js</span>
+      <span class="tag tag-time">ca. 90 min</span>
+    </div>
+  </header>
+
+  <div class="content-area">
+
+  <!-- LERNZIELE -->
+  <section class="section section-lernziele">
+    <h2>Lernziele</h2>
+    <p>Nach dieser Lektion kannst du folgendes:</p>
+    <ul>
+      <li>Route Handlers (API-Endpunkte) direkt im Next.js-Projekt erstellen</li>
+      <li>GET- und POST-Handler mit <code>NextRequest</code> und <code>NextResponse</code> implementieren</li>
+      <li>Query-Parameter aus der URL lesen und zur Filterung einsetzen</li>
+      <li>Dynamische Route Handler f&uuml;r GET und DELETE nach ID erstellen</li>
+      <li>Server Actions als Alternative zu API Routes f&uuml;r Formulare verwenden</li>
+      <li>Server Components direkt importieren statt &uuml;ber <code>fetch</code> abzurufen</li>
+    </ul>
+  </section>
+
+  <!-- SECTION 1 -->
+  <section class="section">
+    <h2>1 &mdash; Was sind Route Handlers?</h2>
+    <p>
+      Route Handlers sind API-Endpunkte, die direkt im Next.js-Projekt leben.
+      Anstatt ein separates Backend (wie unser Deno-Server aus Teil&nbsp;1) zu betreiben,
+      definierst du deine API-Logik in <code>route.ts</code>-Dateien innerhalb von
+      <code>src/app/api/</code>.
+    </p>
+
+    <h3>Vorteile gegen&uuml;ber einem separaten Backend</h3>
+    <ul>
+      <li><strong>Geteilte Typen:</strong> <code>Flight</code>-Interface in API und Frontend identisch</li>
+      <li><strong>Kein CORS:</strong> Gleiche Domain &mdash; kein Cross-Origin-Problem</li>
+      <li><strong>Automatisches Deployment:</strong> API und Frontend werden zusammen deployt</li>
+      <li><strong>Direkter Datenzugriff:</strong> Server Components k&ouml;nnen Daten direkt importieren</li>
+    </ul>
+
+    <h3>Route Handler Dateistruktur</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">API-Struktur f&uuml;r FlugBoard</span>
+        <span class="code-lang">Bash</span>
+      </div>
+      <pre><code class="language-bash">src/app/api/
+├── flights/
+│   ├── route.ts           → GET  /api/flights
+│   │                      → POST /api/flights
+│   └── [id]/
+│       └── route.ts       → GET    /api/flights/LH123
+│                          → DELETE /api/flights/LH123
+└── status/
+    └── route.ts           → GET /api/status</code></pre>
+    </div>
+
+    <div class="callout callout-info">
+      <div class="callout-icon">&#8505;</div>
+      <div class="callout-body">
+        <div class="callout-title">Route Handler vs. Server Action</div>
+        <p>
+          Route Handlers (<code>route.ts</code>) eignen sich f&uuml;r REST-APIs, die auch von
+          au&szlig;en aufgerufen werden sollen &mdash; z.&nbsp;B. von einer mobilen App.
+          Server Actions (<code>'use server'</code>) sind einfacher f&uuml;r Formulare innerhalb
+          der Next.js-App selbst. Beide Ans&auml;tze lernst du in dieser Lektion.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2 -->
+  <section class="section">
+    <h2>2 &mdash; GET-Endpunkt mit Query-Parametern</h2>
+    <p>
+      Der <code>GET</code>-Handler f&uuml;r <code>/api/flights</code> soll alle Fl&uuml;ge
+      zur&uuml;ckgeben. Zus&auml;tzlich unterst&uuml;tzt er die Query-Parameter <code>type</code>
+      (departure / arrival) und <code>status</code> zur Filterung.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">src/app/api/flights/route.ts</span>
+        <span class="code-lang">TypeScript</span>
+      </div>
+      <pre><code class="language-typescript">import { NextRequest, NextResponse } from 'next/server';
+import { insertFlight, listFlights } from '@/lib/flights-db';
+import type { Flight } from '@/types/flight';
+
+export async function GET(request: NextRequest) {
+  const { searchParams } = request.nextUrl;
+  const type   = searchParams.get('type');
+  const status = searchParams.get('status');
+  const query  = searchParams.get('q');
+
+  let result: Flight[] = listFlights(type ?? undefined, status ?? undefined);
+
+  // Volltextsuche in Flugnummer, Airport, Airline
+  if (query) {
+    const q = query.toLowerCase();
+    result = result.filter(f =&gt;
+      f.flightNumber.toLowerCase().includes(q) ||
+      f.airport.toLowerCase().includes(q) ||
+      f.airline.toLowerCase().includes(q)
+    );
+  }
+
+  // Sortierung: fr&uuml;heste Fl&uuml;ge zuerst
+  result.sort((a, b) =&gt;
+    a.scheduledTime.localeCompare(b.scheduledTime)
+  );
+
+  return NextResponse.json(result, {
+    headers: {
+      'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60',
+    },
+  });
+}</code></pre>
+    </div>
+
+    <h3>Endpunkt mit curl testen</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">Terminal &mdash; curl Tests</span>
+        <span class="code-lang">Bash</span>
+      </div>
+      <pre><code class="language-bash"># Alle Fl&uuml;ge
+curl http://localhost:3000/api/flights | json_pp
+
+# Nur Abfl&uuml;ge
+curl "http://localhost:3000/api/flights?type=departure"
+
+# Versp&auml;tete Fl&uuml;ge
+curl "http://localhost:3000/api/flights?status=delayed"
+
+# Kombiniert: versp&auml;tete Abfl&uuml;ge von Lufthansa
+curl "http://localhost:3000/api/flights?type=departure&amp;status=delayed&amp;q=LH"</code></pre>
+    </div>
+  </section>
+
+  <!-- SECTION 3 -->
+  <section class="section">
+    <h2>3 &mdash; POST-Handler mit Validierung</h2>
+    <p>
+      Der POST-Handler erzeugt einen neuen Flug. Er liest den Request-Body als JSON,
+      validiert die Pflichtfelder und gibt bei Erfolg den neuen Flug mit HTTP&nbsp;201
+      zur&uuml;ck.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">src/app/api/flights/route.ts &mdash; POST hinzuf&uuml;gen</span>
+        <span class="code-lang">TypeScript</span>
+      </div>
+      <pre><code class="language-typescript">// ... (GET-Handler wie oben)
+
+export async function POST(request: NextRequest) {
+  let body: unknown;
+
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json(
+      { error: 'Ung&uuml;ltiger JSON-Body' },
+      { status: 400 }
+    );
+  }
+
+  // Typpr&uuml;fung und Validierung
+  if (
+    typeof body !== 'object' ||
+    body === null ||
+    !('flightNumber' in body) ||
+    !('airline'      in body) ||
+    !('airport'      in body) ||
+    !('scheduledTime' in body) ||
+    !('type'         in body)
+  ) {
+    return NextResponse.json(
+      {
+        error: 'Fehlende Pflichtfelder',
+        required: ['flightNumber', 'airline', 'airport', 'scheduledTime', 'type'],
+      },
+      { status: 422 }
+    );
+  }
+
+  const input = body as Record&lt;string, unknown&gt;;
+
+  const newFlight = insertFlight({
+    flightNumber: String(input.flightNumber),
+    airline: String(input.airline),
+    type: (input.type as Flight['type']) ?? 'departure',
+    scheduledTime: String(input.scheduledTime),
+    expectedTime: typeof input.expectedTime === 'string'
+      ? input.expectedTime
+      : undefined,
+    airport: String(input.airport),
+    terminal: typeof input.terminal === 'string' ? input.terminal : 'T1',
+    gate: typeof input.gate === 'string' ? input.gate : undefined,
+  });
+
+  return NextResponse.json(newFlight, { status: 201 });
+}</code></pre>
+    </div>
+
+    <div class="callout callout-warning">
+      <div class="callout-icon">&#9888;</div>
+      <div class="callout-body">
+        <div class="callout-title">Persistente Daten mit Drizzle + SQLite</div>
+        <p>
+          Seit Lektion 2.8 verwenden wir persistente Flugdaten in SQLite.
+          In den Route Handlers greifen wir deshalb nicht mehr auf ein In-Memory-Array zu,
+          sondern auf Funktionen wie <code>listFlights</code>, <code>insertFlight</code>
+          und <code>removeFlight</code> aus einer gemeinsamen DB-Schicht.
+        </p>
+      </div>
+    </div>
+
+    <h3>POST mit curl testen</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">Terminal &mdash; POST testen</span>
+        <span class="code-lang">Bash</span>
+      </div>
+      <pre><code class="language-bash">curl -X POST http://localhost:3000/api/flights \
+  -H "Content-Type: application/json" \
+  -d '{
+    "flightNumber": "EW456",
+    "airline": "Eurowings",
+    "airport": "Barcelona (BCN)",
+    "scheduledTime": "2026-10-23T14:30:00",
+    "type": "departure",
+    "gate": "G12",
+    "terminal": "2"
+  }' | json_pp</code></pre>
+    </div>
+  </section>
+
+  <!-- SECTION 4 -->
+  <section class="section">
+    <h2>4 &mdash; Dynamischer Route Handler f&uuml;r <code>[id]</code></h2>
+    <p>
+      F&uuml;r Operationen auf einem einzelnen Flug erstellen wir einen Route Handler
+      unter <code>src/app/api/flights/[id]/route.ts</code>. Auch hier gilt: in
+      Next.js&nbsp;15 ist <code>params</code> ein Promise!
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">src/app/api/flights/[id]/route.ts</span>
+        <span class="code-lang">TypeScript</span>
+      </div>
+      <pre><code class="language-typescript">import { NextRequest, NextResponse } from 'next/server';
+import { getFlightById, removeFlight, updateFlight } from '@/lib/flights-db';
+
+interface RouteContext {
+  params: Promise&lt;{ id: string }&gt;;
+}
+
+// GET /api/flights/:id
+export async function GET(
+  _request: NextRequest,
+  { params }: RouteContext
+) {
+  const { id } = await params;
+  const flight = getFlightById(Number(id));
+
+  if (!flight) {
+    return NextResponse.json(
+      { error: `Flug mit ID "${id}" nicht gefunden` },
+      { status: 404 }
+    );
+  }
+
+  return NextResponse.json(flight);
+}
+
+// DELETE /api/flights/:id
+export async function DELETE(
+  _request: NextRequest,
+  { params }: RouteContext
+) {
+  const { id } = await params;
+  const deleted = removeFlight(Number(id));
+
+  if (!deleted) {
+    return NextResponse.json(
+      { error: `Flug mit ID "${id}" nicht gefunden` },
+      { status: 404 }
+    );
+  }
+
+  return NextResponse.json({
+    message: `Flug ${deleted.flightNumber} wurde gel&ouml;scht`,
+    deleted,
+  });
+}
+
+// PATCH /api/flights/:id – Status aktualisieren
+export async function PATCH(
+  request: NextRequest,
+  { params }: RouteContext
+) {
+  const { id }  = await params;
+  const body    = await request.json() as { status?: string };
+  const flight  = getFlightById(Number(id));
+
+  if (!flight) {
+    return NextResponse.json(
+      { error: 'Nicht gefunden' },
+      { status: 404 }
+    );
+  }
+
+  const updated = updateFlight(Number(id), { status: body.status });
+  return NextResponse.json(updated);
+}</code></pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">Terminal &mdash; DELETE und PATCH testen</span>
+        <span class="code-lang">Bash</span>
+      </div>
+      <pre><code class="language-bash"># Einen Flug abrufen
+curl http://localhost:3000/api/flights/1
+
+# Einen Flug l&ouml;schen
+curl -X DELETE http://localhost:3000/api/flights/1
+
+# Status aktualisieren
+curl -X PATCH http://localhost:3000/api/flights/2 \
+  -H "Content-Type: application/json" \
+  -d '{"status": "boarding"}'</code></pre>
+    </div>
+  </section>
+
+  <!-- SECTION 5 -->
+  <section class="section">
+    <h2>5 &mdash; Server Actions f&uuml;r Formulare</h2>
+    <p>
+      Server Actions sind eine Alternative zu Route Handlers f&uuml;r Formular-Submissions.
+      Sie sind einfacher einzusetzen, weil kein <code>fetch</code> n&ouml;tig ist &mdash;
+      das Formular ruft die Funktion direkt auf.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">src/actions/flight-actions.ts</span>
+        <span class="code-lang">TypeScript</span>
+      </div>
+      <pre><code class="language-typescript">'use server';
+
+import { revalidatePath } from 'next/cache';
+import { insertFlight, removeFlight } from '@/lib/flights-db';
+import type { Flight } from '@/types/flight';
+
+const FLIGHT_NUMBER_PATTERN = /^[A-Z]{2}\d{3,4}$/;
+
+export async function addFlight(formData: FormData) {
+  // FormData-Werte auslesen
+  const flightNumber  = String(formData.get('flightNumber') ?? '').trim().toUpperCase();
+  const airline       = formData.get('airline') as string;
+  const airport       = formData.get('airport') as string;
+  const scheduledTime = formData.get('scheduledTime') as string;
+  const terminal      = formData.get('terminal') as string | null;
+  const gate          = formData.get('gate') as string | null;
+
+  // Einfache Validierung
+  if (!flightNumber || !airline || !airport || !scheduledTime) {
+    throw new Error('Bitte alle Pflichtfelder ausf&uuml;llen.');
+  }
+
+  if (!FLIGHT_NUMBER_PATTERN.test(flightNumber)) {
+    throw new Error('Flugnummer muss genau 2 Buchstaben und 3 oder 4 Ziffern enthalten (z.B. OS123).');
+  }
+
+  const newFlight: Omit&lt;Flight, 'id' | 'status'&gt; = {
+    flightNumber,
+    airline,
+    type:          'departure',
+    scheduledTime,
+    airport,
+    terminal:      terminal ?? 'T1',
+    gate:          gate ?? undefined,
+  };
+
+  insertFlight(newFlight);
+
+  // Seite neu validieren &ndash; zeigt sofort den neuen Flug
+  revalidatePath('/departures');
+}
+
+export async function deleteFlight(id: string) {
+  removeFlight(Number(id));
+  revalidatePath('/departures');
+  revalidatePath('/arrivals');
+}</code></pre>
+    </div>
+
+    <h3>Server Action in einem Formular einsetzen</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">src/components/AddFlightForm.tsx</span>
+        <span class="code-lang">TypeScript</span>
+      </div>
+      <pre><code class="language-typescript">import { addFlight } from '@/actions/flight-actions';
+
+// Kein 'use client' n&ouml;tig! Das Formular l&auml;uft als Server Component.
+export default function AddFlightForm() {
+  return (
+    &lt;form action={addFlight} className="add-flight-form"&gt;
+      &lt;div className="form-group"&gt;
+        &lt;label htmlFor="flightNumber"&gt;Flugnummer *&lt;/label&gt;
+        &lt;input
+          id="flightNumber"
+          name="flightNumber"
+          type="text"
+          placeholder="z.B. LH456"
+          pattern="[A-Za-z]{2}\d{3,4}"
+          title="2 Buchstaben gefolgt von 3 oder 4 Ziffern, z.B. OS123"
+          required
+        /&gt;
+      &lt;/div&gt;
+      &lt;div className="form-group"&gt;
+        &lt;label htmlFor="airline"&gt;Airline *&lt;/label&gt;
+        &lt;input
+          id="airline"
+          name="airline"
+          type="text"
+          placeholder="z.B. Lufthansa"
+          required
+        /&gt;
+      &lt;/div&gt;
+      &lt;div className="form-group"&gt;
+        &lt;label htmlFor="airport"&gt;Ziel / Airport *&lt;/label&gt;
+        &lt;input
+          id="airport"
+          name="airport"
+          type="text"
+          placeholder="z.B. Paris (CDG)"
+          required
+        /&gt;
+      &lt;/div&gt;
+      &lt;div className="form-group"&gt;
+        &lt;label htmlFor="scheduledTime"&gt;Abflugzeit *&lt;/label&gt;
+        &lt;input
+          id="scheduledTime"
+          name="scheduledTime"
+          type="datetime-local"
+          required
+        /&gt;
+      &lt;/div&gt;
+      &lt;div className="form-group"&gt;
+        &lt;label htmlFor="gate"&gt;Gate&lt;/label&gt;
+        &lt;input id="gate" name="gate" type="text" placeholder="z.B. B12" /&gt;
+      &lt;/div&gt;
+      &lt;button type="submit" className="btn-primary"&gt;
+        Flug hinzuf&uuml;gen
+      &lt;/button&gt;
+    &lt;/form&gt;
+  );
+}</code></pre>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-icon">&#10003;</div>
+      <div class="callout-body">
+        <div class="callout-title"><code>revalidatePath</code> &mdash; Cache invalidieren</div>
+        <p>
+          Nach einer m&uuml;tierenden Operation (POST, DELETE, PATCH) rufst du
+          <code>revalidatePath('/departures')</code> auf, um den Cache f&uuml;r diese Route
+          zu l&ouml;schen. Beim n&auml;chsten Seitenaufruf werden die Daten frisch vom Server geladen.
+          Ohne <code>revalidatePath</code> w&uuml;rde die Seite noch die alten gecachten Daten zeigen.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 6 -->
+  <section class="section">
+    <h2>6 &mdash; Server Components importieren statt fetchen</h2>
+    <p>
+      Das Sch&ouml;nste am Next.js-Ansatz: In Server Components kannst du Daten
+      <em>direkt importieren</em>, ohne einen HTTP-Request zu machen. Das ist nicht nur
+      einfacher, sondern auch deutlich schneller &mdash; kein Netzwerk-Overhead.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">Direkter Import vs. fetch &mdash; Vergleich</span>
+        <span class="code-lang">TypeScript</span>
+      </div>
+      <pre><code class="language-typescript">// ✅ BESSER: Direkter Daten-Import in Server Components
+import { listFlights } from '@/lib/flights-db';
+
+export default async function DeparturePage() {
+  const departures = listFlights('departure');
+  return &lt;FlightTable flights={departures} /&gt;;
+}
+
+// ⚠️ Nur n&ouml;tig f&uuml;r Client Components oder externe APIs
+export default async function DeparturePage() {
+  // Nur wenn Daten von einer externen Quelle kommen:
+  const res = await fetch('https://api.flughafen.de/flights');
+  const flights = await res.json();
+  return &lt;FlightTable flights={flights} /&gt;;
+}</code></pre>
+    </div>
+
+    <h3>Wann welchen Ansatz verwenden?</h3>
+    <div style="overflow-x:auto;">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Datenquelle</th>
+            <th>Empfohlener Ansatz</th>
+            <th>Begr&uuml;ndung</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Seed-Daten in SQLite</td>
+            <td>Direkter Import</td>
+            <td>Einfachst, kein Overhead</td>
+          </tr>
+          <tr>
+            <td>Eigene Route Handler im selben Projekt</td>
+            <td>Direkter Import (bevorzugt)</td>
+            <td>Kein n&ouml;tiger HTTP-Roundtrip</td>
+          </tr>
+          <tr>
+            <td>Externe REST-APIs</td>
+            <td><code>fetch</code> mit Cache-Option</td>
+            <td>Kein direkter Zugriff m&ouml;glich</td>
+          </tr>
+          <tr>
+            <td>Datenbank (Prisma, Drizzle)</td>
+            <td>Direkte DB-Abfrage in Server Component</td>
+            <td>Kein API-Layer n&ouml;tig</td>
+          </tr>
+          <tr>
+            <td>Client Components</td>
+            <td><code>fetch('/api/...')</code></td>
+            <td>Kein direkter Serverzugriff m&ouml;glich</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- PROJEKTSCHRITT -->
+  <section class="section section-projekt">
+    <h2>Projektschritt</h2>
+    <div class="projekt-box">
+      <div class="projekt-box-header">
+        <span class="projekt-step">Projektschritt 3.4</span>
+        <h3>Next.js API Routes auf Drizzle + SQLite umstellen</h3>
+      </div>
+      <p>
+        In diesem Projektschritt bleibt die Datenbank das Zentrum der Anwendung.
+        Wir verlagern den Datenzugriff in Next.js Route Handlers, aber arbeiten weiterhin
+        mit Drizzle + SQLite.
+      </p>
+      <ol>
+        <li>
+          <strong>GET + POST Route Handler:</strong> Erstelle
+          <code>src/app/api/flights/route.ts</code> mit GET (Query-Params) und POST
+          (mit Validierung und 201-Antwort).
+        </li>
+        <li>
+          <strong>Dynamischer Handler:</strong> Erstelle
+          <code>src/app/api/flights/[id]/route.ts</code> mit GET, DELETE und PATCH.
+        </li>
+        <li>
+          <strong>Server Components anpassen:</strong> Ersetze in <code>page.tsx</code>
+          alle In-Memory-Zugriffe durch DB-Funktionen aus <code>@/lib/flights-db</code>.
+        </li>
+        <li>
+          <strong>Client Components anpassen:</strong> Ersetze in Client Components alle
+          Fetch-URLs durch <code>/api/flights</code> (relativ, kein Hostname n&ouml;tig).
+        </li>
+        <li>
+          <strong>Server Action:</strong> Erstelle <code>src/actions/flight-actions.ts</code>
+          mit <code>addFlight</code> und <code>deleteFlight</code>. Baue ein
+          <code>AddFlightForm.tsx</code> ein.
+        </li>
+        <li>
+          <strong>Datenbankdatei pr&uuml;fen:</strong> Verifiziere, dass neue Fl&uuml;ge in
+          <code>flugboard.sqlite</code> persistent gespeichert werden.
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- FEHLER -->
+  <section class="section section-fehler">
+    <h2>H&auml;ufige Fehler</h2>
+
+    <div class="fehler-item">
+      <div class="fehler-title">Fehler: <code>fetch</code> mit relativem Pfad in Server Components schlägt fehl</div>
+      <p>
+        Du schreibst <code>fetch('/api/flights')</code> in einer Server Component.
+        Im Browser funktioniert das &mdash; auf dem Server gibt es keinen Hostname,
+        daher schlägt der Request fehl: <em>&bdquo;TypeError: Failed to parse URL from /api/flights&ldquo;</em>.
+      </p>
+      <p class="fehler-fix">
+        <strong>Fix:</strong> Entweder den absoluten Pfad verwenden
+        (<code>fetch('http://localhost:3000/api/flights')</code>) oder &mdash; noch besser &mdash;
+        Daten direkt importieren: <code>import {'{ listFlights }'} from '@/lib/flights-db'</code>.
+        Letzteres ist einfacher und performanter.
+      </p>
+    </div>
+
+    <div class="fehler-item">
+      <div class="fehler-title">Fehler: Datenbankdatei wird nicht gefunden</div>
+      <p>
+        Der Handler startet, aber alle Requests schlagen mit 500 fehl, weil der Pfad zur
+        SQLite-Datei nicht stimmt oder Schreibrechte fehlen.
+      </p>
+      <p class="fehler-fix">
+        <strong>Fix:</strong> Verwende einen stabilen Dateipfad und initialisiere die Tabelle
+        beim Start. F&uuml;r echtes Hosting ohne lokales Filesystem auf managed DB wechseln.
+      </p>
+    </div>
+
+    <div class="fehler-item">
+      <div class="fehler-title">Fehler: Route Handler ohne Gro&szlig;buchstaben-Export</div>
+      <p>
+        Du schreibst <code>export async function get()</code> statt
+        <code>export async function GET()</code>. Next.js erkennt den Handler nicht
+        und gibt eine 405-Antwort (Method Not Allowed) zur&uuml;ck.
+      </p>
+      <p class="fehler-fix">
+        <strong>Fix:</strong> HTTP-Methoden in Route Handlers werden als
+        <strong>Gro&szlig;buchstaben</strong> exportiert:
+        <code>GET</code>, <code>POST</code>, <code>PUT</code>, <code>PATCH</code>, <code>DELETE</code>.
+        Kleinschreibung wird ignoriert.
+      </p>
+    </div>
+
+    <div class="fehler-item">
+      <div class="fehler-title">Fehler: <code>params</code> nicht awaited im Route Handler</div>
+      <p>
+        Du verwendest <code>const { id } = params</code> im Route Handler ohne <code>await</code>.
+        In Next.js&nbsp;15 ist das ein Fehler &mdash; <code>id</code> ist dann ein unaufgel&ouml;stes
+        Promise-Objekt, und dein Datenzugriff (z.&nbsp;B. <code>getFlightById()</code>) trifft nie die richtige ID.
+      </p>
+      <p class="fehler-fix">
+        <strong>Fix:</strong> <code>const { id } = await params;</code> &mdash; genau wie in
+        Page Components. Der Route Handler muss ebenfalls <code>async</code> sein.
+      </p>
+    </div>
+  </section>
+
+  <!-- AUFGABEN -->
+  <section class="section section-aufgaben">
+    <h2>Aufgaben</h2>
+    <div class="aufgaben-list">
+
+      <div class="aufgabe">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">Aufgabe 1</span>
+          <span class="aufgabe-title">GET /api/flights mit Query-Parametern</span>
+        </div>
+        <p>
+          Implementiere den GET-Handler und teste ihn mit <code>curl</code>.
+        </p>
+        <ul>
+          <li>Erstelle <code>src/app/api/flights/route.ts</code> mit dem GET-Handler</li>
+          <li>Unterst&uuml;tze <code>type</code>, <code>status</code> und <code>q</code> als Query-Parameter</li>
+          <li>Teste alle Kombinationen mit <code>curl</code> (mindestens 4 verschiedene Aufrufe)</li>
+          <li>Pr&uuml;fe die Antwort im Browser unter <code>http://localhost:3000/api/flights</code></li>
+        </ul>
+      </div>
+
+      <div class="aufgabe">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">Aufgabe 2</span>
+          <span class="aufgabe-title">POST-Handler testen und einbinden</span>
+        </div>
+        <p>
+          Erweitere <code>route.ts</code> um den POST-Handler und teste ihn.
+        </p>
+        <ul>
+          <li>F&uuml;ge den POST-Handler zu <code>route.ts</code> hinzu</li>
+          <li>Sende einen g&uuml;ltigen Flug per <code>curl -X POST</code> und pr&uuml;fe die 201-Antwort</li>
+          <li>Sende einen Request ohne Pflichtfelder und pr&uuml;fe die 422-Antwort</li>
+          <li>Pr&uuml;fe, ob der neue Flug danach bei GET erscheint</li>
+        </ul>
+      </div>
+
+      <div class="aufgabe">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">Aufgabe 3</span>
+          <span class="aufgabe-title">DELETE-Handler mit L&ouml;schen-Button</span>
+        </div>
+        <p>
+          Implementiere den DELETE-Handler und verbinde ihn mit der Detailseite.
+        </p>
+        <ul>
+          <li>Erstelle <code>src/app/api/flights/[id]/route.ts</code> mit GET und DELETE</li>
+          <li>Teste DELETE mit <code>curl -X DELETE</code></li>
+          <li>F&uuml;ge auf der Flugdetailseite einen &bdquo;Flug stornieren&ldquo;-Button ein</li>
+          <li>Der Button ist eine Client Component, die <code>fetch('/api/flights/{id}', {'{ method: "DELETE" }'})</code> aufruft</li>
+        </ul>
+      </div>
+
+      <div class="aufgabe aufgabe-bonus">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">Aufgabe 4 &mdash; Bonus</span>
+          <span class="aufgabe-title">Server Action f&uuml;r <code>AddFlightForm</code> mit <code>revalidatePath</code></span>
+        </div>
+        <p>
+          Ersetze den POST-Fetch im Formular durch eine Server Action.
+        </p>
+        <ul>
+          <li>Erstelle <code>src/actions/flight-actions.ts</code> mit <code>'use server'</code></li>
+          <li>Implementiere <code>addFlight(formData: FormData)</code> mit Validierung</li>
+          <li>Rufe <code>revalidatePath('/departures')</code> nach dem Hinzuf&uuml;gen auf</li>
+          <li>Binde die Action im Formular mit <code>action={addFlight}</code> ein (kein <code>'use client'</code> n&ouml;tig!)</li>
+          <li>Teste: Nach dem Submit soll der neue Flug sofort in der Abflug-Liste erscheinen</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- LESSON NAV -->
+
+  </div><!-- /content-area -->
+
+        <nav class="lesson-nav">
+    <a class="nav-btn" href="3.3-server-client.html">&larr; Lektion 3.3: Server &amp; Client Components</a>
+    <span class="nav-center-info">Lektion 3.4</span>
+    <a class="nav-btn primary" href="3.5-playwright-e2e.html">Lektion 3.5: Playwright E2E &rarr;</a>
+  </nav>
+
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+<script>
+  // Hamburger menu
+  const ham = document.getElementById('hamburger');
+  const sb  = document.getElementById('sidebar');
+  const ov  = document.getElementById('overlay');
+  ham.addEventListener('click', () => { sb.classList.toggle('open'); ov.classList.toggle('visible'); });
+  ov.addEventListener('click',  () => { sb.classList.remove('open'); ov.classList.remove('visible'); });
+  // Active nav link
+  const cur = window.location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.nav-link').forEach(l => {
+    if (l.getAttribute('href') === cur) l.classList.add('active');
+  });
+  // Theme toggle — einfach & robust (kein CSS-Swap nötig)
+  const themeBtn = document.getElementById('theme-toggle');
+  const applyTheme = (t) => {
+    document.documentElement.setAttribute('data-theme', t);
+    if (themeBtn) themeBtn.innerHTML = t === 'dark' ? '&#9728;' : '&#9790;';
+  };
+  // Theme aus localStorage laden (alle Seiten teilen denselben Key)
+  applyTheme(localStorage.getItem('kurs-theme') || 'dark');
+  // Transitions erst nach dem initialen Render aktivieren (verhindert Flash)
+  setTimeout(() => document.documentElement.classList.add('theme-transitions'), 50);
+  if (themeBtn) themeBtn.addEventListener('click', () => {
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('kurs-theme', next);
+    applyTheme(next);
+  });
+  hljs.highlightAll();
+</script>
+</body>
+</html>

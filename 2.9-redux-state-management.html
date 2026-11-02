@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2.9 &ndash; State Management mit Redux (Überblick) | React Kurs</title>
+  <script>(function(){var t=localStorage.getItem('kurs-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
+  <link rel="stylesheet" href="assets/kurs.css">
+</head>
+<body>
+
+<button class="hamburger" id="hamburger" aria-label="Navigation &ouml;ffnen">&#9776;</button>
+<div class="sidebar-overlay" id="overlay"></div>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <a href="index.html">
+      <span class="brand-icon">&#9992;</span>
+      <div>
+        <div class="brand-name">React Kurs</div>
+        <div class="brand-sub">Web &amp; Mobile</div>
+      </div>
+    </a>
+    <button class="theme-toggle" id="theme-toggle" aria-label="Dark/Light Mode" title="Theme wechseln">&#9728;</button>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-group">
+      <div class="nav-group-label react-label">Teil 1 &mdash; React Einführung</div>
+      <a class="nav-link" href="1.1-einfuehrung-spa.html"><span class="ln">1.1</span>Motivation &amp; SPA</a>
+      <a class="nav-link" href="1.2-einfuehrung.html"><span class="ln">1.2</span>Einführung &amp; Umgebung</a>
+      <a class="nav-link" href="1.3-komponenten-props-einfach.html"><span class="ln">1.3</span>Komponenten &amp; Props (einfach)</a>
+      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten &amp; Props (Vertiefung)</a>
+      <a class="nav-link" href="1.5-state-events.html"><span class="ln">1.5</span>State &amp; Events</a>
+      <a class="nav-link" href="1.6-listen-conditional.html"><span class="ln">1.6</span>Listen &amp; Conditional Rendering</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label react-label">Teil 2 &mdash; React Praxis</div>
+      <a class="nav-link" href="2.1-formulare.html"><span class="ln">2.1</span>Formulare &amp; Inputs</a>
+      <a class="nav-link" href="2.2-useeffect-api.html"><span class="ln">2.2</span>useEffect &amp; API</a>
+      <a class="nav-link" href="2.3-kommunikation.html"><span class="ln">2.3</span>Komponentenkommunikation</a>
+      <a class="nav-link" href="2.4-context.html"><span class="ln">2.4</span>Context API</a>
+      <a class="nav-link" href="2.5-custom-hooks.html"><span class="ln">2.5</span>Custom Hooks</a>
+      <a class="nav-link" href="2.6-testen-vitest-rtl.html"><span class="ln">2.6</span>Testen mit Vitest + RTL</a>
+      <a class="nav-link" href="2.7-react-router.html"><span class="ln">2.7</span>React Router</a>
+      <a class="nav-link" href="2.8-datenbank-drizzle-sqlite.html"><span class="ln">2.8</span>Datenbankzugriff mit Drizzle + SQLite</a>
+      <a class="nav-link" href="2.9-redux-state-management.html"><span class="ln">2.9</span>State Management mit Redux (Überblick)</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label next-label">Teil 3 &mdash; Next.js</div>
+      <a class="nav-link" href="3.1-nextjs-einfuehrung.html"><span class="ln">3.1</span>Einführung Next.js</a>
+      <a class="nav-link" href="3.2-nextjs-routing.html"><span class="ln">3.2</span>Routing &amp; Layouts</a>
+      <a class="nav-link" href="3.3-server-client.html"><span class="ln">3.3</span>Server &amp; Client Components</a>
+      <a class="nav-link" href="3.4-api-routes.html"><span class="ln">3.4</span>API Routes &amp; Datenabruf</a>
+      <a class="nav-link" href="3.5-playwright-e2e.html"><span class="ln">3.5</span>Playwright E2E</a>
+      <a class="nav-link" href="3.6-deployment.html"><span class="ln">3.6</span>Deployment</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label rn-label">Teil 4 &mdash; React Native</div>
+      <a class="nav-link" href="4.1-rn-einfuehrung.html"><span class="ln">4.1</span>Einführung React Native</a>
+      <a class="nav-link" href="4.2-rn-komponenten.html"><span class="ln">4.2</span>Native Komponenten &amp; Styling</a>
+      <a class="nav-link" href="4.3-rn-navigation.html"><span class="ln">4.3</span>Navigation &amp; State</a>
+    </div>
+  </nav>
+</aside>
+
+<main class="main-content">
+  <header class="lesson-header">
+    <p class="lesson-eyebrow">Lektion 2.9 &mdash; Teil 2: React Praxis</p>
+    <h1>State Management mit Redux (Überblick)</h1>
+    <div class="lesson-tags">
+      <span class="tag tag-react">Architektur</span>
+      <span class="tag tag-time">ca. 35 min</span>
+    </div>
+  </header>
+
+  <div class="content-area">
+    <section class="section section-lernziele">
+      <h2>Lernziele</h2>
+      <ul class="lernziele-list">
+        <li>Verstehen, wann globales State Management sinnvoll ist</li>
+        <li>Die Kernideen von Redux einordnen: Store, Actions, Reducer, Dispatch, Selector</li>
+        <li>Den unidirektionalen Datenfluss in Redux nachvollziehen</li>
+        <li>Die Rolle von Redux Toolkit in modernen React-Projekten kennen</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>Wichtiger Hinweis: kein eigenes Beispielprojekt</h2>
+      <p>
+        Diese Lektion hat <strong>kein eigenes Beispielprojekt unter <code>beispiele/2.9</code></strong>.
+        Wir arbeiten also nicht mit einem neuen Projektordner, zeigen aber
+        bewusst mehrere <strong>konkrete Code-Ausschnitte</strong>, damit das Redux-Modell
+        nicht zu abstrakt bleibt.
+      </p>
+      <div class="callout callout-info">
+        <div class="callout-icon">&#8505;</div>
+        <div class="callout-body">
+          <div class="callout-title">Didaktischer Fokus</div>
+          <p>
+            Nach Context, Router und Datenbank geht es jetzt um die Architekturfrage:
+            Wie verwalten wir viel gemeinsamen Zustand sauber, testbar und vorhersehbar?
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Warum überhaupt Redux?</h2>
+      <p>
+        In kleinen Apps reichen lokaler State und Context oft aus. In gr&ouml;&szlig;eren Apps
+        steigen jedoch Komplexit&auml;t und Nebenwirkungen: viele Datenquellen, parallele
+        Updates, Caching, Berechtigungen, Undo/Redo oder reproduzierbare Fehleranalyse.
+      </p>
+      <ul>
+        <li><strong>Vorhersehbarkeit:</strong> Jede Zustands&auml;nderung ist explizit beschrieben.</li>
+        <li><strong>Nachvollziehbarkeit:</strong> Actions bilden eine klare Historie von Ereignissen.</li>
+        <li><strong>Skalierbarkeit:</strong> Fachlogik wird zentral und konsistent organisiert.</li>
+        <li><strong>Testbarkeit:</strong> Reducer sind reine Funktionen mit klaren Ein-/Ausgaben.</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>Kernbausteine im Redux-Modell</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Baustein</th>
+              <th>Aufgabe</th>
+              <th>Merksatz</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Store</td>
+              <td>Zentrale Quelle des globalen States</td>
+              <td>Single Source of Truth</td>
+            </tr>
+            <tr>
+              <td>Action</td>
+              <td>Beschreibt ein Ereignis in der App</td>
+              <td>&bdquo;Was ist passiert?&ldquo;</td>
+            </tr>
+            <tr>
+              <td>Reducer</td>
+              <td>Leitet aus altem State + Action den neuen State ab</td>
+              <td>Reine Funktion ohne Nebenwirkungen</td>
+            </tr>
+            <tr>
+              <td>Dispatch</td>
+              <td>Sendet eine Action in den Store</td>
+              <td>Startet den Update-Zyklus</td>
+            </tr>
+            <tr>
+              <td>Selector</td>
+              <td>Liest abgeleitete Daten aus dem Store</td>
+              <td>&bdquo;Was braucht diese UI wirklich?&ldquo;</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>So l&auml;uft ein Update in Redux ab</h2>
+      <ol>
+        <li>Ein Nutzer-Ereignis tritt auf (z. B. Filter ge&auml;ndert, Flug gespeichert).</li>
+        <li>Die UI l&ouml;st eine Action aus.</li>
+        <li>Der Store gibt Action + aktuellen State an den passenden Reducer.</li>
+        <li>Der Reducer berechnet den neuen State deterministisch.</li>
+        <li>Alle betroffenen Komponenten lesen den neuen Wert &uuml;ber Selectors.</li>
+      </ol>
+      <p>
+        Dieser Fluss bleibt immer gleich. Genau deshalb ist Redux bei komplexen Oberfl&auml;chen
+        gut debugbar und im Team leichter wartbar.
+      </p>
+    </section>
+
+    <section class="section">
+      <h2>Code-Skizze: Store mit Redux Toolkit</h2>
+      <p>
+        Typischer Einstieg: ein zentraler Store, der alle fachlichen Slices kombiniert.
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">src/store/index.ts (Skizze)</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code>import { configureStore } from '@reduxjs/toolkit';
+import flightsReducer from './flights-slice';
+import filterReducer from './filter-slice';
+
+export const store = configureStore({
+  reducer: {
+    flights: flightsReducer,
+    filter: filterReducer,
+  },
+});
+
+export type RootState = ReturnType&lt;typeof store.getState&gt;;
+export type AppDispatch = typeof store.dispatch;</code></pre>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Code-Skizze: Slice mit Actions + Reducer</h2>
+      <p>
+        Ein Slice kapselt den State-Bereich, die Action Creator und den Reducer an einer Stelle.
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">src/store/flights-slice.ts (Skizze)</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code>import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+
+type Flight = { id: number; flightNumber: string; status: string };
+
+type FlightsState = {
+  items: Flight[];
+  loading: boolean;
+};
+
+const initialState: FlightsState = {
+  items: [],
+  loading: false,
+};
+
+const flightsSlice = createSlice({
+  name: 'flights',
+  initialState,
+  reducers: {
+    flightsRequested(state) {
+      state.loading = true;
+    },
+    flightsReceived(state, action: PayloadAction&lt;Flight[]&gt;) {
+      state.items = action.payload;
+      state.loading = false;
+    },
+    flightStatusChanged(
+      state,
+      action: PayloadAction&lt;{ id: number; status: string }&gt;
+    ) {
+      const flight = state.items.find((f) =&gt; f.id === action.payload.id);
+      if (flight) flight.status = action.payload.status;
+    },
+  },
+});
+
+export const {
+  flightsRequested,
+  flightsReceived,
+  flightStatusChanged,
+} = flightsSlice.actions;
+
+export default flightsSlice.reducer;</code></pre>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Code-Skizze: Nutzung in einer React-Komponente</h2>
+      <p>
+        Die UI liest Daten mit Selectors und l&ouml;st &Auml;nderungen per Dispatch aus.
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">src/features/flight-board.tsx (Skizze)</span>
+          <span class="code-lang">TSX</span>
+        </div>
+        <pre><code>import { useDispatch, useSelector } from 'react-redux';
+import type { RootState, AppDispatch } from '../store';
+import { flightStatusChanged } from '../store/flights-slice';
+
+export function FlightBoard() {
+  const dispatch = useDispatch&lt;AppDispatch&gt;();
+  const flights = useSelector((state: RootState) =&gt; state.flights.items);
+  const delayedCount = useSelector(
+    (state: RootState) =&gt;
+      state.flights.items.filter((f) =&gt; f.status === 'delayed').length
+  );
+
+  return (
+    &lt;section&gt;
+      &lt;h2&gt;Versp&auml;tete Fl&uuml;ge: {delayedCount}&lt;/h2&gt;
+      {flights.map((f) =&gt; (
+        &lt;button
+          key={f.id}
+          onClick={() =&gt;
+            dispatch(flightStatusChanged({ id: f.id, status: 'boarding' }))
+          }
+        &gt;
+          {f.flightNumber} → {f.status}
+        &lt;/button&gt;
+      ))}
+    &lt;/section&gt;
+  );
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Wie w&uuml;rde das im FlugBoard aussehen?</h2>
+      <p>
+        Der globale State k&ouml;nnte in fachliche Bereiche getrennt werden, zum Beispiel
+        Flugdaten, aktive Filter, UI-Status (Loading/Errors) und Nutzerkontext.
+      </p>
+      <ul>
+        <li><strong>Flights:</strong> Liste, Sortierung, Status-&Auml;nderungen, letzte Aktualisierung</li>
+        <li><strong>Filter:</strong> Terminal, Status, Suchbegriff, Sortiermodus</li>
+        <li><strong>UI:</strong> Ladezust&auml;nde pro Bereich, Fehlerzust&auml;nde, offene Dialoge</li>
+        <li><strong>Session:</strong> Rollen/Permissions und evtl. Feature-Flags</li>
+      </ul>
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#128161;</div>
+        <div class="callout-body">
+          <div class="callout-title">Redux Toolkit statt &bdquo;klassischem&ldquo; Redux</div>
+          <p>
+            In aktuellen Projekten wird fast immer Redux Toolkit eingesetzt, weil es
+            Boilerplate reduziert und robuste Standardmuster mitliefert.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-fehler">
+      <h2>H&auml;ufige Architekturfehler</h2>
+      <div class="fehler-item">
+        <h3>Zu fr&uuml;h Redux einf&uuml;hren</h3>
+        <p class="fehler-fix">
+          Erst mit lokalem State + Context starten. Redux einf&uuml;hren, wenn Komplexit&auml;t
+          und Teamgr&ouml;&szlig;e den Mehraufwand wirklich rechtfertigen.
+        </p>
+      </div>
+      <div class="fehler-item">
+        <h3>Zu viel in den globalen Store legen</h3>
+        <p class="fehler-fix">
+          Kurzlebiger UI-State bleibt lokal. Global nur Zustand, den mehrere Bereiche
+          wirklich teilen oder nachvollziehbar versionieren m&uuml;ssen.
+        </p>
+      </div>
+      <div class="fehler-item">
+        <h3>Store als Ersatz f&uuml;r API-Design missbrauchen</h3>
+        <p class="fehler-fix">
+          Redux ersetzt kein Backend-Konzept. Eine saubere API und Datenmodellierung
+          bleiben weiterhin entscheidend.
+        </p>
+      </div>
+    </section>
+
+    <section class="section section-aufgaben">
+      <h2>Aufgaben (ohne eigenes Projekt)</h2>
+      <div class="aufgabe">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">1</span>
+          <span class="aufgabe-title">State-Inventur</span>
+        </div>
+        <p>Liste f&uuml;r FlugBoard auf, welche Zust&auml;nde lokal bleiben und welche global werden sollten.</p>
+      </div>
+      <div class="aufgabe">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">2</span>
+          <span class="aufgabe-title">Action-Sprache</span>
+        </div>
+        <p>Formuliere f&uuml;nf fachliche Ereignisse als Actions und ordne sie einem Slice zu.</p>
+      </div>
+      <div class="aufgabe aufgabe-bonus">
+        <div class="aufgabe-header">
+          <span class="aufgabe-num">★</span>
+          <span class="aufgabe-title">Team-Entscheidung</span>
+        </div>
+        <p>Definiert Kriterien, ab wann ihr von Context auf Redux Toolkit wechseln w&uuml;rdet, und skizziert daf&uuml;r 3 konkrete Migrationsschritte.</p>
+      </div>
+    </section>
+  </div>
+
+  <nav class="lesson-nav">
+    <a class="nav-btn" href="2.8-datenbank-drizzle-sqlite.html">&larr; Lektion 2.8: Datenbankzugriff mit Drizzle + SQLite</a>
+    <span class="nav-center-info">Lektion 2.9</span>
+    <a class="nav-btn primary" href="3.1-nextjs-einfuehrung.html">Lektion 3.1: Einführung Next.js &rarr;</a>
+  </nav>
+</main>
+
+<script>
+  const ham = document.getElementById('hamburger');
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('overlay');
+  ham.addEventListener('click', () => {
+    sb.classList.toggle('open');
+    ov.classList.toggle('visible');
+  });
+  ov.addEventListener('click', () => {
+    sb.classList.remove('open');
+    ov.classList.remove('visible');
+  });
+
+  const cur = window.location.pathname.split('/').pop() || 'index.html';
+  document.querySelectorAll('.nav-link').forEach((l) => {
+    if (l.getAttribute('href') === cur) l.classList.add('active');
+  });
+
+  const root = document.documentElement;
+  const btn = document.getElementById('theme-toggle');
+  const icon = { dark: '&#9728;', light: '&#9790;' };
+  const apply = (mode) => {
+    root.setAttribute('data-theme', mode);
+    localStorage.setItem('kurs-theme', mode);
+    btn.innerHTML = icon[mode] || icon.dark;
+  };
+  const initial = localStorage.getItem('kurs-theme') || 'dark';
+  apply(initial);
+  btn.addEventListener('click', () => {
+    const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    apply(next);
+  });
+</script>
+</body>
+</html>
