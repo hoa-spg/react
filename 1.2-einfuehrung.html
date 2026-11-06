@@ -190,6 +190,37 @@ npm run dev</code></pre>
           >
         </div>
       </div>
+
+      <h3>VS Code &ndash; ESLint-Plugin installieren</h3>
+      <p>
+        Das <strong>ESLint-Plugin</strong> von Microsoft zeigt Linting-Fehler und Warnungen
+        direkt im Editor an &ndash; ohne den Terminal &ouml;ffnen zu m&uuml;ssen. Probleme werden
+        sofort mit Wellenlinien markiert und per Hover erkl&auml;rt.
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">VS Code &ndash; Terminal</span>
+          <span class="code-lang">Bash</span>
+        </div>
+        <pre><code class="language-bash"># ESLint-Extension per VS Code-CLI installieren
+code --install-extension dbaeumer.vscode-eslint</code></pre>
+      </div>
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#10003;</div>
+        <div class="callout-body">
+          <div class="callout-title">Alternativ: &uuml;ber den Marketplace</div>
+          <p>
+            In VS Code: <kbd>Ctrl+Shift+X</kbd> (Windows/Linux) bzw. <kbd>Cmd+Shift+X</kbd> (Mac)
+            &ouml;ffnet den Extension-Marketplace. Suche dort nach <strong>ESLint</strong>
+            (Herausgeber: <em>Microsoft</em>) und klicke auf <em>Install</em>.
+          </p>
+          <p>
+            Die Extension ist passiv, solange kein ESLint im Projekt konfiguriert ist &ndash;
+            sobald du sp&auml;ter eine <code>.eslintrc</code>-Datei oder
+            <code>eslint.config.js</code> hinzuf&uuml;gst, greift sie automatisch.
+          </p>
+        </div>
+      </div>
     </section>
 
     <section class="section">
