@@ -9,20 +9,55 @@ interface FlightCardProps {
 }
 
 /**
- * A table row component for a single flight. Highlights when selected.
+ * A table row for a single flight with conditional time and style rendering.
+ * - Cancelled: flight number struck through, muted colour.
+ * - Delayed: shows original time struck through + expected time in yellow.
+ * - On-time / Boarding: scheduled time in cyan.
+ *
  * @param flight     - The flight data to render.
  * @param isSelected - Whether this row is currently selected.
  * @param onSelect   - Callback invoked when the row is clicked.
  */
 const FlightCard = ({ flight, isSelected, onSelect }: FlightCardProps) => {
-  const rowClassName = isSelected ? 'flight-row is-selected' : 'flight-row';
+  const isCancelled = flight.status === 'cancelled';
+  const isDelayed = flight.status === 'delayed';
+  const isBoarding = flight.status === 'boarding';
+
+  const rowClassName = [
+    'flight-row',
+    isSelected ? 'is-selected' : '',
+    isCancelled ? 'is-cancelled' : '',
+  ].filter(Boolean).join(' ');
+
+  const flightNumberClassName = ['flight-num', isCancelled ? 'is-cancelled' : '']
+    .filter(Boolean)
+    .join(' ');
+
+  const renderTime = () => {
+    if (isDelayed && flight.expectedTime) {
+      return (
+        <span>
+          <span className="time-old">
+            {flight.scheduledTime}
+          </span>
+          <span className="time-delayed">→ {flight.expectedTime}</span>
+        </span>
+      );
+    }
+    if (isBoarding) {
+      return <span className="time-boarding">{flight.scheduledTime}</span>;
+    }
+    return <span>{flight.scheduledTime}</span>;
+  };
 
   return (
     <tr className={rowClassName} onClick={() => onSelect(flight)}>
-      <td className="flight-cell">{flight.flightNumber}</td>
+      <td className="flight-cell">
+        <span className={flightNumberClassName}>{flight.flightNumber}</span>
+      </td>
       <td className="flight-cell">{flight.airline}</td>
       <td className="flight-cell">{flight.airport}</td>
-      <td className="flight-cell">{flight.scheduledTime}</td>
+      <td className="flight-cell">{renderTime()}</td>
       <td className="flight-cell">
         <FlightStatusBadge status={flight.status} />
       </td>

@@ -21,14 +21,15 @@ const SearchBar = ({
   return (
     <div className="search-wrap">
       <input
-        type="text"
+        type="search"
+        aria-label="Flüge suchen"
         className="search-input"
         value={value}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
       />
       {value && (
-        <button className="search-clear" onClick={() => onChange('')} title="Löschen">
+        <button className="search-clear" onClick={() => onChange('')} title="Löschen" aria-label="Suche löschen">
           ✕
         </button>
       )}

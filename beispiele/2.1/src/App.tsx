@@ -14,7 +14,7 @@ const sortByTime = (flights: Flight[]): Flight[] =>
   [...flights].sort((a, b) => a.scheduledTime.localeCompare(b.scheduledTime));
 
 /**
- * Root application component for L05.
+ * Root application component for lesson 2.1.
  * Manages the full flight list, search, filtering, add, delete, and detail panel.
  */
 const App = () => {
@@ -114,7 +114,8 @@ const App = () => {
           count={filteredDepartures.length}
           selectedFlightId={selectedFlight?.id}
           onFlightSelect={setSelectedFlight}
-          onDeleteFlight={handleDeleteFlight}
+          onFlightDelete={handleDeleteFlight}
+          onResetFilters={hasActiveFilters ? handleReset : undefined}
         />
       )}
       {showArrivals && (
@@ -124,7 +125,8 @@ const App = () => {
           count={filteredArrivals.length}
           selectedFlightId={selectedFlight?.id}
           onFlightSelect={setSelectedFlight}
-          onDeleteFlight={handleDeleteFlight}
+          onFlightDelete={handleDeleteFlight}
+          onResetFilters={hasActiveFilters ? handleReset : undefined}
         />
       )}
 

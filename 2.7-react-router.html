@@ -29,9 +29,8 @@
       <a class="nav-link" href="1.1-einfuehrung-spa.html"><span class="ln">1.1</span>Motivation &amp; SPA</a>
       <a class="nav-link" href="1.2-einfuehrung.html"><span class="ln">1.2</span>Einführung &amp; Umgebung</a>
       <a class="nav-link" href="1.3-komponenten-props-einfach.html"><span class="ln">1.3</span>Komponenten &amp; Props (einfach)</a>
-      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten &amp; Props (Vertiefung)</a>
+      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten, Props &amp; Listen</a>
       <a class="nav-link" href="1.5-state-events.html"><span class="ln">1.5</span>State &amp; Events</a>
-      <a class="nav-link" href="1.6-listen-conditional.html"><span class="ln">1.6</span>Listen &amp; Conditional Rendering</a>
     </div>
     <div class="nav-group">
       <div class="nav-group-label react-label">Teil 2 &mdash; React Praxis</div>
@@ -86,6 +85,7 @@
         <li>URL-Parameter mit <code>useParams</code> auslesen</li>
         <li>Programmatisch navigieren mit <code>useNavigate</code></li>
         <li>Eine 404-Seite einrichten</li>
+        <li>Daten einmal im Layout laden und per <code>&lt;Outlet context&gt;</code> an alle Seiten weitergeben</li>
       </ul>
     </section>
 
@@ -178,14 +178,15 @@
           <span class="code-filename">src/main.tsx</span>
           <span class="code-lang">TypeScript</span>
         </div>
-        <pre><code class="language-typescript">import React from 'react';
-import ReactDOM from 'react-dom/client';
+        <pre><code class="language-typescript">import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import App from './App';
+import './styles.css';
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  &lt;React.StrictMode&gt;
+createRoot(document.getElementById('root')!).render(
+  &lt;StrictMode&gt;
     &lt;BrowserRouter
       future={{
         v7_startTransition: true,
@@ -196,7 +197,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         &lt;App /&gt;
       &lt;/ThemeProvider&gt;
     &lt;/BrowserRouter&gt;
-  &lt;/React.StrictMode&gt;
+  &lt;/StrictMode&gt;
 );</code></pre>
       </div>
 
@@ -242,42 +243,46 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
           <span class="code-filename">src/App.tsx (mit Routing)</span>
           <span class="code-lang">TypeScript</span>
         </div>
-        <pre><code class="language-typescript">import { Routes, Route } from 'react-router-dom';
-
-import Layout          from './components/Layout';
-import DeparturePage   from './pages/DeparturePage';
-import ArrivalPage     from './pages/ArrivalPage';
+        <pre><code class="language-typescript">import { Routes, Route, Navigate } from 'react-router-dom';
+import Layout from './components/Layout';
+import FlightListPage from './pages/FlightListPage';
 import FlightDetailPage from './pages/FlightDetailPage';
-import NotFoundPage    from './pages/NotFoundPage';
+import NotFoundPage from './pages/NotFoundPage';
 
+/**
+ * Root component for lesson 2.7.
+ * Defines the client-side route structure with React Router v6.
+ */
 function App() {
   return (
     &lt;Routes&gt;
-      {/* Layout umschlie&szlig;t alle Seiten: gemeinsamer Header, Navbar */}
       &lt;Route path="/" element={&lt;Layout /&gt;}&gt;
-
-        {/* index-Route: wird bei "/" gerendert */}
-        &lt;Route index element={&lt;DeparturePage /&gt;} /&gt;
-
-        {/* Normale Routen */}
-        &lt;Route path="arrivals" element={&lt;ArrivalPage /&gt;} /&gt;
-
-        {/* Route mit URL-Parameter (:id) */}
+        &lt;Route index element={&lt;Navigate to="/departures" replace /&gt;} /&gt;
+        {/* Eine Seitenkomponente für beide Listen; key sorgt dafür, dass React
+            beim Wechsel eine neue Instanz erzeugt (z.B. Formular wieder zu) */}
+        &lt;Route path="departures" element={&lt;FlightListPage key="departure" type="departure" /&gt;} /&gt;
+        &lt;Route path="arrivals" element={&lt;FlightListPage key="arrival" type="arrival" /&gt;} /&gt;
         &lt;Route path="flight/:id" element={&lt;FlightDetailPage /&gt;} /&gt;
-
-        {/* Catch-all: alle anderen Pfade &rarr; 404 */}
         &lt;Route path="*" element={&lt;NotFoundPage /&gt;} /&gt;
-
       &lt;/Route&gt;
     &lt;/Routes&gt;
   );
-}</code></pre>
+}
+
+export default App;</code></pre>
       </div>
 
       <p>
+        Die <code>index</code>-Route greift bei genau <code>/</code>. Sie leitet mit <code>&lt;Navigate&gt;</code> auf
+        <code>/departures</code> weiter &ndash; so hat jede Seite eine eindeutige URL, und der Navigationslink
+        &bdquo;Abfl&uuml;ge&ldquo; wird auch auf der Startseite als aktiv markiert. <code>replace</code> verhindert, dass
+        <code>/</code> in der History bleibt.
+      </p>
+      <p>
         Das Layout-Muster funktioniert &uuml;ber die <code>&lt;Outlet /&gt;</code>-Komponente.
         <code>Outlet</code> ist ein Platzhalter in der Layout-Komponente, an dem React Router die
-        jeweilige Kind-Seite einf&uuml;gt:
+        jeweilige Kind-Seite einf&uuml;gt. (Wozu <code>useFlights</code> und <code>context</code> hier dienen,
+        zeigt der Projektschritt.)
       </p>
 
       <div class="code-block">
@@ -288,59 +293,65 @@ function App() {
         <pre><code class="language-typescript">import { Link, NavLink, Outlet } from 'react-router-dom';
 import { CSSProperties } from 'react';
 import { useTheme } from '../context/ThemeContext';
+import useFlights from '../hooks/useFlights';
 import './Layout.css';
 
 /**
- * Layout-Komponente: Gemeinsamer Rahmen f&uuml;r alle Seiten.
- * CSS-Variablen werden einmalig am Root injiziert; alle Kind-Elemente
- * verwenden sie via var(--...). &lt;Outlet /&gt; wird durch die jeweilige Seite ersetzt.
+ * Shared layout with top navigation bar.
+ * NavLinks highlight the active route; theme toggle is always visible.
+ * Loads the flights once and passes them to every page via the Outlet context,
+ * so switching between pages does not trigger a new request.
  */
 const Layout = () =&gt; {
   const { colors, theme, toggleTheme } = useTheme();
-
-  // Inline style ist hier bewusst: CSS-Variablen k&ouml;nnen nur per JS gesetzt
-  // werden &ndash; keine hardcodierten Farben, nur Token-Zuweisung.
+  const flightData = useFlights();
   const themeVars = {
-    '--bg': colors.bg,
-    '--bg-sidebar': colors.bgSidebar,
-    '--text': colors.text,
-    '--text-muted': colors.textMuted,
-    '--border': colors.border,
-    '--accent': colors.accent,
+    '--app-bg': colors.bg,
+    '--app-card-bg': colors.bgCard,
+    '--app-sidebar-bg': colors.bgSidebar,
+    '--app-text': colors.text,
+    '--app-muted': colors.textMuted,
+    '--app-border': colors.border,
+    '--app-accent': colors.accent,
   } as CSSProperties;
 
   return (
+    // Inline style remains for runtime theme token injection into CSS variables.
     &lt;div className="app-root" style={themeVars}&gt;
       &lt;header className="top-nav"&gt;
-        &lt;Link to="/" className="brand-link"&gt;&#9992; FlugBoard&lt;/Link&gt;
+        &lt;Link to="/" className="brand-link"&gt;
+          ✈ FlugBoard 2.7
+        &lt;/Link&gt;
 
-        {/* NavLink setzt die CSS-Klasse &bdquo;active&ldquo; &uuml;ber den className-Callback */}
         &lt;NavLink
           to="/departures"
           className={({ isActive }) =&gt; `nav-link${isActive ? ' active' : ''}`}
         &gt;
-          Abfl&uuml;ge
+          Abflüge
         &lt;/NavLink&gt;
+
         &lt;NavLink
           to="/arrivals"
           className={({ isActive }) =&gt; `nav-link${isActive ? ' active' : ''}`}
         &gt;
-          Ank&uuml;nfte
+          Ankünfte
         &lt;/NavLink&gt;
 
         &lt;div className="top-nav-actions"&gt;
           &lt;button onClick={toggleTheme} className="theme-toggle"&gt;
-            {theme === 'dark' ? '&#9728;&#65039;' : '&#127769;'}
+            {theme === 'dark' ? '☀️' : '🌙'}
           &lt;/button&gt;
         &lt;/div&gt;
       &lt;/header&gt;
+
       &lt;main className="page-content"&gt;
-        {/* Hier wird die aktive Seite gerendert */}
-        &lt;Outlet /&gt;
+        &lt;Outlet context={flightData} /&gt;
       &lt;/main&gt;
     &lt;/div&gt;
   );
-};</code></pre>
+};
+
+export default Layout;</code></pre>
       </div>
 
       <div class="callout callout-info">
@@ -406,25 +417,24 @@ const Layout = () =&gt; {
   gap: 2rem;
   height: 56px;
   padding: 0 2rem;
-  background: var(--bg-sidebar);
-  border-bottom: 1px solid var(--border);
+  background: var(--app-sidebar-bg);
+  border-bottom: 1px solid var(--app-border);
 }
 
 .brand-link {
-  color: var(--accent);
+  color: var(--app-accent);
   font-size: 1.1rem;
   font-weight: 700;
   text-decoration: none;
 }
 
 .nav-link {
-  color: var(--text-muted);
+  color: var(--app-muted);
   text-decoration: none;
 }
 
-/* React Router setzt "active" automatisch &uuml;ber den className-Callback */
 .nav-link.active {
-  color: var(--accent);
+  color: var(--app-accent);
   font-weight: 600;
 }
 
@@ -435,9 +445,9 @@ const Layout = () =&gt; {
 .theme-toggle {
   padding: 4px 10px;
   background: none;
-  border: 1px solid var(--border);
+  border: 1px solid var(--app-border);
   border-radius: 6px;
-  color: var(--text);
+  color: var(--app-text);
 }</code></pre>
       </div>
 
@@ -483,72 +493,89 @@ const Layout = () =&gt; {
           <span class="code-lang">TypeScript</span>
         </div>
         <pre><code class="language-typescript">import { useParams, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Flight } from '../types/flight';
 import FlightDetail from '../components/FlightDetail';
 
+const API_URL = 'http://localhost:8000';
+
+/**
+ * Detail page for a single flight, loaded by ID from the URL parameter.
+ * Uses useParams to get the flight ID and fetches from the backend.
+ */
 const FlightDetailPage = () =&gt; {
-  // useParams liefert die URL-Parameter als Record&lt;string, string | undefined&gt;
   const { id } = useParams&lt;{ id: string }&gt;();
   const navigate = useNavigate();
 
   const [flight, setFlight]     = useState&lt;Flight | null&gt;(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError]         = useState&lt;string | null&gt;(null);
+  const [error, setError]       = useState&lt;string | null&gt;(null);
 
   useEffect(() =&gt; {
-    if (!id) {
-      setError('Keine Flug-ID in der URL');
-      setIsLoading(false);
-      return;
-    }
+    if (!id) return;
+    const controller = new AbortController();
 
-    const fetchFlight = async () =&gt; {
+    const load = async () =&gt; {
+      let isAborted = false;
+
       try {
         setIsLoading(true);
         setError(null);
-
-        const response = await fetch(`http://localhost:8000/api/flights/${id}`);
-
-        if (response.status === 404) {
-          throw new Error(`Flug mit ID ${id} wurde nicht gefunden.`);
-        }
-        if (!response.ok) {
-          throw new Error(`Server-Fehler: ${response.status}`);
-        }
-
-        const data: Flight = await response.json();
+        const res = await fetch(`${API_URL}/api/flights/${id}`, {
+          signal: controller.signal,
+        });
+        if (!res.ok) throw new Error(`Flug ${id} nicht gefunden`);
+        const data: Flight = await res.json();
         setFlight(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unbekannter Fehler');
+        if (err instanceof Error &amp;&amp; err.name === 'AbortError') {
+          isAborted = true;
+        } else if (err instanceof Error) {
+          setError(err.message);
+        }
       } finally {
-        setIsLoading(false);
+        if (!isAborted) {
+          setIsLoading(false);
+        }
       }
     };
 
-    fetchFlight();
-  }, [id]); // Effekt l&auml;uft neu, wenn sich die ID in der URL &auml;ndert
+    load();
+    return () =&gt; controller.abort();
+  }, [id]);
+
+  if (isLoading) {
+    return &lt;p className="state-block state-block--muted"&gt;Laden...&lt;/p&gt;;
+  }
+
+  if (error || !flight) {
+    return (
+      &lt;div&gt;
+        &lt;p className="error-text"&gt;{error ?? 'Flug nicht gefunden'}&lt;/p&gt;
+        &lt;button
+          onClick={() =&gt; navigate(-1)}
+          className="action-btn action-btn--neutral action-btn--small"
+        &gt;
+          ← Zurück
+        &lt;/button&gt;
+      &lt;/div&gt;
+    );
+  }
 
   return (
-    &lt;div style={{ padding: '2rem' }}&gt;
-      {isLoading ? (
-        &lt;div className="board-loading board-loading--muted" style={{ textAlign: 'center' }}&gt;
-          Flugdaten werden geladen...
-        &lt;/div&gt;
-      ) : error || !flight ? (
-        &lt;&gt;
-          &lt;p style={{ color: '#f85149' }}&gt;{error ?? 'Flug nicht gefunden.'}&lt;/p&gt;
-          &lt;button onClick={() =&gt; navigate(-1)}&gt;&larr; Zur&uuml;ck&lt;/button&gt;
-        &lt;/&gt;
-      ) : (
-        &lt;FlightDetail
-          flight={flight}
-          onClose={() =&gt; navigate(-1)}
-        /&gt;
-      )}
+    &lt;div&gt;
+      &lt;button
+        onClick={() =&gt; navigate(-1)}
+        className="action-btn action-btn--neutral action-btn--small back-link"
+      &gt;
+        ← Zurück
+      &lt;/button&gt;
+      &lt;FlightDetail flight={flight} onClose={() =&gt; navigate(-1)} /&gt;
     &lt;/div&gt;
   );
-};</code></pre>
+};
+
+export default FlightDetailPage;</code></pre>
       </div>
     </section>
 
@@ -561,45 +588,29 @@ const FlightDetailPage = () =&gt; {
         &ndash; z.B. nach dem Absenden eines Formulars, nach einem API-Call oder beim Klick auf
         eine Tabellenzeile.
       </p>
+      <p>
+        Bei uns l&ouml;st der Klick auf eine Zeile wie bisher den Callback <code>onFlightSelect</code> aus
+        (seit Lektion 1.5). Neu ist nur, was die Seite damit macht: Statt ein Detail-Panel zu &ouml;ffnen,
+        navigiert sie zur Detailseite. <code>FlightCard</code> selbst bleibt unver&auml;ndert und wei&szlig; nichts
+        vom Router &ndash; deshalb funktionieren auch die Tests aus Lektion 2.6 ohne Router weiter.
+      </p>
 
       <div class="code-block">
         <div class="code-header">
-          <span class="code-filename">src/components/FlightCard.tsx (mit Navigation)</span>
+          <span class="code-filename">src/pages/FlightListPage.tsx (Ausschnitt)</span>
           <span class="code-lang">TypeScript</span>
         </div>
         <pre><code class="language-typescript">import { useNavigate } from 'react-router-dom';
-import { Flight } from '../types/flight';
-import FlightStatusBadge from './FlightStatusBadge';
+// ...
 
-interface FlightCardProps {
-  flight: Flight;
-  isSelected?: boolean;
-}
-
-const FlightCard = ({ flight, isSelected }: FlightCardProps) =&gt; {
+const FlightListPage = ({ type }: FlightListPageProps) =&gt; {
   const navigate = useNavigate();
+  // ...
 
-  const handleClick = () =&gt; {
-    // Navigiert zu /flight/3 (oder welche ID der Flug hat)
-    navigate(`/flight/${flight.id}`);
-  };
-
-  return (
-    &lt;tr
-      onClick={handleClick}
-      style={{
-        cursor: 'pointer',
-        background: isSelected ? '#1f3a4a' : 'transparent',
-      }}
-    &gt;
-      &lt;td&gt;&lt;strong&gt;{flight.flightNumber}&lt;/strong&gt;&lt;/td&gt;
-      &lt;td&gt;{flight.airline}&lt;/td&gt;
-      &lt;td&gt;{flight.airport}&lt;/td&gt;
-      &lt;td&gt;{flight.scheduledTime}&lt;/td&gt;
-      &lt;td&gt;&lt;FlightStatusBadge status={flight.status} /&gt;&lt;/td&gt;
-    &lt;/tr&gt;
-  );
-};</code></pre>
+        &lt;FlightBoard
+          // ...
+          onFlightSelect={(flight: Flight) =&gt; navigate(`/flight/${flight.id}`)}
+        /&gt;</code></pre>
       </div>
 
       <p>
@@ -674,11 +685,21 @@ const NotFoundPage = () =&gt; {
         </div>
 
         <p>
-          Wir verwandeln FlugBoard von einer Single-View-App in eine vollwertige Multi-Seiten-App
-          mit eigenen URLs f&uuml;r Abfl&uuml;ge, Ank&uuml;nfte und Flugdetails.
-          Da Abfl&uuml;ge und Ank&uuml;nfte jetzt getrennte Seiten sind, entf&auml;llt der Typ-Filter
-          (Abflug/Ankunft) in der Toolbar.
+          Wir verwandeln FlugBoard in eine Multi-Seiten-App mit eigenen URLs f&uuml;r Abfl&uuml;ge, Ank&uuml;nfte und
+          Flugdetails. Dabei &auml;ndert sich die Aufteilung der Oberfl&auml;che:
         </p>
+        <ul>
+          <li><strong>Layout</strong> &uuml;bernimmt, was auf jeder Seite gleich ist: Logo, Navigation und
+            Theme-Umschalter. Die Theme-Variablen (<code>--app-bg</code> usw. aus Lektion 2.4) setzt jetzt
+            <code>Layout</code> statt <code>App</code>.</li>
+          <li><strong>Der Seitenkopf</strong> (Titel, &bdquo;Aktualisiert&ldquo;, Buttons) geh&ouml;rt zur jeweiligen Seite.
+            <code>AirportHeader</code> geht damit in <code>Layout</code> und Seitenkopf auf und entf&auml;llt.</li>
+          <li><strong>Der Typ-Filter</strong> (Abflug/Ankunft) entf&auml;llt &ndash; das erledigen jetzt die Routen.
+            <code>FilterBar</code> und <code>useFlightFilters</code> verlieren <code>typeFilter</code>.</li>
+          <li><strong>Das Detail-Panel</strong> wird zur eigenen Seite <code>/flight/:id</code>.</li>
+          <li><strong>Globale Stile</strong> wandern von <code>App.css</code> nach <code>src/styles.css</code> (Import in
+            <code>main.tsx</code>), weil <code>App</code> nur noch Routen definiert.</li>
+        </ul>
 
         <h4>Schritt 1: Installation und BrowserRouter</h4>
         <div class="code-block">
@@ -690,22 +711,77 @@ const NotFoundPage = () =&gt; {
         </div>
         <p>Danach <code>main.tsx</code> wie in Abschnitt 2 gezeigt anpassen.</p>
 
-        <h4>Schritt 2: pages/-Ordner mit Seitenkomponenten</h4>
+        <h4>Schritt 2: Daten einmal im Layout laden</h4>
+        <p>
+          W&uuml;rde jede Seite <code>useFlights()</code> selbst aufrufen, h&auml;tte jede ihren eigenen State: Bei jedem
+          Wechsel zwischen Abfl&uuml;gen und Ank&uuml;nften w&uuml;rde neu geladen (siehe &bdquo;Geteilter State aus Custom
+          Hook&ldquo; in Lektion 2.5). Deshalb ruft <code>Layout</code> den Hook einmal auf und gibt das Ergebnis &uuml;ber
+          <code>&lt;Outlet context={flightData} /&gt;</code> an die aktive Seite weiter (siehe Layout in Abschnitt 3).
+          Die Seiten lesen es mit <code>useOutletContext</code> &ndash; verpackt in einen kleinen, typisierten Hook:
+        </p>
         <div class="code-block">
           <div class="code-header">
-            <span class="code-filename">src/pages/DeparturePage.tsx</span>
+            <span class="code-filename">src/hooks/useFlightData.ts</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">import { useOutletContext } from 'react-router-dom';
+import { UseFlightsReturn } from './useFlights';
+
+/**
+ * Returns the flight data that Layout loads once and passes down
+ * via &lt;Outlet context={...} /&gt;.
+ */
+const useFlightData = () =&gt; useOutletContext&lt;UseFlightsReturn&gt;();
+
+export default useFlightData;</code></pre>
+        </div>
+        <p>
+          Damit der Typ dort verf&uuml;gbar ist, wird in <code>useFlights.ts</code> das Interface exportiert:
+          <code>export interface UseFlightsReturn { ... }</code>.
+        </p>
+
+        <h4>Schritt 3: Eine Seite f&uuml;r Abfl&uuml;ge und Ank&uuml;nfte</h4>
+        <p>
+          Abfl&uuml;ge und Ank&uuml;nfte sehen gleich aus und unterscheiden sich nur in Titel und Liste. Statt zwei fast
+          identischer Dateien schreiben wir eine Komponente mit dem Prop <code>type</code>:
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">src/pages/FlightListPage.tsx</span>
             <span class="code-lang">TypeScript</span>
           </div>
           <pre><code class="language-typescript">import { useState } from 'react';
-import { Flight } from '../types/flight';
-import useFlights from '../hooks/useFlights';
+import { useNavigate } from 'react-router-dom';
+import { Flight, FlightType } from '../types/flight';
+import useFlightData from '../hooks/useFlightData';
 import useFlightFilters from '../hooks/useFlightFilters';
 import FlightBoard from '../components/FlightBoard';
 import SearchBar from '../components/SearchBar';
 import FilterBar from '../components/FilterBar';
+import AddFlightForm from '../components/AddFlightForm';
 
-const DeparturePage = () =&gt; {
-  const { flights, isLoading, error } = useFlights();
+interface FlightListPageProps {
+  type: FlightType;
+}
+
+/**
+ * Page showing either departures or arrivals – one component for both routes.
+ * The data comes from Layout (useFlightData); clicking a row opens the detail page.
+ */
+const FlightListPage = ({ type }: FlightListPageProps) =&gt; {
+  const navigate = useNavigate();
+  const {
+    flights,
+    isLoading,
+    error,
+    lastUpdated,
+    isRefreshing,
+    refetch,
+    addFlight,
+    deleteFlight,
+    updateStatus,
+  } = useFlightData();
+
   const {
     searchQuery,
     setSearchQuery,
@@ -714,37 +790,115 @@ const DeparturePage = () =&gt; {
     resetFilters,
     hasActiveFilters,
     filteredDepartures,
-  } =
-    useFlightFilters(flights);
+    filteredArrivals,
+  } = useFlightFilters(flights);
 
-  if (error)     return &lt;p style={{ color: '#f85149' }}&gt;{error}&lt;/p&gt;;
+  const visibleFlights = type === 'departure' ? filteredDepartures : filteredArrivals;
+  const title = type === 'departure' ? 'Abflüge' : 'Ankünfte';
+
+  const [showAddForm, setShowAddForm] = useState(false);
+
+  const formatTime = (d: Date) =&gt;
+    d.toLocaleTimeString('de-AT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+  if (error) {
+    return (
+      &lt;div className="state-block state-block--error"&gt;
+        &lt;p className="error-title"&gt;Fehler: {error}&lt;/p&gt;
+        &lt;p className="error-hint"&gt;
+          Ist das Backend gestartet?{' '}
+          &lt;code className="inline-code"&gt;
+            deno task dev
+          &lt;/code&gt;{' '}
+          im backend/-Ordner ausführen.
+        &lt;/p&gt;
+        &lt;button onClick={refetch} className="action-btn action-btn--neutral"&gt;
+          Neu laden
+        &lt;/button&gt;
+      &lt;/div&gt;
+    );
+  }
 
   return (
     &lt;div&gt;
-      &lt;h2&gt;Abfl&uuml;ge&lt;/h2&gt;
-      &lt;SearchBar value={searchQuery} onChange={setSearchQuery} /&gt;
-      &lt;FilterBar
-        statusFilter={statusFilter}
-        onStatusChange={setStatusFilter}
-        onReset={resetFilters}
-        hasActiveFilters={hasActiveFilters}
-      /&gt;
+      &lt;div className="page-head"&gt;
+        &lt;div&gt;
+          &lt;h2 className="page-title"&gt;{title}&lt;/h2&gt;
+          {lastUpdated &amp;&amp; (
+            &lt;span className="page-meta"&gt;
+              Aktualisiert: {formatTime(lastUpdated)}
+              {isRefreshing &amp;&amp; ' (wird aktualisiert...)'}
+            &lt;/span&gt;
+          )}
+        &lt;/div&gt;
+        &lt;div className="head-actions"&gt;
+          &lt;button
+            onClick={refetch}
+            disabled={isRefreshing}
+            className="action-btn action-btn--neutral"
+          &gt;
+            {isRefreshing ? 'Lädt...' : 'Aktualisieren'}
+          &lt;/button&gt;
+          &lt;button
+            className="action-btn action-btn--primary"
+            onClick={() =&gt; setShowAddForm((v) =&gt; !v)}
+          &gt;
+            {showAddForm ? 'Abbrechen' : '+ Flug hinzufügen'}
+          &lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      {showAddForm &amp;&amp; (
+        &lt;AddFlightForm
+          onAdd={async (f) =&gt; {
+            try {
+              await addFlight(f);
+              setShowAddForm(false);
+            } catch (err) {
+              console.error('Fehler beim Hinzufügen:', err);
+            }
+          }}
+          onCancel={() =&gt; setShowAddForm(false)}
+        /&gt;
+      )}
+
+      &lt;div className="toolbar"&gt;
+        &lt;SearchBar value={searchQuery} onChange={setSearchQuery} placeholder="Suche nach Flug, Airline, Ziel…" /&gt;
+        &lt;FilterBar
+          statusFilter={statusFilter}
+          onStatusChange={setStatusFilter}
+          onReset={resetFilters}
+          hasActiveFilters={hasActiveFilters}
+        /&gt;
+      &lt;/div&gt;
+
       {isLoading ? (
         &lt;div className="board-loading board-loading--muted"&gt;
-          &lt;div className="loading-spinner" aria-hidden="true" /&gt;
-          Flugdaten werden geladen...
+          &lt;div className="loading-spinner" aria-hidden="true"&gt;&lt;/div&gt;
+          &lt;p&gt;Flugdaten werden geladen...&lt;/p&gt;
         &lt;/div&gt;
       ) : (
         &lt;FlightBoard
-          title="Abfl&uuml;ge"
-          flights={filteredDepartures}
+          flights={visibleFlights}
+          title=""
+          count={visibleFlights.length}
+          onFlightSelect={(flight: Flight) =&gt; navigate(`/flight/${flight.id}`)}
+          onFlightDelete={deleteFlight}
+          onStatusChange={updateStatus}
+          onResetFilters={hasActiveFilters ? resetFilters : undefined}
         /&gt;
       )}
     &lt;/div&gt;
   );
-};</code></pre>
+};
+
+export default FlightListPage;</code></pre>
         </div>
 
+        <h4>Schritt 4: Detailseite und 404-Seite</h4>
+        <p>
+          <code>FlightDetailPage</code> wie in Abschnitt 5. Dazu eine Seite f&uuml;r unbekannte Pfade:
+        </p>
         <div class="code-block">
           <div class="code-header">
             <span class="code-filename">src/pages/NotFoundPage.tsx</span>
@@ -752,59 +906,73 @@ const DeparturePage = () =&gt; {
           </div>
           <pre><code class="language-typescript">import { Link, useLocation } from 'react-router-dom';
 
+/**
+ * 404 page displayed when no route matches.
+ * Shows the current path and a link back to departures.
+ */
 const NotFoundPage = () =&gt; {
   const location = useLocation();
 
   return (
     &lt;div className="not-found"&gt;
-      &lt;div className="not-found-icon"&gt;&#9992;&lt;/div&gt;
-      &lt;h1 className="not-found-title"&gt;
-        404 &ndash; Gate nicht gefunden
-      &lt;/h1&gt;
-      &lt;p className="not-found-text"&gt;
-        Der Pfad{' '}
-        &lt;code className="not-found-path"&gt;
+      &lt;div className="not-found-icon"&gt;✈&lt;/div&gt;
+      &lt;h1 className="not-found-code"&gt;404&lt;/h1&gt;
+      &lt;p className="not-found-title"&gt;Seite nicht gefunden&lt;/p&gt;
+      &lt;p className="not-found-route"&gt;
+        Die Route{' '}
+        &lt;code className="route-code"&gt;
           {location.pathname}
-        &lt;/code&gt;
-        {' '}existiert nicht.
+        &lt;/code&gt;{' '}
+        existiert nicht.
       &lt;/p&gt;
-      &lt;Link to="/" className="not-found-link"&gt;
-        Zur&uuml;ck zur Abflugtafel
+      &lt;Link to="/departures" className="cta-link"&gt;
+        Zur Abflugtafel
       &lt;/Link&gt;
     &lt;/div&gt;
   );
-};</code></pre>
+};
+
+export default NotFoundPage;</code></pre>
         </div>
 
-        <h4>Schritt 3: Routing in App.tsx zusammenf&uuml;hren</h4>
+        <h4>Schritt 5: Routing in App.tsx</h4>
         <div class="code-block">
           <div class="code-header">
-            <span class="code-filename">src/App.tsx (finale Version mit Routing)</span>
+            <span class="code-filename">src/App.tsx</span>
             <span class="code-lang">TypeScript</span>
           </div>
-          <pre><code class="language-typescript">import { Routes, Route } from 'react-router-dom';
-
-import Layout           from './components/Layout';
-import DeparturePage    from './pages/DeparturePage';
-import ArrivalPage      from './pages/ArrivalPage';
+          <pre><code class="language-typescript">import { Routes, Route, Navigate } from 'react-router-dom';
+import Layout from './components/Layout';
+import FlightListPage from './pages/FlightListPage';
 import FlightDetailPage from './pages/FlightDetailPage';
-import NotFoundPage     from './pages/NotFoundPage';
+import NotFoundPage from './pages/NotFoundPage';
 
-// App.tsx ist jetzt nur noch die Routing-Konfiguration.
-// Alle Logik lebt in Pages, Hooks und Komponenten.
+/**
+ * Root component for lesson 2.7.
+ * Defines the client-side route structure with React Router v6.
+ */
 function App() {
   return (
     &lt;Routes&gt;
       &lt;Route path="/" element={&lt;Layout /&gt;}&gt;
-        &lt;Route index          element={&lt;DeparturePage /&gt;}    /&gt;
-        &lt;Route path="arrivals"  element={&lt;ArrivalPage /&gt;}      /&gt;
+        &lt;Route index element={&lt;Navigate to="/departures" replace /&gt;} /&gt;
+        {/* Eine Seitenkomponente für beide Listen; key sorgt dafür, dass React
+            beim Wechsel eine neue Instanz erzeugt (z.B. Formular wieder zu) */}
+        &lt;Route path="departures" element={&lt;FlightListPage key="departure" type="departure" /&gt;} /&gt;
+        &lt;Route path="arrivals" element={&lt;FlightListPage key="arrival" type="arrival" /&gt;} /&gt;
         &lt;Route path="flight/:id" element={&lt;FlightDetailPage /&gt;} /&gt;
-        &lt;Route path="*"         element={&lt;NotFoundPage /&gt;}     /&gt;
+        &lt;Route path="*" element={&lt;NotFoundPage /&gt;} /&gt;
       &lt;/Route&gt;
     &lt;/Routes&gt;
   );
-}</code></pre>
+}
+
+export default App;</code></pre>
         </div>
+        <p>
+          Beide Listen-Routen verwenden dieselbe Komponente. Der <code>key</code> sorgt daf&uuml;r, dass React beim
+          Wechsel eine neue Instanz erzeugt &ndash; sonst bliebe z.B. ein ge&ouml;ffnetes Formular beim Wechsel offen.
+        </p>
 
         <div class="callout callout-tip">
           <div class="callout-icon">&#128161;</div>
@@ -861,9 +1029,10 @@ function App() {
         </p>
         <p class="fehler-fix">
           Fix: Explizit konvertieren und validieren:
-          <code>const numId = id ? parseInt(id, 10) : NaN;</code>
-          <code>if (isNaN(numId)) return navigate('*');</code>
-          Dann <code>numId</code> statt <code>id</code> verwenden.
+          <code>const numId = Number(id);</code>
+          <code>if (!id || Number.isNaN(numId)) return &lt;NotFoundPage /&gt;;</code>
+          Dann <code>numId</code> statt <code>id</code> verwenden. (<code>navigate()</code> darf nicht w&auml;hrend
+          des Renderns aufgerufen werden &ndash; zum Umleiten gibt es <code>&lt;Navigate to="..." /&gt;</code>.)
         </p>
       </div>
 
@@ -900,17 +1069,22 @@ function App() {
           <li>Installiere <code>react-router-dom</code></li>
           <li>Wickle die App in <code>main.tsx</code> in <code>&lt;BrowserRouter&gt;</code></li>
           <li>
-            Erstelle <code>src/pages/DeparturePage.tsx</code> und <code>src/pages/ArrivalPage.tsx</code> &ndash;
-            beide nutzen <code>useFlights()</code> und rendern je ein <code>FlightBoard</code>
+            Erstelle <code>src/components/Layout.tsx</code> mit Logo, Navigationsleiste (Abfl&uuml;ge / Ank&uuml;nfte via
+            <code>NavLink</code>), Theme-Umschalter und <code>&lt;Outlet /&gt;</code>
           </li>
           <li>
-            Erstelle <code>src/components/Layout.tsx</code> mit <code>AirportHeader</code>,
-            einer Navigationsleiste (Abfl&uuml;ge / Ank&uuml;nfte via <code>NavLink</code>) und <code>&lt;Outlet /&gt;</code>
+            Lade die Fl&uuml;ge einmal in <code>Layout</code> und gib sie per <code>&lt;Outlet context&gt;</code> weiter;
+            erstelle dazu <code>useFlightData()</code>
           </li>
           <li>
-            Konfiguriere die Routes in <code>App.tsx</code>:
-            <code>/</code> &rarr; <code>DeparturePage</code>, <code>/arrivals</code> &rarr; <code>ArrivalPage</code>
+            Erstelle <code>src/pages/FlightListPage.tsx</code> mit dem Prop <code>type</code> &ndash; eine Komponente
+            f&uuml;r Abfl&uuml;ge und Ank&uuml;nfte
           </li>
+          <li>
+            Konfiguriere die Routes in <code>App.tsx</code>: <code>/</code> leitet auf <code>/departures</code> weiter,
+            <code>/departures</code> und <code>/arrivals</code> zeigen <code>FlightListPage</code>
+          </li>
+          <li>Teste: Beim Wechsel zwischen Abfl&uuml;gen und Ank&uuml;nften erscheint keine Ladeanzeige</li>
         </ul>
       </div>
 
@@ -980,11 +1154,11 @@ function App() {
         </p>
         <ul>
           <li>
-            Ersetze in <code>DeparturePage</code> den <code>useLocalStorage</code>-basierten Filter
+            Ersetze in <code>FlightListPage</code> den <code>useLocalStorage</code>-basierten Filter
             durch <code>useSearchParams</code> aus React Router
           </li>
           <li>
-            Die URL <code>/?status=delayed&amp;q=LH</code> soll den Statusfilter
+            Die URL <code>/departures?status=delayed&amp;q=LH</code> soll den Statusfilter
             &bdquo;Versp&auml;tet&ldquo; und die Suche &bdquo;LH&ldquo; vorbelegen
           </li>
           <li>

@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>1.4 &ndash; Komponenten &amp; Props (Vertiefung) | React Kurs</title>
+  <title>1.4 &ndash; Komponenten, Props &amp; Listen | React Kurs</title>
   <script>(function () { var t = localStorage.getItem('kurs-theme') || 'dark'; document.documentElement.setAttribute('data-theme', t); })();</script>
   <link rel="stylesheet" href="assets/kurs.css">
   <link rel="stylesheet" id="hljs-theme"
@@ -33,9 +33,8 @@
       <a class="nav-link" href="1.1-einfuehrung-spa.html"><span class="ln">1.1</span>Motivation &amp; SPA</a>
       <a class="nav-link" href="1.2-einfuehrung.html"><span class="ln">1.2</span>Einführung &amp; Umgebung</a>
       <a class="nav-link" href="1.3-komponenten-props-einfach.html"><span class="ln">1.3</span>Komponenten &amp; Props (einfach)</a>
-      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten &amp; Props (Vertiefung)</a>
+      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten, Props &amp; Listen</a>
       <a class="nav-link" href="1.5-state-events.html"><span class="ln">1.5</span>State &amp; Events</a>
-      <a class="nav-link" href="1.6-listen-conditional.html"><span class="ln">1.6</span>Listen &amp; Conditional Rendering</a>
     </div>
     <div class="nav-group">
       <div class="nav-group-label react-label">Teil 2 &mdash; React Praxis</div>
@@ -70,10 +69,10 @@
   <main class="main-content">
     <header class="lesson-header">
       <p class="lesson-eyebrow">Lektion 1.4 &mdash; Teil 1: React Einführung</p>
-      <h1>Komponenten &amp; Props</h1>
+      <h1>Komponenten, Props &amp; Listen</h1>
       <div class="lesson-tags">
         <span class="tag tag-react">React</span>
-        <span class="tag tag-time">ca. 90 min</span>
+        <span class="tag tag-time">ca. 120 min</span>
       </div>
     </header>
 
@@ -88,6 +87,10 @@
           <li>Children Props verstehen</li>
           <li>Default Props und optionale Props mit <code>?</code> nutzen</li>
           <li>Komponenten in eigene Dateien auslagern</li>
+          <li>Listen mit <code>.map()</code> rendern und den <code>key</code>-Prop richtig einsetzen</li>
+          <li>Elemente bedingt rendern mit <code>&amp;&amp;</code>, Ternary und fr&uuml;hem Return</li>
+          <li>Listen sortieren, ohne das Original-Array zu ver&auml;ndern</li>
+          <li>Leere Listen mit einem Empty State abfangen</li>
         </ul>
       </section>
 
@@ -195,9 +198,9 @@ const FlightStatusBadge = ({ status }: FlightStatusBadgeProps) => {
     'on-time':   { label: 'P&uuml;nktlich', className: 'status-on-time' },
     'delayed':   { label: 'Versp&auml;tet', className: 'status-delayed' },
     'boarding':  { label: 'Boarding', className: 'status-boarding' },
-    'departed':  { label: 'Abgeflogen', className: 'status-departed' },
+    'departed':  { label: 'Gestartet',  className: 'status-departed' },
     'landed':    { label: 'Gelandet', className: 'status-landed' },
-    'cancelled': { label: 'Annulliert', className: 'status-cancelled' },
+    'cancelled': { label: 'Gestrichen', className: 'status-cancelled' },
   };
 
   const { label, className } = config[status];
@@ -257,190 +260,13 @@ const AirportHeader = ({
       </section>
 
       <section class="section">
-        <h2>FlightCard &ndash; Eine Komponente pro Tabellenzeile</h2>
-        <p>
-          Anstatt die Tabelle mit hartkodierten <code>&lt;tr&gt;</code>-Elementen zu f&uuml;llen, extrahieren wir
-          jede Zeile in eine eigene <code>FlightCard</code>-Komponente. Die Komponente bekommt ein vollst&auml;ndiges
-          <code>Flight</code>-Objekt als Prop.
-        </p>
-        <div class="code-block">
-          <div class="code-header">
-            <span class="code-filename">src/components/FlightCard.tsx</span>
-            <span class="code-lang">TypeScript</span>
-          </div>
-          <pre><code class="language-typescript">import FlightStatusBadge from './FlightStatusBadge';
-import { Flight } from '../types/flight';
-import './FlightCard.css';
-
-// Props-Interface: Ein einziges flight-Objekt als Prop
-interface FlightCardProps {
-  flight: Flight;
-}
-
-/**
- * Stellt einen einzelnen Flug als Tabellenzeile dar.
- */
-const FlightCard = ({ flight }: FlightCardProps) => {
-  // Zeitanzeige: Falls Versp&auml;tung vorliegt, beide Zeiten anzeigen
-  const timeDisplay =
-    flight.expectedTime &amp;&amp; flight.expectedTime !== flight.scheduledTime
-      ? `${flight.scheduledTime} (${flight.expectedTime})`
-      : flight.scheduledTime;
-
-  return (
-    &lt;tr className="flight-row"&gt;
-      &lt;td className="flight-cell flight-cell-number"&gt;
-        {flight.flightNumber}
-      &lt;/td&gt;
-      &lt;td className="flight-cell flight-cell-airline"&gt;
-        {flight.airline}
-      &lt;/td&gt;
-      &lt;td className="flight-cell"&gt;{flight.airport}&lt;/td&gt;
-      &lt;td className="flight-cell flight-cell-time"&gt;
-        {timeDisplay}
-      &lt;/td&gt;
-      &lt;td className="flight-cell"&gt;{flight.terminal}&lt;/td&gt;
-      {/* Nullish Coalescing: falls gate undefined, zeige &mdash; */}
-      &lt;td className="flight-cell"&gt;{flight.gate ?? '&mdash;'}&lt;/td&gt;
-      &lt;td className="flight-cell"&gt;
-        &lt;FlightStatusBadge status={flight.status} /&gt;
-      &lt;/td&gt;
-    &lt;/tr&gt;
-  );
-};
-
-export default FlightCard;</code></pre>
-        </div>
-      </section>
-
-      <section class="section">
-        <h2>FlightBoard &ndash; Komponenten zusammensetzen</h2>
-        <p>
-          <code>FlightBoard</code> ist eine Container-Komponente: Sie erh&auml;lt ein Array von Fl&uuml;gen und
-          einen Titel als Props und rendert f&uuml;r jeden Flug eine <code>FlightCard</code>. Das <code>.map()</code>
-          wird sp&auml;ter in Lektion 1.6 ausf&uuml;hrlich erkl&auml;rt; hier sehen wir es schon im Einsatz.
-        </p>
-        <div class="code-block">
-          <div class="code-header">
-            <span class="code-filename">src/components/FlightBoard.tsx</span>
-            <span class="code-lang">TypeScript</span>
-          </div>
-          <pre><code class="language-typescript">import FlightCard from './FlightCard';
-import { Flight } from '../types/flight';
-import './FlightBoard.css';
-
-interface FlightBoardProps {
-  flights: Flight[];   // Array von Fl&uuml;gen
-  title: string;       // &Uuml;berschrift der Tabelle
-}
-
-/**
- * Tabellenansicht f&uuml;r eine Liste von Fl&uuml;gen.
- */
-const FlightBoard = ({ flights, title }: FlightBoardProps) => {
-  return (
-    &lt;section className="flight-board-section"&gt;
-      &lt;h2 className="flight-board-title"&gt;{title}&lt;/h2&gt;
-      &lt;table className="flight-board-table"&gt;
-        &lt;thead&gt;
-          &lt;tr&gt;
-            &lt;th className="flight-board-heading"&gt;Flug&lt;/th&gt;
-            &lt;th className="flight-board-heading"&gt;Airline&lt;/th&gt;
-            &lt;th className="flight-board-heading"&gt;Ziel / Herkunft&lt;/th&gt;
-            &lt;th className="flight-board-heading"&gt;Zeit&lt;/th&gt;
-            &lt;th className="flight-board-heading"&gt;Terminal&lt;/th&gt;
-            &lt;th className="flight-board-heading"&gt;Gate&lt;/th&gt;
-            &lt;th className="flight-board-heading"&gt;Status&lt;/th&gt;
-          &lt;/tr&gt;
-        &lt;/thead&gt;
-        &lt;tbody&gt;
-          {flights.map((flight) => (
-            // key ist Pflicht beim Rendern von Listen &ndash; mehr dazu in L04
-            &lt;FlightCard key={flight.id} flight={flight} /&gt;
-          ))}
-        &lt;/tbody&gt;
-      &lt;/table&gt;
-    &lt;/section&gt;
-  );
-};
-
-export default FlightBoard;</code></pre>
-        </div>
-        <p>In <code>App.tsx</code> werden die Fl&uuml;ge nach Typ aufgeteilt und an zwei
-          <code>FlightBoard</code>-Instanzen &uuml;bergeben:</p>
-        <div class="code-block">
-          <div class="code-header">
-            <span class="code-filename">src/App.tsx</span>
-            <span class="code-lang">TypeScript</span>
-          </div>
-          <pre><code class="language-typescript">import FlightBoard from './components/FlightBoard';
-import { sampleFlights } from './data/flights';
-
-function App() {
-  // Fl&uuml;ge nach Typ aufteilen
-  const departures = sampleFlights.filter(f => f.type === 'departure');
-  const arrivals   = sampleFlights.filter(f => f.type === 'arrival');
-
-  return (
-    &lt;div className="app-page"&gt;
-      &lt;header className="app-header"&gt;
-        &lt;h1 className="app-title"&gt;&#9992; FlugBoard &ndash; Wien International&lt;/h1&gt;
-        &lt;p className="app-subtitle"&gt;Flughafen Wien-Schwechat (VIE)&lt;/p&gt;
-      &lt;/header&gt;
-
-      {/* Gleiche Komponente, unterschiedliche Props */}
-      &lt;FlightBoard flights={departures} title="Abfl&uuml;ge" /&gt;
-      &lt;FlightBoard flights={arrivals}   title="Ank&uuml;nfte" /&gt;
-    &lt;/div&gt;
-  );
-}
-
-export default App;</code></pre>
-        </div>
-      </section>
-
-      <section class="section">
-        <h2>Children Props</h2>
-        <p>
-          Jede Komponente hat automatisch Zugriff auf ein spezielles Prop namens <code>children</code>. Es
-          enth&auml;lt alles, was zwischen dem &ouml;ffnenden und schlie&szlig;enden Tag der Komponente steht &ndash;
-          &auml;hnlich wie der Inhalt eines HTML-Elements. Der Typ f&uuml;r children ist <code>React.ReactNode</code>.
-        </p>
-        <div class="code-block">
-          <div class="code-header">
-            <span class="code-filename">Children Props Beispiel</span>
-            <span class="code-lang">TypeScript</span>
-          </div>
-          <pre><code class="language-typescript">import { ReactNode } from 'react';
-
-// Props-Interface mit children
-interface SectionProps {
-  title: string;
-  children: ReactNode;   // Alles was zwischen die Tags kommt
-}
-
-// Layout-Komponente, die Kinder-Elemente einbettet
-const BoardSection = ({ title, children }: SectionProps) => (
-  &lt;section className="board-section"&gt;
-    &lt;h2 className="board-section-title"&gt;{title}&lt;/h2&gt;
-    {children}
-  &lt;/section&gt;
-);
-
-// Verwendung: Alles zwischen den Tags wird als children &uuml;bergeben
-&lt;BoardSection title="Abfl&uuml;ge"&gt;
-  &lt;FlightBoard flights={departures} title="Abfl&uuml;ge" /&gt;
-  &lt;p className="board-section-note"&gt;{departures.length} Fl&uuml;ge angezeigt&lt;/p&gt;
-&lt;/BoardSection&gt;</code></pre>
-        </div>
-      </section>
-
-      <section class="section">
         <h2>Typdefinitionen in eigene Datei auslagern</h2>
         <p>
+          Bevor wir die Flugtabelle in Komponenten zerlegen, brauchen wir ein gemeinsames Datenmodell.
           Wenn mehrere Komponenten dasselbe Interface verwenden, lagert man Typen in eine eigene Datei aus.
           Dadurch vermeiden wir Duplikation und haben eine einzige &bdquo;Source of Truth&ldquo; f&uuml;r unser
-          Datenmodell.
+          Datenmodell. Das Interface <code>Flight</code> beschreibt einen einzelnen Flug und wird in den
+          folgenden Abschnitten von <code>FlightCard</code> und <code>FlightBoard</code> verwendet.
         </p>
         <div class="code-block">
           <div class="code-header">
@@ -471,6 +297,20 @@ export interface Flight {
   terminal:      string;
   gate?:         string;       // Optional: nicht immer bekannt
 }</code></pre>
+        </div>
+        <p>
+          Auch <code>FlightStatusBadge</code> definiert den Typ <code>FlightStatus</code> ab jetzt nicht mehr
+          selbst, sondern importiert ihn aus der zentralen Datei:
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">src/components/FlightStatusBadge.tsx (Ausschnitt)</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">import { FlightStatus } from '../types/flight';
+import './FlightStatusBadge.css';
+
+// Die lokale Definition von FlightStatus entf&auml;llt.</code></pre>
         </div>
         <div class="code-block">
           <div class="code-header">
@@ -525,12 +365,454 @@ export const sampleFlights: Flight[] = [
         </div>
       </section>
 
+      <section class="section">
+        <h2>FlightCard &ndash; Eine Komponente pro Tabellenzeile</h2>
+        <p>
+          Anstatt die Tabelle mit hartkodierten <code>&lt;tr&gt;</code>-Elementen zu f&uuml;llen, extrahieren wir
+          jede Zeile in eine eigene <code>FlightCard</code>-Komponente. Die Komponente bekommt ein vollst&auml;ndiges
+          <code>Flight</code>-Objekt als Prop.
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">src/components/FlightCard.tsx</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">import FlightStatusBadge from './FlightStatusBadge';
+import { Flight } from '../types/flight';
+import './FlightCard.css';
+
+// Props-Interface: Ein einziges flight-Objekt als Prop
+interface FlightCardProps {
+  flight: Flight;
+}
+
+/**
+ * Stellt einen einzelnen Flug als Tabellenzeile dar.
+ */
+const FlightCard = ({ flight }: FlightCardProps) => {
+  // Zeitanzeige: Falls Versp&auml;tung vorliegt, beide Zeiten anzeigen
+  const timeDisplay =
+    flight.expectedTime &amp;&amp; flight.expectedTime !== flight.scheduledTime
+      ? `${flight.scheduledTime} (${flight.expectedTime})`
+      : flight.scheduledTime;
+
+  return (
+    &lt;tr&gt;
+      &lt;td className="flight-cell"&gt;{flight.flightNumber}&lt;/td&gt;
+      &lt;td className="flight-cell"&gt;{flight.airline}&lt;/td&gt;
+      &lt;td className="flight-cell"&gt;{flight.airport}&lt;/td&gt;
+      &lt;td className="flight-cell"&gt;{timeDisplay}&lt;/td&gt;
+      &lt;td className="flight-cell"&gt;
+        &lt;FlightStatusBadge status={flight.status} /&gt;
+      &lt;/td&gt;
+      &lt;td className="flight-cell"&gt;{flight.terminal}&lt;/td&gt;
+      {/* Nullish Coalescing: falls gate undefined, zeige &mdash; */}
+      &lt;td className="flight-cell"&gt;{flight.gate ?? '&mdash;'}&lt;/td&gt;
+    &lt;/tr&gt;
+  );
+};
+
+export default FlightCard;</code></pre>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>FlightBoard &ndash; Komponenten zusammensetzen</h2>
+        <p>
+          <code>FlightBoard</code> ist eine Container-Komponente: Sie erh&auml;lt ein Array von Fl&uuml;gen und
+          einen Titel als Props und rendert f&uuml;r jeden Flug eine <code>FlightCard</code>. Wie <code>.map()</code>
+          und der <code>key</code>-Prop genau funktionieren, sehen wir weiter unten in dieser Lektion.
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">src/components/FlightBoard.tsx</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">import FlightCard from './FlightCard';
+import { Flight } from '../types/flight';
+import './FlightBoard.css';
+
+interface FlightBoardProps {
+  flights: Flight[];   // Array von Fl&uuml;gen
+  title: string;       // &Uuml;berschrift der Tabelle
+}
+
+/**
+ * Tabellenansicht f&uuml;r eine Liste von Fl&uuml;gen.
+ */
+const FlightBoard = ({ flights, title }: FlightBoardProps) => {
+  return (
+    &lt;section className="board-section"&gt;
+      &lt;h2 className="board-title"&gt;{title}&lt;/h2&gt;
+      &lt;table className="flight-table"&gt;
+        &lt;thead&gt;
+          &lt;tr&gt;
+            &lt;th&gt;Flug&lt;/th&gt;
+            &lt;th&gt;Airline&lt;/th&gt;
+            &lt;th&gt;Ziel&lt;/th&gt;
+            &lt;th&gt;Geplant&lt;/th&gt;
+            &lt;th&gt;Status&lt;/th&gt;
+            &lt;th&gt;Terminal&lt;/th&gt;
+            &lt;th&gt;Gate&lt;/th&gt;
+          &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+          {flights.map((flight) => (
+            // key ist Pflicht beim Rendern von Listen &ndash; mehr dazu weiter unten
+            &lt;FlightCard key={flight.id} flight={flight} /&gt;
+          ))}
+        &lt;/tbody&gt;
+      &lt;/table&gt;
+    &lt;/section&gt;
+  );
+};
+
+export default FlightBoard;</code></pre>
+        </div>
+        <p>In <code>App.tsx</code> werden die Fl&uuml;ge nach Typ aufgeteilt und an zwei
+          <code>FlightBoard</code>-Instanzen &uuml;bergeben. Der <code>AirportHeader</code> aus Lektion 1.3
+          bleibt als Seitenkopf erhalten:</p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">src/App.tsx</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">import { sampleFlights } from './data/flights';
+import AirportHeader from './components/AirportHeader';
+import FlightBoard from './components/FlightBoard';
+import './App.css';
+
+function App() {
+  // Fl&uuml;ge nach Typ aufteilen
+  const departures = sampleFlights.filter(f => f.type === 'departure');
+  const arrivals   = sampleFlights.filter(f => f.type === 'arrival');
+
+  return (
+    &lt;div className="app-page"&gt;
+      &lt;AirportHeader airportName="Flughafen Wien-Schwechat" /&gt;
+
+      {/* Gleiche Komponente, unterschiedliche Props */}
+      &lt;FlightBoard flights={departures} title="Abfl&uuml;ge" /&gt;
+      &lt;FlightBoard flights={arrivals}   title="Ank&uuml;nfte" /&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default App;</code></pre>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Children Props</h2>
+        <p>
+          Jede Komponente hat automatisch Zugriff auf ein spezielles Prop namens <code>children</code>. Es
+          enth&auml;lt alles, was zwischen dem &ouml;ffnenden und schlie&szlig;enden Tag der Komponente steht &ndash;
+          &auml;hnlich wie der Inhalt eines HTML-Elements. Der Typ f&uuml;r children ist <code>React.ReactNode</code>.
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">Children Props Beispiel</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">import { ReactNode } from 'react';
+
+// Props-Interface mit children
+interface SectionProps {
+  title: string;
+  children: ReactNode;   // Alles was zwischen die Tags kommt
+}
+
+// Layout-Komponente, die Kinder-Elemente einbettet
+const BoardSection = ({ title, children }: SectionProps) => (
+  &lt;section&gt;
+    &lt;h2&gt;{title}&lt;/h2&gt;
+    {children}
+  &lt;/section&gt;
+);
+
+// Verwendung: Alles zwischen den Tags wird als children &uuml;bergeben
+&lt;BoardSection title="Abfl&uuml;ge"&gt;
+  &lt;FlightBoard flights={departures} title="Abfl&uuml;ge" /&gt;
+  &lt;p&gt;{departures.length} Fl&uuml;ge angezeigt&lt;/p&gt;
+&lt;/BoardSection&gt;</code></pre>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Listen mit .map() rendern</h2>
+        <p>
+          Im <code>FlightBoard</code> haben wir es schon verwendet: In React rendert man Listen, indem man
+          ein Array mit der <code>.map()</code>-Methode in ein Array von JSX-Elementen umwandelt. React kann
+          solche Arrays direkt rendern. Das <code>key</code>-Prop ist dabei <strong>Pflicht</strong> &ndash;
+          es hilft React, die Elemente bei &Auml;nderungen eindeutig zu identifizieren.
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">Listen rendern &ndash; Grundlagen</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">// Einfaches Beispiel: Array von Strings
+const staedte = ['Wien', 'Berlin', 'Paris'];
+
+const Stadtliste = () => (
+  &lt;ul&gt;
+    {staedte.map((stadt) => (
+      &lt;li key={stadt}&gt;{stadt}&lt;/li&gt;
+    ))}
+  &lt;/ul&gt;
+);
+
+// Mit Objekten: Immer eine eindeutige ID als key verwenden!
+{flights.map((flight) => (
+  &lt;FlightCard key={flight.id} flight={flight} /&gt;
+))}
+
+// SCHLECHT: Index als key (nur ok, wenn sich die Liste nie &auml;ndert!)
+{flights.map((flight, index) => (
+  &lt;FlightCard key={index} flight={flight} /&gt;
+))}</code></pre>
+        </div>
+        <p>
+          Warum der Index als <code>key</code> problematisch ist, zeigt das folgende Beispiel. Noch ist
+          unsere Flugliste statisch &ndash; ab Lektion 1.5 &auml;ndern sich Listen aber zur Laufzeit
+          (Eintr&auml;ge werden gefiltert, entfernt, umsortiert).
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">key-Prop: Index vs. ID</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">// Ausgangsliste:
+// [OS123 (id:1), LH456 (id:2), BA234 (id:4)]
+//  key=0           key=1           key=2           (mit Index als key)
+//  key=1           key=2           key=4           (mit ID als key)
+
+// Nach L&ouml;schen von LH456 (id:2):
+// [OS123 (id:1), BA234 (id:4)]
+
+// MIT INDEX ALS KEY (falsch):
+// React sieht: key=0 gleich, key=1 ANDERS (jetzt BA234 statt LH456)
+// React denkt: key=1 wurde ge&auml;ndert, key=2 wurde entfernt
+// Problem: BA234 erbt State/Fokus von LH456!
+
+// MIT ID ALS KEY (richtig):
+// React sieht: key=1 gleich, key=2 wurde entfernt, key=4 gleich
+// React wei&szlig;: LH456 wurde entfernt, alle anderen bleiben unver&auml;ndert
+
+// Fazit: Bei statischen Listen (Reihenfolge &auml;ndert sich nie) ist Index ok.
+//        Bei dynamischen Listen (hinzuf&uuml;gen, l&ouml;schen, sortieren) immer eine stabile ID nutzen!</code></pre>
+        </div>
+        <div class="callout callout-info">
+          <div class="callout-icon">&#8505;</div>
+          <div class="callout-body">
+            <div class="callout-title">key ist kein normales Prop</div>
+            <p>
+              <code>key</code> wird von React intern verwendet und ist in der Komponente selbst nicht
+              zug&auml;nglich. Wenn du die ID innerhalb der Komponente ben&ouml;tigst, &uuml;bergib sie zus&auml;tzlich
+              als normales Prop: <code>&lt;FlightCard key={flight.id} id={flight.id} flight={flight} /&gt;</code>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Conditional Rendering &ndash; Drei Patterns</h2>
+        <p>
+          Einzelne Muster kennen wir schon: <code>{showTime &amp;&amp; ...}</code> im <code>AirportHeader</code>
+          und den Ternary-Operator f&uuml;r die Zeitanzeige in <code>FlightCard</code>. React rendert bedingt,
+          indem JavaScript-Ausdr&uuml;cke direkt in JSX verwendet werden. Es gibt drei g&auml;ngige Patterns &ndash;
+          jedes hat seine Berechtigung:
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">Pattern 1: &amp;&amp; Operator</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">// Wenn die Bedingung wahr ist, wird der rechte Teil gerendert.
+// Wenn falsch, wird nichts gerendert (undefined/false wird von React ignoriert).
+
+{flight.status === 'delayed' &amp;&amp; (
+  &lt;span className="time-delayed"&gt;
+    Versp&auml;tet: {flight.expectedTime} Uhr
+  &lt;/span&gt;
+)}
+
+{flight.gate &amp;&amp; (
+  &lt;span&gt;Gate: {flight.gate}&lt;/span&gt;
+)}
+
+// ACHTUNG: Zahlen! 0 wird als "0" gerendert, nicht als nichts!
+// FALSCH:
+{flights.length &amp;&amp; &lt;span&gt;{flights.length} Fl&uuml;ge&lt;/span&gt;}
+// Wenn flights.length === 0, wird "0" im DOM angezeigt!
+
+// RICHTIG:
+{flights.length &gt; 0 &amp;&amp; &lt;span&gt;{flights.length} Fl&uuml;ge&lt;/span&gt;}</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">Pattern 2: Ternary Operator</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">// Bedingung ? WennWahr : WennFalsch
+// Gut, wenn es zwei alternative Darstellungen gibt.
+
+{flight.gate ? (
+  &lt;span&gt;Gate: {flight.gate}&lt;/span&gt;
+) : (
+  &lt;span&gt;Kein Gate zugewiesen&lt;/span&gt;
+)}
+
+// Auch f&uuml;r CSS-Klassen (statt Inline-Styles):
+&lt;span className={flight.status === 'cancelled' ? 'flight-num is-cancelled' : 'flight-num'}&gt;
+  {flight.flightNumber}
+&lt;/span&gt;</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">Pattern 3: Fr&uuml;her Return</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">// F&uuml;r komplexere Logik: vor dem Haupt-JSX zur&uuml;ckkehren.
+// Gut lesbar und vermeidet tief verschachtelte Bedingungen.
+
+const FlightRow = ({ flight }: { flight: Flight }) => {
+  // Annullierte Fl&uuml;ge bekommen eine spezielle Darstellung
+  if (flight.status === 'cancelled') {
+    return (
+      &lt;tr className="flight-row is-cancelled"&gt;
+        &lt;td colSpan={7} className="flight-cell"&gt;
+          {flight.flightNumber} &ndash; {flight.airline} &ndash; Gestrichen
+        &lt;/td&gt;
+      &lt;/tr&gt;
+    );
+  }
+
+  // Normaler Fall: vollst&auml;ndige Zeile
+  return (
+    &lt;tr&gt;
+      {/* ... alle Spalten ... */}
+    &lt;/tr&gt;
+  );
+};</code></pre>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Listen sortieren ohne Mutation</h2>
+        <p>
+          JavaScript-Array-Methoden wie <code>.filter()</code> und <code>.sort()</code> eignen sich gut,
+          um Flugdaten vor dem Rendern aufzubereiten. Aber Vorsicht: <code>.filter()</code> und
+          <code>.map()</code> liefern ein <strong>neues</strong> Array, <code>.sort()</code> dagegen
+          <strong>ver&auml;ndert das Original-Array</strong>. Deshalb zuerst mit dem Spread-Operator eine
+          Kopie erstellen und erst die Kopie sortieren.
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">src/App.tsx &ndash; Fl&uuml;ge nach Zeit sortieren</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">import { sampleFlights } from './data/flights';
+import { Flight } from './types/flight';
+import AirportHeader from './components/AirportHeader';
+import FlightBoard from './components/FlightBoard';
+import './App.css';
+
+// Kopie erstellen, dann sortieren &ndash; das Original bleibt unver&auml;ndert.
+// Stringvergleich funktioniert f&uuml;r das Format "HH:MM" korrekt.
+const sortByTime = (flights: Flight[]): Flight[] =&gt;
+  [...flights].sort((a, b) =&gt; a.scheduledTime.localeCompare(b.scheduledTime));
+
+function App() {
+  const departures = sortByTime(sampleFlights.filter(f =&gt; f.type === 'departure'));
+  const arrivals   = sortByTime(sampleFlights.filter(f =&gt; f.type === 'arrival'));
+
+  return (
+    &lt;div className="app-page"&gt;
+      &lt;AirportHeader airportName="Flughafen Wien-Schwechat" /&gt;
+      &lt;FlightBoard flights={departures} title="Abfl&uuml;ge" /&gt;
+      &lt;FlightBoard flights={arrivals}   title="Ank&uuml;nfte" /&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default App;</code></pre>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Empty States</h2>
+        <p>
+          Wenn eine Liste leer ist, sollte die App eine hilfreiche Nachricht anzeigen statt einer leeren
+          Tabelle mit Kopfzeile. Das nennt sich <em>Empty State</em>. Die Komponente ist ein gutes Beispiel
+          f&uuml;r ein optionales Prop mit Default-Wert:
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">src/components/EmptyState.tsx</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">import './EmptyState.css';
+
+interface EmptyStateProps {
+  message?: string;
+}
+
+/**
+ * Zeigt einen Hinweis an, wenn eine Liste keine Eintr&auml;ge hat.
+ */
+const EmptyState = ({ message = 'Keine Fl&uuml;ge gefunden' }: EmptyStateProps) =&gt; (
+  &lt;div className="empty-state"&gt;
+    &lt;span className="empty-icon"&gt;&#9992;&lt;/span&gt;
+    &lt;p className="empty-text"&gt;{message}&lt;/p&gt;
+  &lt;/div&gt;
+);
+
+export default EmptyState;</code></pre>
+        </div>
+        <p>
+          In <code>FlightBoard</code> entscheidet ein Ternary, ob die Tabelle oder der Empty State
+          gerendert wird:
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">src/components/FlightBoard.tsx (Ausschnitt)</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">import EmptyState from './EmptyState';
+
+// ...
+    &lt;section className="board-section"&gt;
+      &lt;h2 className="board-title"&gt;{title}&lt;/h2&gt;
+      {flights.length === 0 ? (
+        &lt;EmptyState /&gt;
+      ) : (
+        &lt;table className="flight-table"&gt;
+          {/* ... thead und tbody wie bisher ... */}
+        &lt;/table&gt;
+      )}
+    &lt;/section&gt;</code></pre>
+        </div>
+        <div class="callout callout-tip">
+          <div class="callout-icon">&#128161;</div>
+          <div class="callout-body">
+            <div class="callout-title">Empty State testen</div>
+            <p>
+              Mit unseren Beispieldaten ist keine Liste leer. Zum Ausprobieren kannst du in
+              <code>App.tsx</code> ein Board mit leerem Array rendern:
+              <code>&lt;FlightBoard flights={[]} title="Charterfl&uuml;ge" /&gt;</code>. Sobald in
+              Lektion 1.5 Filter dazukommen, wird der Empty State auch im Betrieb sichtbar.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section class="section section-projekt">
         <h2>Projektschritt</h2>
         <div class="projekt-box">
           <div class="projekt-box-header">
             <span class="projekt-step">Projektschritt 1.4</span>
-            <h3>Komponenten extrahieren</h3>
+            <h3>Komponenten extrahieren &amp; Darstellung verfeinern</h3>
           </div>
           <p>
             Wir zerlegen die monolithische <code>App.tsx</code> aus Lektion 1.2 in wiederverwendbare Komponenten.
@@ -542,10 +824,12 @@ export const sampleFlights: Flight[] = [
               <span class="code-lang">Bash</span>
             </div>
             <pre><code class="language-bash">src/
-├── App.tsx                     &larr; Nutzt FlightBoard, importiert sampleFlights
+├── App.tsx                     &larr; Sortiert die Fl&uuml;ge, nutzt AirportHeader und FlightBoard
 ├── components/
+│   ├── AirportHeader.tsx       &larr; Seitenkopf (aus Lektion 1.3)
+│   ├── EmptyState.tsx          &larr; Hinweis bei leerer Liste
 │   ├── FlightCard.tsx          &larr; Einzelne Tabellenzeile
-│   ├── FlightBoard.tsx         &larr; Tabelle + Header
+│   ├── FlightBoard.tsx         &larr; Tabelle + Header (oder EmptyState)
 │   └── FlightStatusBadge.tsx   &larr; Status-Badge mit Farben
 ├── data/
 │   └── flights.ts              &larr; sampleFlights Array (alle 8 Fl&uuml;ge)
@@ -568,6 +852,83 @@ export const sampleFlights: Flight[] = [
                 perfektes Beispiel: klar definiert, wiederverwendbar, eigenst&auml;ndig testbar.
               </p>
             </div>
+          </div>
+          <p><strong>Darstellung verfeinern:</strong></p>
+          <ul>
+            <li>Alle Fl&uuml;ge sind nach <code>scheduledTime</code> aufsteigend sortiert (<code>sortByTime</code> in <code>App.tsx</code>)</li>
+            <li>Versp&auml;tete Fl&uuml;ge zeigen beide Zeiten: <code>11:15 &rarr; 11:45</code></li>
+            <li>Gestrichene Fl&uuml;ge werden durchgestrichen und ged&auml;mpft dargestellt</li>
+            <li>Bei leerer Liste zeigt <code>FlightBoard</code> den <code>EmptyState</code></li>
+          </ul>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-filename">src/components/FlightCard.tsx &ndash; Zeitanzeige &amp; gestrichene Fl&uuml;ge</span>
+              <span class="code-lang">TypeScript</span>
+            </div>
+            <pre><code class="language-typescript">const FlightCard = ({ flight }: FlightCardProps) =&gt; {
+  const isCancelled = flight.status === 'cancelled';
+  const isDelayed = flight.status === 'delayed';
+  const isBoarding = flight.status === 'boarding';
+
+  // CSS-Klassen bedingt setzen
+  const rowClassName = isCancelled ? 'flight-row is-cancelled' : 'flight-row';
+  const flightNumberClassName = isCancelled
+    ? 'flight-num is-cancelled'
+    : 'flight-num';
+
+  // Zeitanzeige mit fr&uuml;hen Returns je nach Status
+  const renderTime = () =&gt; {
+    if (isDelayed &amp;&amp; flight.expectedTime) {
+      return (
+        &lt;span&gt;
+          &lt;span className="time-old"&gt;{flight.scheduledTime}&lt;/span&gt;
+          &lt;span className="time-delayed"&gt;&rarr; {flight.expectedTime}&lt;/span&gt;
+        &lt;/span&gt;
+      );
+    }
+    if (isBoarding) {
+      return &lt;span className="time-boarding"&gt;{flight.scheduledTime}&lt;/span&gt;;
+    }
+    return &lt;span&gt;{flight.scheduledTime}&lt;/span&gt;;
+  };
+
+  return (
+    &lt;tr className={rowClassName}&gt;
+      &lt;td className="flight-cell"&gt;
+        &lt;span className={flightNumberClassName}&gt;{flight.flightNumber}&lt;/span&gt;
+      &lt;/td&gt;
+      &lt;td className="flight-cell"&gt;{flight.airline}&lt;/td&gt;
+      &lt;td className="flight-cell"&gt;{flight.airport}&lt;/td&gt;
+      &lt;td className="flight-cell"&gt;{renderTime()}&lt;/td&gt;
+      &lt;td className="flight-cell"&gt;
+        &lt;FlightStatusBadge status={flight.status} /&gt;
+      &lt;/td&gt;
+      &lt;td className="flight-cell"&gt;{flight.terminal}&lt;/td&gt;
+      &lt;td className="flight-cell"&gt;{flight.gate ?? '&mdash;'}&lt;/td&gt;
+    &lt;/tr&gt;
+  );
+};</code></pre>
+          </div>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-filename">src/components/FlightCard.css (Erg&auml;nzung)</span>
+              <span class="code-lang">CSS</span>
+            </div>
+            <pre><code class="language-css">.flight-row.is-cancelled { opacity: 0.6; }
+
+.flight-num.is-cancelled {
+  color: #8b949e;
+  text-decoration: line-through;
+}
+
+.time-old {
+  color: #8b949e;
+  margin-right: 4px;
+  text-decoration: line-through;
+}
+
+.time-delayed  { color: #d29922; }
+.time-boarding { color: #61dafb; }</code></pre>
           </div>
         </div>
       </section>
@@ -601,9 +962,38 @@ export const sampleFlights: Flight[] = [
           <p>
             Wenn man <code>.map()</code> verwendet und kein <code>key</code>-Prop angibt, erscheint in der
             Browser-Konsole: <em>"Each child in a list should have a unique key prop."</em> React kann die
-            Liste dann nicht effizient aktualisieren. Mehr dazu in Lektion 1.6.
+            Liste dann nicht effizient aktualisieren. TypeScript pr&uuml;ft das nicht automatisch.
           </p>
           <p class="fehler-fix">Beim <code>.map()</code> immer <code>key=&#123;flight.id&#125;</code> setzen.</p>
+        </div>
+
+        <div class="fehler-item">
+          <div class="fehler-title">Fehler: Index als <code>key</code> bei dynamischen Listen</div>
+          <p>
+            <code>key={index}</code> ist nur sicher, wenn die Liste statisch ist. Sobald Elemente hinzugef&uuml;gt,
+            gel&ouml;scht oder umsortiert werden, f&uuml;hrt der Index als <code>key</code> zu falschen Updates und kann
+            internen Komponenten-State durcheinanderbringen.
+          </p>
+          <p class="fehler-fix">Bei dynamischen Listen immer eine stabile, eindeutige ID aus den Daten verwenden.</p>
+        </div>
+
+        <div class="fehler-item">
+          <div class="fehler-title">Fehler: <code>&amp;&amp;</code> mit dem Wert <code>0</code></div>
+          <p>
+            <code>{flights.length &amp;&amp; &lt;span&gt;...&lt;/span&gt;}</code> rendert den Wert <code>0</code> ins DOM,
+            wenn <code>flights.length === 0</code> ist. JavaScript wertet <code>0 &amp;&amp; irgendwas</code> als
+            <code>0</code> aus, und React rendert Zahlen direkt.
+          </p>
+          <p class="fehler-fix">Expliziten Vergleich verwenden: <code>{flights.length &gt; 0 &amp;&amp; ...}</code></p>
+        </div>
+
+        <div class="fehler-item">
+          <div class="fehler-title">Fehler: Original-Array mit <code>.sort()</code> ver&auml;ndern</div>
+          <p>
+            <code>flights.sort(...)</code> sortiert das Array <em>in-place</em>. Bei einem Props-Array
+            ver&auml;ndert die Komponente damit Daten, die ihr nicht geh&ouml;ren &ndash; Props sind read-only.
+          </p>
+          <p class="fehler-fix">Vor <code>.sort()</code> immer eine Kopie erstellen: <code>[...flights].sort(...)</code></p>
         </div>
 
         <div class="fehler-item">
@@ -664,19 +1054,54 @@ export const sampleFlights: Flight[] = [
           <div class="aufgabe">
             <div class="aufgabe-header">
               <span class="aufgabe-num">Aufgabe 3</span>
-              <span class="aufgabe-title">AirportHeader Komponente</span>
+              <span class="aufgabe-title">AirportHeader mit children</span>
             </div>
             <p>
-              Erstelle eine neue Komponente <code>AirportHeader</code> in
-              <code>src/components/AirportHeader.tsx</code>.
+              Erweitere die Komponente <code>AirportHeader</code> aus Lektion 1.3
+              (<code>src/components/AirportHeader.tsx</code>) um ein optionales <code>children</code>-Prop.
             </p>
             <ul>
-              <li>Props: <code>airportName: string</code>, <code>iataCode: string</code>,
-                <code>children?: React.ReactNode</code></li>
+              <li>Props: <code>airportName: string</code>, <code>children?: React.ReactNode</code></li>
               <li>Die Komponente zeigt einen Seitentitel mit dem Flugzeug-Symbol (&#9992;) und optional Kinder-Elemente
                 darunter</li>
               <li>Verwende die Komponente in <code>App.tsx</code> und platziere darin einen kurzen Info-Text als
                 children</li>
+            </ul>
+          </div>
+
+          <div class="aufgabe">
+            <div class="aufgabe-header">
+              <span class="aufgabe-num">Aufgabe 4</span>
+              <span class="aufgabe-title">Sortierung und Zeitanzeige</span>
+            </div>
+            <p>
+              Sortiere die Fl&uuml;ge nach <code>scheduledTime</code> aufsteigend und verbessere die
+              Darstellung in <code>FlightCard</code>.
+            </p>
+            <ul>
+              <li>Verwende <code>[...flights].sort((a, b) =&gt; a.scheduledTime.localeCompare(b.scheduledTime))</code></li>
+              <li>Bei versp&auml;teten Fl&uuml;gen beide Zeiten anzeigen: <code>"11:15 &rarr; 11:45"</code>, die alte
+                Zeit durchgestrichen, die neue in einer Warnfarbe</li>
+              <li>Gestrichene Fl&uuml;ge: Flugnummer durchgestrichen, ganze Zeile ged&auml;mpft</li>
+              <li>Teste mit den Musterfl&uuml;gen TK567 (13:20 &rarr; 14:05), LH456 (11:15 &rarr; 11:45) und VY334
+                (gestrichen)</li>
+            </ul>
+          </div>
+
+          <div class="aufgabe">
+            <div class="aufgabe-header">
+              <span class="aufgabe-num">Aufgabe 5</span>
+              <span class="aufgabe-title">Empty State einbauen</span>
+            </div>
+            <p>
+              Erstelle eine wiederverwendbare <code>EmptyState</code>-Komponente und verwende sie in
+              <code>FlightBoard</code>.
+            </p>
+            <ul>
+              <li>Props: <code>message?: string</code> mit dem Default-Wert &bdquo;Keine Fl&uuml;ge gefunden&ldquo;</li>
+              <li>Zeige ein Flugzeug-Symbol (&#9992;) und die Meldung an</li>
+              <li><code>FlightBoard</code> zeigt bei leerem Array den Empty State statt der Tabelle</li>
+              <li>Teste mit einem dritten Board: <code>&lt;FlightBoard flights={[]} title="Charterfl&uuml;ge" /&gt;</code></li>
             </ul>
           </div>
 

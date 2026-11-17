@@ -29,9 +29,8 @@
       <a class="nav-link" href="1.1-einfuehrung-spa.html"><span class="ln">1.1</span>Motivation &amp; SPA</a>
       <a class="nav-link" href="1.2-einfuehrung.html"><span class="ln">1.2</span>Einführung &amp; Umgebung</a>
       <a class="nav-link" href="1.3-komponenten-props-einfach.html"><span class="ln">1.3</span>Komponenten &amp; Props (einfach)</a>
-      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten &amp; Props (Vertiefung)</a>
+      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten, Props &amp; Listen</a>
       <a class="nav-link" href="1.5-state-events.html"><span class="ln">1.5</span>State &amp; Events</a>
-      <a class="nav-link" href="1.6-listen-conditional.html"><span class="ln">1.6</span>Listen &amp; Conditional Rendering</a>
     </div>
     <div class="nav-group">
       <div class="nav-group-label react-label">Teil 2 &mdash; React Praxis</div>
@@ -121,7 +120,7 @@
 
     <div class="code-block">
       <div class="code-header">
-        <span class="code-filename">VORHER: src/pages/DeparturePage.tsx (React + Vite)</span>
+        <span class="code-filename">VORHER (vereinfacht): Abflugseite mit useEffect + fetch (React + Vite)</span>
         <span class="code-lang">TypeScript</span>
       </div>
       <pre><code class="language-typescript">import { useState, useEffect } from 'react';
@@ -135,7 +134,7 @@ export default function DeparturePage() {
 
   useEffect(() =&gt; {
     setLoading(true);
-    fetch('http://localhost:3000/api/flights?type=departure')
+    fetch('http://localhost:8000/api/flights?type=departure')
       .then(res =&gt; {
         if (!res.ok) throw new Error('Fehler beim Laden');
         return res.json();
@@ -154,32 +153,46 @@ export default function DeparturePage() {
 
     <div class="code-block">
       <div class="code-header">
-        <span class="code-filename">NACHHER: src/app/(board)/departures/page.tsx (Next.js)</span>
+        <span class="code-filename">NACHHER: src/app/(board)/departures/page.tsx (Next.js, Projektstand 3.3)</span>
         <span class="code-lang">TypeScript</span>
       </div>
-      <pre><code class="language-typescript">import FlightBoard from '@/components/FlightBoard';
-import type { Flight } from '@/types/flight';
+      <pre><code class="language-typescript">import type { Metadata } from 'next';
+import { listFlights } from '@/lib/flights-db';
+import SearchWrapper from '@/components/SearchWrapper';
 
-export default async function DeparturePage() {
-  const response = await fetch(
-    'http://localhost:3000/api/flights?type=departure',
-    { next: { revalidate: 30 } }  // ISR: alle 30 Sekunden neu laden
+export const metadata: Metadata = {
+  title: 'Abflüge',
+};
+
+// Seite höchstens alle 30 Sekunden neu erzeugen (ISR).
+// Ohne diese Zeile würde Next.js sie nur einmal beim Build rendern.
+export const revalidate = 30;
+
+export default function DeparturePage() {
+  // Server Component: liest direkt aus der Datenbank – kein fetch, kein useEffect
+  const departures = [...listFlights('departure')].sort((a, b) =&gt;
+    a.scheduledTime.localeCompare(b.scheduledTime),
   );
 
-  if (!response.ok) {
-    throw new Error('Fehler beim Laden der Abflugdaten');
-  }
-
-  const flights: Flight[] = await response.json();
-
-  return &lt;FlightBoard flights={flights} /&gt;;
+  return (
+    &lt;div&gt;
+      {/* Überschrift wird auf dem Server gerendert */}
+      &lt;h1 className="board-page-title"&gt;
+        Abflüge ({departures.length})
+      &lt;/h1&gt;
+      {/* Server Component übergibt serialisierbare Daten an die Client Component */}
+      &lt;SearchWrapper flights={departures} /&gt;
+    &lt;/div&gt;
+  );
 }</code></pre>
     </div>
 
     <p>
-      Aus ~40 Zeilen werden ~15 Zeilen. Kein State, kein Effect, kein Lade-Spinner-Management.
-      Next.js &uuml;bernimmt das Lade-UI automatisch &uuml;ber <code>loading.tsx</code> und
-      das Fehler-Handling &uuml;ber <code>error.tsx</code>.
+      Kein State, kein Effect, kein Lade-Spinner-Management: Die Server Component liest die Fl&uuml;ge
+      direkt aus der Datenbank (<code>listFlights</code> aus Lektion 3.1) &mdash; ein <code>fetch</code> auf die
+      eigene API ist auf dem Server nicht n&ouml;tig. Next.js &uuml;bernimmt das Lade-UI &uuml;ber
+      <code>loading.tsx</code> und das Fehler-Handling &uuml;ber <code>error.tsx</code>.
+      <code>SearchWrapper</code> und <code>export const revalidate</code> erkl&auml;ren die Abschnitte 3 und 4.
     </p>
 
     <div class="callout callout-tip">
@@ -262,10 +275,15 @@ export default async function DeparturePage() {
     </div>
 
     <h3>Beispiel: SearchBar als Client Component</h3>
+    <p>
+      Eine Suchleiste braucht State und Event-Handler &mdash; also <code>'use client'</code>. Die Skizze zeigt eine
+      eigenst&auml;ndige Variante mit Callback. Im Projekt b&uuml;ndeln wir Suchfeld, Filterlogik und Tabelle im
+      <code>SearchWrapper</code> (Abschnitt 3).
+    </p>
 
     <div class="code-block">
       <div class="code-header">
-        <span class="code-filename">src/components/SearchBar.tsx</span>
+        <span class="code-filename">Skizze: SearchBar als eigenst&auml;ndige Client Component</span>
         <span class="code-lang">TypeScript</span>
       </div>
       <pre><code class="language-typescript">'use client';
@@ -286,7 +304,7 @@ export default function SearchBar({ onSearch, placeholder }: SearchBarProps) {
   }
 
   return (
-    &lt;div className="search-bar"&gt;
+    &lt;div className="search-row"&gt;
       &lt;input
         type="search"
         value={value}
@@ -297,7 +315,7 @@ export default function SearchBar({ onSearch, placeholder }: SearchBarProps) {
       {value &amp;&amp; (
         &lt;button
           onClick={() =&gt; { setValue(''); onSearch(''); }}
-          className="search-clear"
+          className="ghost-btn"
           aria-label="Suche zur&uuml;cksetzen"
         &gt;
           &times;
@@ -334,32 +352,39 @@ export default function SearchBar({ onSearch, placeholder }: SearchBarProps) {
       </div>
       <pre><code class="language-typescript">'use client';
 
-import { useState } from 'react';
-import SearchBar from './SearchBar';
-import type { Flight } from '@/types/flight';
+import { useState, useMemo } from 'react';
+import { Flight } from '@/types/flight';
+import FlightTable from './FlightTable';
 
-interface SearchWrapperProps {
-  // Fl&uuml;ge werden als Props vom Server Component &uuml;bergeben
-  allFlights: Flight[];
-  children: (filtered: Flight[]) =&gt; React.ReactNode;
-}
-
-export default function SearchWrapper(
-  { allFlights, children }: SearchWrapperProps
-) {
+export default function SearchWrapper({ flights }: { flights: Flight[] }) {
   const [query, setQuery] = useState('');
 
-  const filtered = allFlights.filter(f =&gt;
-    f.flightNumber.toLowerCase().includes(query.toLowerCase()) ||
-    f.airport.toLowerCase().includes(query.toLowerCase()) ||
-    f.airline.toLowerCase().includes(query.toLowerCase())
-  );
+  const filtered = useMemo(() =&gt; {
+    if (!query) return flights;
+    const q = query.toLowerCase();
+    return flights.filter(
+      f =&gt;
+        f.flightNumber.toLowerCase().includes(q) ||
+        f.airline.toLowerCase().includes(q) ||
+        f.airport.toLowerCase().includes(q)
+    );
+  }, [flights, query]);
 
   return (
-    &lt;&gt;
-      &lt;SearchBar onSearch={setQuery} /&gt;
-      {children(filtered)}
-    &lt;/&gt;
+    &lt;div&gt;
+      &lt;div className="search-row"&gt;
+        &lt;input
+          value={query}
+          onChange={(e) =&gt; setQuery(e.target.value)}
+          placeholder="Flug, Airline oder Ziel suchen..."
+          className="search-input"
+        /&gt;
+      &lt;/div&gt;
+      &lt;p className="search-count"&gt;
+        {filtered.length} {filtered.length === 1 ? 'Flug' : 'Flüge'}
+      &lt;/p&gt;
+      &lt;FlightTable flights={filtered} /&gt;
+    &lt;/div&gt;
   );
 }</code></pre>
     </div>
@@ -369,28 +394,33 @@ export default function SearchWrapper(
         <span class="code-filename">src/app/(board)/departures/page.tsx &mdash; Server Component nutzt Client H&uuml;lle</span>
         <span class="code-lang">TypeScript</span>
       </div>
-      <pre><code class="language-typescript">import SearchWrapper from '@/components/SearchWrapper';
-import FlightTable from '@/components/FlightTable';
+      <pre><code class="language-typescript">import type { Metadata } from 'next';
 import { listFlights } from '@/lib/flights-db';
+import SearchWrapper from '@/components/SearchWrapper';
 
-export default async function DeparturePage() {
-  const res = await fetch(
-    'http://localhost:3000/api/flights?type=departure',
-    { next: { revalidate: 30 } }
+export const metadata: Metadata = {
+  title: 'Abflüge',
+};
+
+// Seite höchstens alle 30 Sekunden neu erzeugen (ISR).
+// Ohne diese Zeile würde Next.js sie nur einmal beim Build rendern.
+export const revalidate = 30;
+
+export default function DeparturePage() {
+  // Server Component: liest direkt aus der Datenbank – kein fetch, kein useEffect
+  const departures = [...listFlights('departure')].sort((a, b) =&gt;
+    a.scheduledTime.localeCompare(b.scheduledTime),
   );
-  const flights: Flight[] = await res.json();
 
   return (
-    &lt;section&gt;
-      &lt;h1&gt;Abfl&uuml;ge ({flights.length})&lt;/h1&gt;
-      {/*
-        Server Component &uuml;bergibt Daten an Client Component.
-        FlightTable ist eine Server Component (kein 'use client').
-      */}
-      &lt;SearchWrapper allFlights={flights}&gt;
-        {(filtered) =&gt; &lt;FlightTable flights={filtered} /&gt;}
-      &lt;/SearchWrapper&gt;
-    &lt;/section&gt;
+    &lt;div&gt;
+      {/* Überschrift wird auf dem Server gerendert */}
+      &lt;h1 className="board-page-title"&gt;
+        Abflüge ({departures.length})
+      &lt;/h1&gt;
+      {/* Server Component übergibt serialisierbare Daten an die Client Component */}
+      &lt;SearchWrapper flights={departures} /&gt;
+    &lt;/div&gt;
   );
 }</code></pre>
     </div>
@@ -477,6 +507,31 @@ const res = await fetch('/api/flights', {
       </table>
     </div>
 
+    <h3>Ohne <code>fetch</code>: <code>revalidate</code> f&uuml;r die ganze Seite</h3>
+    <p>
+      Unsere Seiten lesen direkt aus der Datenbank &mdash; da gibt es kein <code>fetch</code>, an das man eine
+      Cache-Option h&auml;ngen k&ouml;nnte. Ohne weitere Angabe rendert Next.js solche Seiten <strong>einmal beim
+      Build</strong> und liefert danach immer dasselbe HTML aus: Neue Fl&uuml;ge oder Status&auml;nderungen w&auml;ren
+      in der Produktion nie zu sehen. Die L&ouml;sung ist eine Einstellung f&uuml;r die ganze Seite
+      (<em>Route Segment Config</em>):
+    </p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">Seitenweite Cache-Einstellung</span>
+        <span class="code-lang">TypeScript</span>
+      </div>
+      <pre><code class="language-typescript">// ISR: Seite höchstens alle 30 Sekunden neu erzeugen
+export const revalidate = 30;
+
+// oder SSR: bei jedem Request neu rendern
+export const dynamic = 'force-dynamic';</code></pre>
+    </div>
+    <p>
+      <code>npm run build</code> zeigt das Ergebnis: Unsere Board-Seiten stehen mit &bdquo;Revalidate 30s&ldquo; in der
+      Liste. Im Dev-Server (<code>npm run dev</code>) wird jede Seite ohnehin bei jedem Aufruf neu gerendert &mdash;
+      der Unterschied zeigt sich erst im Build.
+    </p>
+
     <div class="callout callout-warning">
       <div class="callout-icon">&#9888;</div>
       <div class="callout-body">
@@ -495,6 +550,7 @@ const res = await fetch('/api/flights', {
   <section class="section">
     <h2>5 &mdash; URL-basierte Filter mit <code>useSearchParams</code></h2>
     <p>
+      <em>Optionaler Ausbau (Bonus-Aufgabe, nicht im Beispielprojekt):</em>
       Statt Filter-State in einer Client Component zu speichern, kannst du ihn in die URL
       auslagern. Das hat gro&szlig;e Vorteile: Die Seite ist bookmarkbar, der Zur&uuml;ck-Button
       des Browsers funktioniert korrekt, und Nutzer k&ouml;nnen die gefilterte Ansicht teilen.
@@ -514,7 +570,7 @@ const STATUS_OPTIONS = [
   { value: 'on-time',   label: 'P&uuml;nktlich' },
   { value: 'delayed',   label: 'Versp&auml;tet' },
   { value: 'boarding',  label: 'Boarding' },
-  { value: 'cancelled', label: 'Annulliert' },
+  { value: 'cancelled', label: 'Gestrichen' },
 ];
 
 export default function FilterBar() {
@@ -542,7 +598,7 @@ export default function FilterBar() {
       {STATUS_OPTIONS.map(opt =&gt; (
         &lt;button
           key={opt.value}
-          className={`filter-btn ${currentStatus === opt.value ? 'active' : ''}`}
+          className={currentStatus === opt.value ? 'filter-btn active' : 'filter-btn'}
           onClick={() =&gt; handleStatusChange(opt.value)}
         &gt;
           {opt.label}
@@ -550,6 +606,44 @@ export default function FilterBar() {
       ))}
     &lt;/div&gt;
   );
+}</code></pre>
+    </div>
+
+    <p>
+      Das Projekt enth&auml;lt noch keine Styles f&uuml;r die Filterleiste. Wenn du die
+      <code>FilterBar</code> einbaust, erg&auml;nze diese Regeln in <code>globals.css</code>:
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">src/app/globals.css (Erg&auml;nzung)</span>
+        <span class="code-lang">CSS</span>
+      </div>
+      <pre><code class="language-css">.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.filter-label {
+  color: #8b949e;
+  font-size: 0.85rem;
+}
+
+.filter-btn {
+  padding: 4px 12px;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  background: #1c2128;
+  color: #e6edf3;
+  cursor: pointer;
+}
+
+.filter-btn.active {
+  border-color: #61dafb;
+  color: #61dafb;
 }</code></pre>
     </div>
 
@@ -563,9 +657,9 @@ export default function FilterBar() {
         <span class="code-filename">src/app/(board)/departures/page.tsx &mdash; mit searchParams</span>
         <span class="code-lang">TypeScript</span>
       </div>
-      <pre><code class="language-typescript">import FilterBar from '@/components/FilterBar';
+      <pre><code class="language-typescript">import { listFlights } from '@/lib/flights-db';
+import FilterBar from '@/components/FilterBar';
 import FlightTable from '@/components/FlightTable';
-import type { Flight } from '@/types/flight';
 
 interface PageProps {
   searchParams: Promise&lt;{ status?: string }&gt;;
@@ -579,11 +673,11 @@ export default async function DeparturePage({ searchParams }: PageProps) {
   );
 
   return (
-    &lt;section&gt;
-      &lt;h1&gt;Abfl&uuml;ge&lt;/h1&gt;
+    &lt;div&gt;
+      &lt;h1 className="board-page-title"&gt;Abfl&uuml;ge&lt;/h1&gt;
       &lt;FilterBar /&gt;
       &lt;FlightTable flights={flights} /&gt;
-    &lt;/section&gt;
+    &lt;/div&gt;
   );
 }</code></pre>
     </div>
@@ -598,48 +692,123 @@ export default async function DeparturePage({ searchParams }: PageProps) {
         <h3>Server und Client Components strukturieren</h3>
       </div>
       <p>
-        In diesem Projektschritt refaktorieren wir die Abflug- und Ankunftsseiten zu
-        sauberen Server Components und extrahieren alle interaktiven Teile in Client Components.
+        Nach Lektion 3.2 sind Abflug- und Ankunftsseite schon Server Components, enthalten aber Tabelle und
+        Status-Badge doppelt. Jetzt lagern wir sie in Komponenten aus und erg&auml;nzen eine Suche als Client
+        Component.
       </p>
       <ol>
         <li>
-          <strong>DeparturePage umschreiben:</strong> Wandle <code>departures/page.tsx</code> in
-          eine <code>async</code> Server Component um. Entferne <code>useState</code> und
-          <code>useEffect</code> &mdash; ersetze sie durch einen direkten <code>await fetch</code>-Aufruf.
+          <strong>FlightStatusBadge auslagern:</strong> Die Inline-Funktion <code>StatusBadge</code> aus beiden
+          Seiten wird zu <code>src/components/FlightStatusBadge.tsx</code> (Server Component, kein State).
         </li>
         <li>
-          <strong>ArrivalPage umschreiben:</strong> Dasselbe f&uuml;r <code>arrivals/page.tsx</code>.
+          <strong>FlightTable auslagern:</strong> Die Tabelle wird zu <code>src/components/FlightTable.tsx</code>
+          und bekommt die Fl&uuml;ge als Prop. Bei leerer Liste zeigt sie einen Hinweis.
         </li>
         <li>
-          <strong>Client Components identifizieren:</strong> Gehe durch alle Komponenten im
-          <code>src/components/</code>-Ordner und f&uuml;ge <code>'use client'</code> dort ein,
-          wo es notwendig ist. Kommentiere kurz, warum.
+          <strong>SearchWrapper erstellen:</strong> Client Component mit Suchfeld, die die Fl&uuml;ge als Props bekommt,
+          filtert und <code>FlightTable</code> rendert (Abschnitt 3).
         </li>
         <li>
-          <strong>SearchWrapper erstellen:</strong> Implementiere <code>SearchWrapper.tsx</code>
-          als Client Component, die die Filterfunktion &uuml;bernimmt.
+          <strong>Seiten umbauen:</strong> <code>departures/page.tsx</code> und <code>arrivals/page.tsx</code> laden die
+          Fl&uuml;ge mit <code>listFlights('departure')</code> bzw. <code>listFlights('arrival')</code>, sortieren sie und
+          geben sie an <code>SearchWrapper</code>. Dazu <code>export const revalidate = 30;</code> &mdash; auch auf der
+          Startseite (Abschnitt 4).
         </li>
         <li>
-          <strong>FilterBar einbauen:</strong> Implementiere <code>FilterBar.tsx</code> mit
-          <code>useSearchParams</code> und binde sie in die Seiten ein.
-        </li>
-        <li>
-          <strong>Vergleich:</strong> Z&auml;hle die Zeilen von <code>page.tsx</code> vor und
-          nach dem Refactoring. Diskutiere die Unterschiede.
+          <strong>Pr&uuml;fen:</strong> Nur <code>SearchWrapper</code> braucht <code>'use client'</code>. Mit
+          <code>npm run build</code> kontrollieren, dass die Board-Seiten mit &bdquo;Revalidate 30s&ldquo; erscheinen.
         </li>
       </ol>
-
-      <h3>Vor/Nachher &mdash; Zeilen im Vergleich</h3>
       <div class="code-block">
         <div class="code-header">
-          <span class="code-filename">App.tsx (React/Vite) vs. page.tsx (Next.js)</span>
+          <span class="code-filename">src/components/FlightStatusBadge.tsx</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import { FlightStatus } from '@/types/flight';
+
+const STATUS_CONFIG: Record&lt;FlightStatus, { label: string; className: string }&gt; = {
+  'on-time': { label: 'Pünktlich', className: 'status-on-time' },
+  'delayed': { label: 'Verspätet', className: 'status-delayed' },
+  'boarding': { label: 'Boarding', className: 'status-boarding' },
+  'departed': { label: 'Gestartet', className: 'status-departed' },
+  'landed': { label: 'Gelandet', className: 'status-landed' },
+  'cancelled': { label: 'Gestrichen', className: 'status-cancelled' },
+};
+
+export default function FlightStatusBadge({ status }: { status: FlightStatus }) {
+  const cfg = STATUS_CONFIG[status];
+  return &lt;span className={`status-pill ${cfg.className}`}&gt;{cfg.label}&lt;/span&gt;;
+}</code></pre>
+      </div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">src/components/FlightTable.tsx</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import Link from 'next/link';
+import { Flight } from '@/types/flight';
+import FlightStatusBadge from './FlightStatusBadge';
+
+export default function FlightTable({ flights }: { flights: Flight[] }) {
+  if (flights.length === 0) {
+    return &lt;p className="empty-table"&gt;Keine Flüge gefunden.&lt;/p&gt;;
+  }
+
+  return (
+    &lt;table className="table-base"&gt;
+      &lt;thead&gt;
+        &lt;tr&gt;
+          {['Flug', 'Airline', 'Ziel / Herkunft', 'Zeit', 'Status', 'Gate'].map((h) =&gt; (
+            &lt;th key={h}&gt;
+              {h}
+            &lt;/th&gt;
+          ))}
+        &lt;/tr&gt;
+      &lt;/thead&gt;
+      &lt;tbody&gt;
+        {flights.map((f) =&gt; (
+          &lt;tr key={f.id}&gt;
+            &lt;td&gt;
+              &lt;Link href={`/flight/${f.id}`} className="table-link"&gt;
+                {f.flightNumber}
+              &lt;/Link&gt;
+            &lt;/td&gt;
+            &lt;td className="text-muted"&gt;{f.airline}&lt;/td&gt;
+            &lt;td className="text-main"&gt;{f.airport}&lt;/td&gt;
+            &lt;td className="text-main"&gt;
+              {f.scheduledTime}
+              {f.expectedTime &amp;&amp; (
+                &lt;span className="time-delayed"&gt;→ {f.expectedTime}&lt;/span&gt;
+              )}
+            &lt;/td&gt;
+            &lt;td&gt;
+              &lt;FlightStatusBadge status={f.status} /&gt;
+            &lt;/td&gt;
+            &lt;td className="text-muted"&gt;{f.gate ?? '—'}&lt;/td&gt;
+          &lt;/tr&gt;
+        ))}
+      &lt;/tbody&gt;
+    &lt;/table&gt;
+  );
+}</code></pre>
+      </div>
+
+      <h3>Vor/Nachher &mdash; Zeilen im Vergleich</h3>
+      <p>
+        Zum Vergleich: die Listen-Seite aus dem Vite-Projekt (Lektion 2.7) mit Laden, Fehleranzeige und Filtern
+        im Client gegen&uuml;ber der neuen Server-Seite.
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">FlightListPage.tsx (React/Vite) vs. page.tsx (Next.js)</span>
           <span class="code-lang">Bash</span>
         </div>
-        <pre><code class="language-bash"># React/Vite App.tsx
-wc -l src/App.tsx          # → ca. 120 Zeilen
+        <pre><code class="language-bash"># React/Vite (Lektion 2.7)
+wc -l src/pages/FlightListPage.tsx            # → ca. 140 Zeilen
 
-# Next.js page.tsx
-wc -l src/app/(board)/departures/page.tsx  # → ca. 20 Zeilen</code></pre>
+# Next.js (Lektion 3.3)
+wc -l src/app/(board)/departures/page.tsx    # → ca. 30 Zeilen</code></pre>
       </div>
     </div>
   </section>
@@ -699,8 +868,9 @@ wc -l src/app/(board)/departures/page.tsx  # → ca. 20 Zeilen</code></pre>
       </p>
       <p class="fehler-fix">
         <strong>Fix:</strong> Setze die Cache-Strategie immer explizit:
-        <code>{'{ next: { revalidate: 30 } }'}</code> f&uuml;r ISR, <code>{'{ cache: "no-store" }'}</code>
-        f&uuml;r echtes SSR oder <code>{'{ cache: "force-cache" }'}</code> f&uuml;r statische Daten.
+        <code>{ next: { revalidate: 30 } }</code> f&uuml;r ISR, <code>{ cache: 'no-store' }</code>
+        f&uuml;r echtes SSR oder <code>{ cache: 'force-cache' }</code> f&uuml;r statische Daten. Ohne
+        <code>fetch</code> gilt dasselbe f&uuml;r <code>export const revalidate</code> bzw. <code>dynamic</code>.
       </p>
     </div>
   </section>
@@ -720,7 +890,7 @@ wc -l src/app/(board)/departures/page.tsx  # → ca. 20 Zeilen</code></pre>
         </p>
         <ul>
           <li>Entferne <code>useState</code>, <code>useEffect</code> und alle Lade-States</li>
-          <li>Implementiere direktes <code>await fetch</code> mit <code>{'{ next: { revalidate: 30 } }'}</code></li>
+          <li>Lies die Flüge direkt mit <code>listFlights()</code> und setze <code>export const revalidate = 30;</code></li>
           <li>Wirf bei Fehlern eine <code>Error</code>-Instanz mit sprechendem Text</li>
           <li>Vergleiche die Zeilen vor und nach dem Refactoring</li>
         </ul>
@@ -752,9 +922,9 @@ wc -l src/app/(board)/departures/page.tsx  # → ca. 20 Zeilen</code></pre>
         </p>
         <ul>
           <li>Erstelle <code>src/components/SearchWrapper.tsx</code> als Client Component</li>
-          <li>Empfange <code>allFlights</code> als Props (vom Server Component)</li>
+          <li>Empfange <code>flights</code> als Props (vom Server Component)</li>
           <li>Filtere nach Flugnummer, Ziel und Airline</li>
-          <li>Verwende das Render-Props-Pattern (<code>children(filtered)</code>) f&uuml;r Flexibilit&auml;t</li>
+          <li>Rendere <code>FlightTable</code> mit den gefilterten Fl&uuml;gen und zeige die Anzahl der Treffer an</li>
         </ul>
       </div>
 

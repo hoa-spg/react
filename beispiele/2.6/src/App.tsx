@@ -45,7 +45,7 @@ const ErrorScreen = ({ error, onRetry }: ErrorScreenProps) => {
 // ── Main App ──────────────────────────────────────────────────────────────────
 
 /**
- * Root component for L09 — very slim thanks to custom hooks.
+ * Root component for lesson 2.6 — very slim thanks to custom hooks.
  * All fetch logic lives in useFlights; all filter logic in useFlightFilters.
  */
 const App = () => {
@@ -85,8 +85,21 @@ const App = () => {
     filteredArrivals,
   } = useFlightFilters(flights);
 
-  const [selectedFlight, setSelectedFlight] = useState<Flight | null>(null);
+  // Nur die ID merken und den Flug aus der aktuellen Liste ableiten:
+  // So zeigt das Detail-Panel immer den aktuellen Status und schließt sich,
+  // sobald der Flug gelöscht wurde.
+  const [selectedFlightId, setSelectedFlightId] = useState<number | null>(null);
+  const selectedFlight = flights.find((f) => f.id === selectedFlightId) ?? null;
   const [showAddForm, setShowAddForm]       = useState(false);
+
+  const handleAddFlight = async (flight: Flight) => {
+    try {
+      await addFlight(flight);
+      setShowAddForm(false);
+    } catch (err) {
+      console.error('Fehler beim Hinzufügen:', err);
+    }
+  };
 
   const showDepartures = typeFilter === 'all' || typeFilter === 'departure';
   const showArrivals   = typeFilter === 'all' || typeFilter === 'arrival';
@@ -112,7 +125,7 @@ const App = () => {
 
       {showAddForm && (
         <AddFlightForm
-          onAdd={async (f) => { await addFlight(f); setShowAddForm(false); }}
+          onAdd={handleAddFlight}
           onCancel={() => setShowAddForm(false)}
         />
       )}
@@ -137,7 +150,7 @@ const App = () => {
 
       {isLoading ? (
         <div className="board-loading board-loading--muted">
-          <div className="status-icon">✈</div>
+          <div className="loading-spinner" aria-hidden="true"></div>
           <p>Flugdaten werden geladen...</p>
         </div>
       ) : (
@@ -148,9 +161,10 @@ const App = () => {
               title="Abflüge"
               count={filteredDepartures.length}
               selectedFlightId={selectedFlight?.id}
-              onFlightSelect={setSelectedFlight}
+              onFlightSelect={(flight) => setSelectedFlightId(flight.id)}
               onFlightDelete={deleteFlight}
               onStatusChange={updateStatus}
+              onResetFilters={hasActiveFilters ? resetFilters : undefined}
             />
           )}
           {showArrivals && (
@@ -159,16 +173,17 @@ const App = () => {
               title="Ankünfte"
               count={filteredArrivals.length}
               selectedFlightId={selectedFlight?.id}
-              onFlightSelect={setSelectedFlight}
+              onFlightSelect={(flight) => setSelectedFlightId(flight.id)}
               onFlightDelete={deleteFlight}
               onStatusChange={updateStatus}
+              onResetFilters={hasActiveFilters ? resetFilters : undefined}
             />
           )}
         </>
       )}
 
       {selectedFlight && (
-        <FlightDetail flight={selectedFlight} onClose={() => setSelectedFlight(null)} />
+        <FlightDetail flight={selectedFlight} onClose={() => setSelectedFlightId(null)} />
       )}
     </div>
   );

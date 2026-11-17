@@ -7,18 +7,18 @@
 
 .filter-select {
   padding: 7px 10px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--app-border);
   border-radius: 6px;
-  background: var(--bg-sidebar);
-  color: var(--text);
+  background: var(--app-sidebar-bg);
+  color: var(--app-text);
   font-size: 0.875rem;
 }
 
 .filter-reset {
   padding: 6px 14px;
-  border: 1px solid var(--danger);
+  border: 1px solid var(--app-danger);
   border-radius: 6px;
   background: transparent;
-  color: var(--danger);
+  color: var(--app-danger);
   font-size: 0.875rem;
 }

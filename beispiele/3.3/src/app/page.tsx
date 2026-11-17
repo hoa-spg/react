@@ -1,5 +1,13 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { listFlights } from '@/lib/flights-db';
+
+export const metadata: Metadata = {
+  title: 'Startseite',
+};
+
+// Die nächsten Abflüge höchstens alle 30 Sekunden neu laden
+export const revalidate = 30;
 
 export default function HomePage() {
   const departures = listFlights('departure').slice(0, 3);

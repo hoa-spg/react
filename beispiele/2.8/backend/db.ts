@@ -123,6 +123,19 @@ export const createFlight = async (input: Omit<Flight, 'id' | 'status'>): Promis
   return newFlight;
 };
 
+export const updateFlightStatus = async (
+  id: number,
+  status: FlightStatus,
+): Promise<Flight | null> => {
+  const flight = await getFlightById(id);
+  if (!flight) {
+    return null;
+  }
+
+  await db.update(flightsTable).set({ status }).where(eq(flightsTable.id, id));
+  return { ...flight, status };
+};
+
 export const deleteFlight = async (id: number): Promise<Flight | null> => {
   const flight = await getFlightById(id);
   if (!flight) {

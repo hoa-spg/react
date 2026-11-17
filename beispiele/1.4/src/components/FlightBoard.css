@@ -1,15 +1,15 @@
-.flight-board-section {
+.board-section {
   margin-bottom: 2.5rem;
 }
 
-.flight-board-title {
+.board-title {
   color: #e6edf3;
   font-size: 1.2rem;
   font-weight: 600;
   margin-bottom: 0.75rem;
 }
 
-.flight-board-table {
+.flight-table {
   background: #1c2128;
   border-collapse: collapse;
   border-radius: 8px;
@@ -17,7 +17,7 @@
   width: 100%;
 }
 
-.flight-board-heading {
+.flight-table th {
   background: #161b22;
   border-bottom: 1px solid #30363d;
   color: #8b949e;

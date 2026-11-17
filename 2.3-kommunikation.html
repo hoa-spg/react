@@ -34,11 +34,8 @@
         <a class="nav-link" href="1.2-einfuehrung.html"><span class="ln">1.2</span>Einführung &amp; Umgebung</a>
         <a class="nav-link" href="1.3-komponenten-props-einfach.html"><span class="ln">1.3</span>Komponenten &amp; Props
           (einfach)</a>
-        <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten &amp;
-          Props (Vertiefung)</a>
+        <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten, Props &amp; Listen</a>
         <a class="nav-link" href="1.5-state-events.html"><span class="ln">1.5</span>State &amp; Events</a>
-        <a class="nav-link" href="1.6-listen-conditional.html"><span class="ln">1.6</span>Listen &amp; Conditional
-          Rendering</a>
       </div>
       <div class="nav-group">
         <div class="nav-group-label react-label">Teil 2 &mdash; React Praxis</div>
@@ -112,7 +109,7 @@
         </p>
 
         <p>
-          Im FlugBoard-Projekt ist ein typisches Beispiel die Flugauswahl: Klickt der Nutzer auf eine Zeile in
+          <strong>Wiederholung aus Lektion 1.5:</strong> Im FlugBoard-Projekt ist ein typisches Beispiel die Flugauswahl: Klickt der Nutzer auf eine Zeile in
           <code>FlightBoard</code>, soll <code>FlightDetail</code> den ausgew&auml;hlten Flug anzeigen.
           Beide Komponenten sind Geschwister unter <code>App</code> &ndash; also muss <code>selectedFlight</code>
           als State in <code>App</code> leben.
@@ -146,13 +143,15 @@
 
         <div class="code-block">
           <div class="code-header">
-            <span class="code-filename">src/App.tsx</span>
+            <span class="code-filename">Wiederholung: App.tsx (vereinfacht)</span>
             <span class="code-lang">TypeScript</span>
           </div>
           <pre><code class="language-typescript">import { useState } from 'react';
 import { Flight } from './types/flight';
+import { sampleFlights } from './data/flights';
 import FlightBoard from './components/FlightBoard';
 import FlightDetail from './components/FlightDetail';
+import './App.css';
 
 function App() {
   // selectedFlight lebt in App, weil sowohl FlightBoard
@@ -164,7 +163,7 @@ function App() {
   const arrivals   = flights.filter(f =&gt; f.type === 'arrival');
 
   return (
-    &lt;div className="app"&gt;
+    &lt;div className="app-page"&gt;
       &lt;FlightBoard
         title="Abfl&uuml;ge"
         flights={departures}
@@ -197,11 +196,12 @@ function App() {
 
         <div class="code-block">
           <div class="code-header">
-            <span class="code-filename">src/components/FlightBoard.tsx</span>
+            <span class="code-filename">Wiederholung: FlightBoard.tsx (vereinfacht)</span>
             <span class="code-lang">TypeScript</span>
           </div>
           <pre><code class="language-typescript">import { Flight } from '../types/flight';
 import FlightCard from './FlightCard';
+import './FlightBoard.css';
 
 interface FlightBoardProps {
   flights: Flight[];
@@ -216,16 +216,20 @@ const FlightBoard = ({
   onFlightSelect,
   selectedFlightId,
 }: FlightBoardProps) =&gt; (
-  &lt;section className="flight-board"&gt;
-    &lt;h2&gt;{title}&lt;/h2&gt;
-    &lt;table&gt;
+  &lt;section className="board-section"&gt;
+    &lt;div className="board-title-row"&gt;
+      &lt;h2 className="board-title"&gt;{title}&lt;/h2&gt;
+    &lt;/div&gt;
+    &lt;table className="flight-table"&gt;
       &lt;thead&gt;
         &lt;tr&gt;
           &lt;th&gt;Flug&lt;/th&gt;
           &lt;th&gt;Airline&lt;/th&gt;
-          &lt;th&gt;Ziel/Herkunft&lt;/th&gt;
-          &lt;th&gt;Planzeit&lt;/th&gt;
+          &lt;th&gt;Ziel&lt;/th&gt;
+          &lt;th&gt;Geplant&lt;/th&gt;
           &lt;th&gt;Status&lt;/th&gt;
+          &lt;th&gt;Terminal&lt;/th&gt;
+          &lt;th&gt;Gate&lt;/th&gt;
         &lt;/tr&gt;
       &lt;/thead&gt;
       &lt;tbody&gt;
@@ -245,11 +249,12 @@ const FlightBoard = ({
 
         <div class="code-block">
           <div class="code-header">
-            <span class="code-filename">src/components/FlightCard.tsx</span>
+            <span class="code-filename">Wiederholung: FlightCard.tsx (vereinfacht)</span>
             <span class="code-lang">TypeScript</span>
           </div>
           <pre><code class="language-typescript">import { Flight } from '../types/flight';
 import FlightStatusBadge from './FlightStatusBadge';
+import './FlightCard.css';
 
 interface FlightCardProps {
   flight: Flight;
@@ -257,22 +262,27 @@ interface FlightCardProps {
   onSelect: (flight: Flight) =&gt; void;
 }
 
-const FlightCard = ({ flight, isSelected, onSelect }: FlightCardProps) =&gt; (
-  &lt;tr
-    onClick={() =&gt; onSelect(flight)}
-    style={{
-      cursor: 'pointer',
-      background: isSelected ? '#1f3a4a' : 'transparent',
-      outline: isSelected ? '2px solid #58a6ff' : 'none',
-    }}
-  &gt;
-    &lt;td&gt;&lt;strong&gt;{flight.flightNumber}&lt;/strong&gt;&lt;/td&gt;
-    &lt;td&gt;{flight.airline}&lt;/td&gt;
-    &lt;td&gt;{flight.airport}&lt;/td&gt;
-    &lt;td&gt;{flight.scheduledTime}&lt;/td&gt;
-    &lt;td&gt;&lt;FlightStatusBadge status={flight.status} /&gt;&lt;/td&gt;
-  &lt;/tr&gt;
-);</code></pre>
+const FlightCard = ({ flight, isSelected, onSelect }: FlightCardProps) =&gt; {
+  // Hervorhebung über CSS-Klasse – FlightCard kennt den State nicht,
+  // sie rendert nur, was sie über isSelected übergeben bekommt.
+  const rowClasses = isSelected ? 'flight-row is-selected' : 'flight-row';
+
+  return (
+    &lt;tr className={rowClasses} onClick={() =&gt; onSelect(flight)}&gt;
+      &lt;td className="flight-cell"&gt;
+        &lt;span className="flight-num"&gt;{flight.flightNumber}&lt;/span&gt;
+      &lt;/td&gt;
+      &lt;td className="flight-cell"&gt;{flight.airline}&lt;/td&gt;
+      &lt;td className="flight-cell"&gt;{flight.airport}&lt;/td&gt;
+      &lt;td className="flight-cell"&gt;{flight.scheduledTime}&lt;/td&gt;
+      &lt;td className="flight-cell"&gt;
+        &lt;FlightStatusBadge status={flight.status} /&gt;
+      &lt;/td&gt;
+      &lt;td className="flight-cell"&gt;{flight.terminal}&lt;/td&gt;
+      &lt;td className="flight-cell"&gt;{flight.gate ?? '—'}&lt;/td&gt;
+    &lt;/tr&gt;
+  );
+};</code></pre>
         </div>
 
         <div class="callout callout-tip">
@@ -418,7 +428,8 @@ const FlightCard = ({
           &lt;option value="on-time"&gt;P&uuml;nktlich&lt;/option&gt;
           &lt;option value="delayed"&gt;Versp&auml;tet&lt;/option&gt;
           &lt;option value="boarding"&gt;Boarding&lt;/option&gt;
-          &lt;option value="departed"&gt;Abgeflogen&lt;/option&gt;
+          &lt;option value="departed"&gt;Gestartet&lt;/option&gt;
+          &lt;option value="landed"&gt;Gelandet&lt;/option&gt;
           &lt;option value="cancelled"&gt;Gestrichen&lt;/option&gt;
         &lt;/select&gt;
       &lt;/td&gt;
@@ -521,144 +532,141 @@ const FlightCard = ({
         <div class="projekt-box">
           <div class="projekt-box-header">
             <span class="projekt-step">Projektschritt 2.3</span>
-            <h3>Filter-State strukturieren &amp; Callbacks verkn&uuml;pfen</h3>
+            <h3>Flugstatus &auml;ndern &ndash; Callbacks &uuml;ber zwei Ebenen</h3>
           </div>
 
           <p>
-            In dieser Lektion bringen wir Ordnung in die Kommunikationsstruktur von <code>App.tsx</code>.
-            Der Filter-State wird sauber typisiert, die Kontroll-Komponenten werden &uuml;ber echte Callback Props
-            gesteuert, und <code>FlightCard</code> erh&auml;lt die F&auml;higkeit, den Status direkt zu &auml;ndern.
+            Jede Zeile der Flugtafel bekommt ein Dropdown, mit dem man den Status direkt &auml;ndern kann.
+            Das ist ein typischer Fall f&uuml;r <em>Kind &rarr; Eltern</em>-Kommunikation &uuml;ber zwei Ebenen:
+            <code>FlightCard</code> meldet die &Auml;nderung per Callback an <code>FlightBoard</code>, das sie nur
+            weiterreicht, und <code>App</code> speichert sie &uuml;ber das Backend und aktualisiert den State.
+            Alles andere aus Lektion 2.2 (Laden, Polling, Suche, Filter, Formular, Detail-Panel) bleibt
+            unver&auml;ndert.
           </p>
 
-          <h4>Schritt 1: FilterState-Interface definieren</h4>
+          <div class="callout callout-warning">
+            <div class="callout-icon">&#9888;</div>
+            <div class="callout-body">
+              <div class="callout-title">Warum &uuml;ber das Backend speichern?</div>
+              <p>
+                W&uuml;rden wir den Status nur im lokalen State &auml;ndern, w&auml;re die &Auml;nderung beim n&auml;chsten
+                Polling (sp&auml;testens nach 30 Sekunden) wieder weg &ndash; wie beim Anlegen und L&ouml;schen in
+                Lektion 2.2. Deshalb bekommt das Backend einen <code>PATCH</code>-Endpunkt.
+              </p>
+            </div>
+          </div>
+
+          <h4>Schritt 1: PATCH-Endpunkt im Backend</h4>
           <div class="code-block">
             <div class="code-header">
-              <span class="code-filename">src/types/filters.ts</span>
+              <span class="code-filename">backend/main.ts (Erg&auml;nzung vor app.delete)</span>
               <span class="code-lang">TypeScript</span>
             </div>
-            <pre><code class="language-typescript">import { FlightStatus } from './flight';
+            <pre><code class="language-typescript">// PATCH /api/flights/:id – einzelne Felder eines Flugs ändern (hier: status)
+app.patch('/api/flights/:id', async (c) =&gt; {
+  const id = Number(c.req.param('id'));
+  const flight = flights.find((f) =&gt; f.id === id);
+  if (!flight) return c.json({ error: 'Nicht gefunden' }, 404);
+  const body = await c.req.json();
+  if (body.status) flight.status = body.status;
+  return c.json(flight);
+});</code></pre>
+          </div>
 
-export interface FilterState {
-  searchQuery: string;
-  typeFilter: 'all' | 'departure' | 'arrival';
-  statusFilter: FlightStatus | 'all';
+          <h4>Schritt 2: Status-Dropdown in FlightCard</h4>
+          <p>
+            <code>e.stopPropagation()</code> auf der Zelle verhindert, dass ein Klick ins Dropdown gleichzeitig die
+            Zeile ausw&auml;hlt und das Detail-Panel &ouml;ffnet.
+          </p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-filename">src/components/FlightCard.tsx (Ausschnitt)</span>
+              <span class="code-lang">TypeScript</span>
+            </div>
+            <pre><code class="language-typescript">interface FlightCardProps {
+  flight: Flight;
+  isSelected: boolean;
+  onSelect: (flight: Flight) =&gt; void;
+  onDelete?: (id: number) =&gt; void;
+  onStatusChange: (id: number, status: FlightStatus) =&gt; void;   // neu
 }
 
-export const DEFAULT_FILTERS: FilterState = {
-  searchQuery: '',
-  typeFilter: 'all',
-  statusFilter: 'all',
-};</code></pre>
+// ... in der Zeile, nach der Gate-Spalte:
+      &lt;td className="flight-cell" onClick={(e) =&gt; e.stopPropagation()}&gt;
+        &lt;select
+          className="mini-select"
+          value={flight.status}
+          onChange={(e) =&gt; onStatusChange(flight.id, e.target.value as FlightStatus)}
+        &gt;
+          &lt;option value="on-time"&gt;Pünktlich&lt;/option&gt;
+          &lt;option value="delayed"&gt;Verspätet&lt;/option&gt;
+          &lt;option value="boarding"&gt;Boarding&lt;/option&gt;
+          &lt;option value="departed"&gt;Gestartet&lt;/option&gt;
+          &lt;option value="landed"&gt;Gelandet&lt;/option&gt;
+          &lt;option value="cancelled"&gt;Gestrichen&lt;/option&gt;
+        &lt;/select&gt;
+      &lt;/td&gt;</code></pre>
           </div>
 
-          <h4>Schritt 2: Filter-Hilfsfunktion extrahieren</h4>
+          <h4>Schritt 3: FlightBoard reicht den Callback durch</h4>
           <div class="code-block">
             <div class="code-header">
-              <span class="code-filename">src/utils/filterFlights.ts</span>
+              <span class="code-filename">src/components/FlightBoard.tsx (Ausschnitt)</span>
               <span class="code-lang">TypeScript</span>
             </div>
-            <pre><code class="language-typescript">import { Flight } from '../types/flight';
-import { FilterState } from '../types/filters';
+            <pre><code class="language-typescript">interface FlightBoardProps {
+  // ... flights, title, selectedFlightId, onFlightSelect, onFlightDelete,
+  //     onResetFilters, count wie bisher
+  onStatusChange: (id: number, status: FlightStatus) =&gt; void;   // neu
+}
 
-export const filterFlights = (
-  flights: Flight[],
-  filters: FilterState
-): Flight[] =&gt; {
-  return flights.filter(flight =&gt; {
-    const matchesSearch =
-      flight.flightNumber.toLowerCase().includes(filters.searchQuery.toLowerCase()) ||
-      flight.airline.toLowerCase().includes(filters.searchQuery.toLowerCase()) ||
-      flight.airport.toLowerCase().includes(filters.searchQuery.toLowerCase());
+// ... im Tabellenkopf eine Spalte ergänzen:
+              &lt;th&gt;Ändern&lt;/th&gt;
 
-    const matchesType =
-      filters.typeFilter === 'all' || flight.type === filters.typeFilter;
-
-    const matchesStatus =
-      filters.statusFilter === 'all' || flight.status === filters.statusFilter;
-
-    return matchesSearch &amp;&amp; matchesType &amp;&amp; matchesStatus;
-  });
-};</code></pre>
+// ... und den Callback nur an jede FlightCard weiterreichen:
+              &lt;FlightCard
+                key={flight.id}
+                flight={flight}
+                isSelected={flight.id === selectedFlightId}
+                onSelect={onFlightSelect}
+                onDelete={onFlightDelete}
+                onStatusChange={onStatusChange}
+              /&gt;</code></pre>
           </div>
 
-          <h4>Schritt 3: App.tsx mit sauberer Callback-Struktur</h4>
+          <h4>Schritt 4: App speichert die &Auml;nderung</h4>
           <div class="code-block">
             <div class="code-header">
-              <span class="code-filename">src/App.tsx (aktualisiert)</span>
+              <span class="code-filename">src/App.tsx (Ausschnitt)</span>
               <span class="code-lang">TypeScript</span>
             </div>
-            <pre><code class="language-typescript">import { useState } from 'react';
-import { Flight, FlightStatus } from './types/flight';
-import { FilterState, DEFAULT_FILTERS } from './types/filters';
-import { filterFlights } from './utils/filterFlights';
-import FlightBoard from './components/FlightBoard';
-import FlightDetail from './components/FlightDetail';
-import FilterBar from './components/FilterBar';
-import SearchBar from './components/SearchBar';
-
-function App() {
-  const [flights, setFlights]             = useState&lt;Flight[]&gt;(sampleFlights);
-  const [filters, setFilters]             = useState&lt;FilterState&gt;(DEFAULT_FILTERS);
-  const [selectedFlight, setSelectedFlight] = useState&lt;Flight | null&gt;(null);
-
-  // Filter-Callbacks: jeder &auml;ndert nur einen Teil des FilterState
-  const handleSearchChange = (query: string) =&gt;
-    setFilters(f =&gt; ({ ...f, searchQuery: query }));
-
-  const handleStatusFilterChange = (status: FlightStatus | 'all') =&gt;
-    setFilters(f =&gt; ({ ...f, statusFilter: status }));
-
-  // Status eines Flugs immutabel aktualisieren
-  const handleStatusChange = (id: number, newStatus: FlightStatus) =&gt; {
-    setFlights(prev =&gt;
-      prev.map(f =&gt; (f.id === id ? { ...f, status: newStatus } : f))
-    );
+            <pre><code class="language-typescript">  // Neu: Status über PATCH speichern, dann State immutabel aktualisieren
+  const handleStatusChange = async (id: number, newStatus: FlightStatus) =&gt; {
+    try {
+      const res = await fetch(`${API_URL}/api/flights/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (!res.ok) throw new Error('Fehler beim Ändern des Status');
+      setFlights((prev) =&gt;
+        prev.map((f) =&gt; (f.id === id ? { ...f, status: newStatus } : f)),
+      );
+      // Auch das Detail-Panel soll den neuen Status zeigen
+      setSelectedFlight((prev) =&gt;
+        prev?.id === id ? { ...prev, status: newStatus } : prev,
+      );
+    } catch (err) {
+      console.error('Fehler beim Ändern des Status:', err);
+    }
   };
 
-  // Flug aus dem Array entfernen
-  const handleDelete = (id: number) =&gt; {
-    setFlights(prev =&gt; prev.filter(f =&gt; f.id !== id));
-    if (selectedFlight?.id === id) setSelectedFlight(null);
-  };
-
-  const allFiltered = filterFlights(flights, filters);
-  const departures  = allFiltered.filter(f =&gt; f.type === 'departure');
-  const arrivals    = allFiltered.filter(f =&gt; f.type === 'arrival');
-
-  return (
-    &lt;div className="app"&gt;
-      &lt;SearchBar value={filters.searchQuery} onChange={handleSearchChange} /&gt;
-      &lt;FilterBar
-        currentStatus={filters.statusFilter}
-        onStatusChange={handleStatusFilterChange}
-      /&gt;
-      &lt;FlightBoard
-        title="Abfl&uuml;ge"
-        flights={departures}
-        totalCount={flights.filter(f =&gt; f.type === 'departure').length}
-        onFlightSelect={setSelectedFlight}
-        onStatusChange={handleStatusChange}
-        onDelete={handleDelete}
-        selectedFlightId={selectedFlight?.id}
-      /&gt;
-      &lt;FlightBoard
-        title="Ank&uuml;nfte"
-        flights={arrivals}
-        totalCount={flights.filter(f =&gt; f.type === 'arrival').length}
-        onFlightSelect={setSelectedFlight}
-        onStatusChange={handleStatusChange}
-        onDelete={handleDelete}
-        selectedFlightId={selectedFlight?.id}
-      /&gt;
-      {selectedFlight &amp;&amp; (
-        &lt;FlightDetail
-          flight={selectedFlight}
-          onClose={() =&gt; setSelectedFlight(null)}
-        /&gt;
-      )}
-    &lt;/div&gt;
-  );
-}</code></pre>
+  // ... im JSX bekommen beide FlightBoards den neuen Callback:
+            &lt;FlightBoard
+              // ... flights, title, count, selectedFlightId, onFlightSelect,
+              //     onFlightDelete, onResetFilters wie in 2.2
+              onStatusChange={handleStatusChange}
+            /&gt;</code></pre>
           </div>
 
           <div class="callout callout-tip">
@@ -759,43 +767,23 @@ function App() {
         <div class="aufgabe">
           <div class="aufgabe-header">
             <span class="aufgabe-num">Aufgabe 2</span>
-            <span class="aufgabe-title">Flug l&ouml;schen</span>
+            <span class="aufgabe-title">Status &uuml;ber das Backend speichern</span>
           </div>
           <p>
-            Erm&ouml;gliche das L&ouml;schen von Fl&uuml;gen direkt aus der Tabelle.
+            Sorge daf&uuml;r, dass Status&auml;nderungen auch nach dem n&auml;chsten Polling erhalten bleiben.
           </p>
           <ul>
-            <li>Erweitere <code>FlightCardProps</code> und <code>FlightBoardProps</code> um
-              <code>onDelete: (id: number) =&gt; void</code></li>
-            <li>F&uuml;ge einen L&ouml;schen-Button in jede Tabellenzeile ein</li>
-            <li>Zeige vor dem L&ouml;schen einen Bestätigungsdialog mit <code>window.confirm()</code></li>
-            <li>In <code>App.tsx</code>: entferne den Flug mit <code>prev.filter(f =&gt; f.id !== id)</code></li>
-            <li>Falls der gel&ouml;schte Flug gerade ausgew&auml;hlt ist, setze <code>selectedFlight</code> auf
-              <code>null</code></li>
+            <li>Erg&auml;nze im Backend den Endpunkt <code>PATCH /api/flights/:id</code>, der den Status eines Flugs &auml;ndert</li>
+            <li>Teste ihn mit <code>curl -X PATCH http://localhost:8000/api/flights/1 -H "Content-Type: application/json" -d '{"status":"cancelled"}'</code></li>
+            <li>Mache <code>handleStatusChange</code> in <code>App.tsx</code> <code>async</code> und rufe den Endpunkt auf;
+              den State nur bei <code>res.ok</code> aktualisieren</li>
+            <li>Pr&uuml;fe: Nach &bdquo;Aktualisieren&ldquo; (bzw. 30 Sekunden) bleibt der ge&auml;nderte Status stehen</li>
           </ul>
         </div>
 
         <div class="aufgabe">
           <div class="aufgabe-header">
             <span class="aufgabe-num">Aufgabe 3</span>
-            <span class="aufgabe-title">Gefilterte Anzahl anzeigen</span>
-          </div>
-          <p>
-            Der <code>FlightBoard</code>-Header soll zeigen, wie viele Fl&uuml;ge gefiltert angezeigt werden.
-          </p>
-          <ul>
-            <li>Erweitere <code>FlightBoardProps</code> um <code>totalCount: number</code></li>
-            <li>Zeige im Board-Header: &bdquo;Abfl&uuml;ge (3 von 5)&ldquo; &ndash; gefilterte Anzahl vs. Gesamtanzahl
-            </li>
-            <li>Wenn kein Filter aktiv ist (beide Zahlen gleich), nur &bdquo;Abfl&uuml;ge (5)&ldquo; anzeigen</li>
-            <li>&Uuml;bergebe in <code>App.tsx</code> sowohl <code>flights={departures}</code> als auch
-              <code>totalCount={allDepartures.length}</code></li>
-          </ul>
-        </div>
-
-        <div class="aufgabe aufgabe-bonus">
-          <div class="aufgabe-header">
-            <span class="aufgabe-num">Bonus</span>
             <span class="aufgabe-title">FlightActions-Komponente</span>
           </div>
           <p>
@@ -803,21 +791,30 @@ function App() {
             b&uuml;ndelt.
           </p>
           <ul>
-            <li>
-              <code>FlightActions</code> erh&auml;lt als Props: <code>flight</code>, <code>onStatusChange</code>,
-              <code>onDelete</code>
-            </li>
-            <li>
-              Die Komponente rendert das Status-Dropdown und den L&ouml;schen-Button
-            </li>
-            <li>
-              <code>FlightCard</code> gibt die Callbacks an <code>FlightActions</code> weiter &ndash;
-              demonstriere so das Weitergeben von Callbacks &uuml;ber zwei Ebenen
-            </li>
-            <li>
-              Erkl&auml;re im Code-Kommentar, warum dies noch kein Prop Drilling ist (es ist nur eine Ebene Weitergabe
-              f&uuml;r eine echte Aufgabe)
-            </li>
+            <li><code>FlightActions</code> erh&auml;lt als Props: <code>flight</code>, <code>onStatusChange</code>,
+              <code>onDelete</code></li>
+            <li>Die Komponente rendert das Status-Dropdown und den L&ouml;schen-Button</li>
+            <li><code>FlightCard</code> gibt die Callbacks an <code>FlightActions</code> weiter &ndash; der Weg ist
+              jetzt <code>App</code> &rarr; <code>FlightBoard</code> &rarr; <code>FlightCard</code> &rarr;
+              <code>FlightActions</code></li>
+            <li>Erkl&auml;re im Code-Kommentar, ab wann das zu Prop Drilling wird und was Lektion 2.4 daran &auml;ndert</li>
+          </ul>
+        </div>
+
+        <div class="aufgabe aufgabe-bonus">
+          <div class="aufgabe-header">
+            <span class="aufgabe-num">Bonus</span>
+            <span class="aufgabe-title">Optimistisches Update mit Rollback</span>
+          </div>
+          <p>
+            Im Projektschritt wartet die App auf die Antwort des Backends, bevor sich der Status in der Tabelle
+            &auml;ndert. Bei einem <em>optimistischen Update</em> ist es umgekehrt.
+          </p>
+          <ul>
+            <li>Setze den neuen Status sofort im State und schicke erst danach den <code>PATCH</code>-Request</li>
+            <li>Merke dir vorher den alten Status</li>
+            <li>Schl&auml;gt der Request fehl, setze den alten Status wieder ein und zeige eine Meldung</li>
+            <li>Teste das, indem du das Backend stoppst und dann einen Status &auml;nderst</li>
           </ul>
         </div>
       </section>

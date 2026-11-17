@@ -1,8 +1,13 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { listFlights } from '@/lib/flights-db';
 import { Flight, FlightStatus } from '@/types/flight';
 
-// Inline StatusBadge – wird in L13 in eine eigene Komponente ausgelagert
+// Inline StatusBadge – wird in Lektion 3.3 in eine eigene Komponente ausgelagert
+export const metadata: Metadata = {
+  title: 'Ankünfte',
+};
+
 function StatusBadge({ status }: { status: FlightStatus }) {
   const config: Record<FlightStatus, { label: string; className: string }> = {
     'on-time': { label: 'Pünktlich', className: 'status-on-time' },

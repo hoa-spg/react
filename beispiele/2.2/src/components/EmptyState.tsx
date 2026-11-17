@@ -21,7 +21,7 @@ const EmptyState = ({
       <p className="empty-text">{message}</p>
       {onReset && (
         <button className="empty-btn" onClick={onReset}>
-          Filter zurucksetzen
+          Filter zurücksetzen
         </button>
       )}
     </div>

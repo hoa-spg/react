@@ -20,7 +20,7 @@ interface FlightStatusBadgeProps {
 }
 
 /**
- * Renders a coloured pill badge for a given flight status.
+ * Renders a coloured pill badge for a given flight status using a Record config.
  * @param status - The flight status value.
  */
 const FlightStatusBadge = ({ status }: FlightStatusBadgeProps) => {

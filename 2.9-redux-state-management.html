@@ -6,6 +6,7 @@
   <title>2.9 &ndash; State Management mit Redux (Überblick) | React Kurs</title>
   <script>(function(){var t=localStorage.getItem('kurs-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
   <link rel="stylesheet" href="assets/kurs.css">
+  <link rel="stylesheet" id="hljs-theme" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
 </head>
 <body>
 
@@ -28,9 +29,8 @@
       <a class="nav-link" href="1.1-einfuehrung-spa.html"><span class="ln">1.1</span>Motivation &amp; SPA</a>
       <a class="nav-link" href="1.2-einfuehrung.html"><span class="ln">1.2</span>Einführung &amp; Umgebung</a>
       <a class="nav-link" href="1.3-komponenten-props-einfach.html"><span class="ln">1.3</span>Komponenten &amp; Props (einfach)</a>
-      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten &amp; Props (Vertiefung)</a>
+      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten, Props &amp; Listen</a>
       <a class="nav-link" href="1.5-state-events.html"><span class="ln">1.5</span>State &amp; Events</a>
-      <a class="nav-link" href="1.6-listen-conditional.html"><span class="ln">1.6</span>Listen &amp; Conditional Rendering</a>
     </div>
     <div class="nav-group">
       <div class="nav-group-label react-label">Teil 2 &mdash; React Praxis</div>
@@ -185,7 +185,7 @@
           <span class="code-filename">src/store/index.ts (Skizze)</span>
           <span class="code-lang">TypeScript</span>
         </div>
-        <pre><code>import { configureStore } from '@reduxjs/toolkit';
+        <pre><code class="language-typescript">import { configureStore } from '@reduxjs/toolkit';
 import flightsReducer from './flights-slice';
 import filterReducer from './filter-slice';
 
@@ -205,15 +205,16 @@ export type AppDispatch = typeof store.dispatch;</code></pre>
       <h2>Code-Skizze: Slice mit Actions + Reducer</h2>
       <p>
         Ein Slice kapselt den State-Bereich, die Action Creator und den Reducer an einer Stelle.
+        Die Typen <code>Flight</code> und <code>FlightStatus</code> kommen wie im FlugBoard aus
+        <code>src/types/flight.ts</code>.
       </p>
       <div class="code-block">
         <div class="code-header">
           <span class="code-filename">src/store/flights-slice.ts (Skizze)</span>
           <span class="code-lang">TypeScript</span>
         </div>
-        <pre><code>import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
-type Flight = { id: number; flightNumber: string; status: string };
+        <pre><code class="language-typescript">import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { Flight, FlightStatus } from '../types/flight';
 
 type FlightsState = {
   items: Flight[];
@@ -238,8 +239,9 @@ const flightsSlice = createSlice({
     },
     flightStatusChanged(
       state,
-      action: PayloadAction&lt;{ id: number; status: string }&gt;
+      action: PayloadAction&lt;{ id: number; status: FlightStatus }&gt;,
     ) {
+      // Immer-Magie: sieht aus wie Mutation, erzeugt aber einen neuen State
       const flight = state.items.find((f) =&gt; f.id === action.payload.id);
       if (flight) flight.status = action.payload.status;
     },
@@ -263,24 +265,24 @@ export default flightsSlice.reducer;</code></pre>
       </p>
       <div class="code-block">
         <div class="code-header">
-          <span class="code-filename">src/features/flight-board.tsx (Skizze)</span>
+          <span class="code-filename">src/features/delayed-flights-panel.tsx (Skizze)</span>
           <span class="code-lang">TSX</span>
         </div>
-        <pre><code>import { useDispatch, useSelector } from 'react-redux';
+        <pre><code class="language-typescript">import { useDispatch, useSelector } from 'react-redux';
 import type { RootState, AppDispatch } from '../store';
 import { flightStatusChanged } from '../store/flights-slice';
 
-export function FlightBoard() {
+export function DelayedFlightsPanel() {
   const dispatch = useDispatch&lt;AppDispatch&gt;();
   const flights = useSelector((state: RootState) =&gt; state.flights.items);
   const delayedCount = useSelector(
     (state: RootState) =&gt;
-      state.flights.items.filter((f) =&gt; f.status === 'delayed').length
+      state.flights.items.filter((f) =&gt; f.status === 'delayed').length,
   );
 
   return (
     &lt;section&gt;
-      &lt;h2&gt;Versp&auml;tete Fl&uuml;ge: {delayedCount}&lt;/h2&gt;
+      &lt;h2&gt;Verspätete Flüge: {delayedCount}&lt;/h2&gt;
       {flights.map((f) =&gt; (
         &lt;button
           key={f.id}
@@ -300,24 +302,163 @@ export function FlightBoard() {
     <section class="section">
       <h2>Wie w&uuml;rde das im FlugBoard aussehen?</h2>
       <p>
-        Der globale State k&ouml;nnte in fachliche Bereiche getrennt werden, zum Beispiel
-        Flugdaten, aktive Filter, UI-Status (Loading/Errors) und Nutzerkontext.
+        Unser FlugBoard verwaltet seinen Zustand nach Lektion 2.8 an mehreren Stellen. So w&uuml;rde Redux Toolkit
+        das &uuml;bernehmen:
       </p>
-      <ul>
-        <li><strong>Flights:</strong> Liste, Sortierung, Status-&Auml;nderungen, letzte Aktualisierung</li>
-        <li><strong>Filter:</strong> Terminal, Status, Suchbegriff, Sortiermodus</li>
-        <li><strong>UI:</strong> Ladezust&auml;nde pro Bereich, Fehlerzust&auml;nde, offene Dialoge</li>
-        <li><strong>Session:</strong> Rollen/Permissions und evtl. Feature-Flags</li>
-      </ul>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Zustand</th><th>Heute (Lektion)</th><th>Mit Redux Toolkit</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Flugliste, Laden, Fehler, Polling</td>
+              <td><code>useFlights</code> im <code>Layout</code>, per <code>&lt;Outlet context&gt;</code> verteilt (2.5, 2.7)</td>
+              <td>RTK Query: <code>getFlights</code> mit <code>pollingInterval</code></td>
+            </tr>
+            <tr>
+              <td>Anlegen, L&ouml;schen, Status &auml;ndern</td>
+              <td>Funktionen aus <code>useFlights</code> (POST/DELETE/PATCH, 2.2&ndash;2.5)</td>
+              <td>RTK-Query-Mutations oder <code>createAsyncThunk</code></td>
+            </tr>
+            <tr>
+              <td>Suche und Status-Filter</td>
+              <td><code>useFlightFilters</code> mit <code>useLocalStorage</code> (2.5)</td>
+              <td><code>filter</code>-Slice; das Speichern im Browser m&uuml;sste man selbst anbinden</td>
+            </tr>
+            <tr>
+              <td>Einzelner Flug auf der Detailseite</td>
+              <td><code>FlightDetailPage</code> l&auml;dt per <code>useParams</code> (2.7)</td>
+              <td>RTK Query <code>getFlight(id)</code>, nutzt denselben Cache</td>
+            </tr>
+            <tr>
+              <td>Dark/Light-Theme</td>
+              <td><code>ThemeContext</code> (2.4)</td>
+              <td>k&ouml;nnte in einen <code>ui</code>-Slice &ndash; bleibt aber besser Context, &auml;ndert sich selten</td>
+            </tr>
+            <tr>
+              <td>Formular offen/zu</td>
+              <td>lokaler <code>useState</code> in <code>FlightListPage</code> (2.1)</td>
+              <td>bleibt lokal &ndash; betrifft nur eine Komponente</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <div class="callout callout-tip">
         <div class="callout-icon">&#128161;</div>
         <div class="callout-body">
-          <div class="callout-title">Redux Toolkit statt &bdquo;klassischem&ldquo; Redux</div>
+          <div class="callout-title">Fazit f&uuml;r unser Projekt</div>
           <p>
-            In aktuellen Projekten wird fast immer Redux Toolkit eingesetzt, weil es
-            Boilerplate reduziert und robuste Standardmuster mitliefert.
+            F&uuml;r das FlugBoard reichen Context und Custom Hooks. Redux Toolkit lohnt sich, wenn viele Bereiche
+            denselben Zustand lesen und &auml;ndern, wenn man &Auml;nderungen nachvollziehen muss (DevTools,
+            Undo) oder wenn mehrere Leute an einer gro&szlig;en App arbeiten. In aktuellen Projekten wird dabei fast
+            immer Redux Toolkit statt &bdquo;klassischem&ldquo; Redux eingesetzt.
           </p>
         </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Und das Backend?</h2>
+      <p>
+        Der Reducer <code>flightStatusChanged</code> aus der Slice-Skizze &auml;ndert nur den Store. Das kennen wir aus
+        Lektion 2.3: Ohne Speichern im Backend w&auml;re die &Auml;nderung beim n&auml;chsten Laden wieder weg. Reducer
+        d&uuml;rfen aber keine Requests schicken &ndash; sie m&uuml;ssen reine Funktionen bleiben. Daf&uuml;r gibt es
+        <strong>asynchrone Actions</strong> mit <code>createAsyncThunk</code>:
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">src/store/flights-slice.ts (Erg&auml;nzung, Skizze)</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">// Asynchrone Action: erst PATCH ans Backend, dann den Store ändern
+export const changeFlightStatus = createAsyncThunk(
+  'flights/changeStatus',
+  async ({ id, status }: { id: number; status: FlightStatus }) =&gt; {
+    const res = await fetch(`http://localhost:8000/api/flights/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+    });
+    if (!res.ok) throw new Error('Fehler beim Ändern des Status');
+    return (await res.json()) as Flight;
+  },
+);
+
+  // im createSlice zusätzlich: auf das Ergebnis der asynchronen Action reagieren
+  extraReducers: (builder) =&gt; {
+    builder.addCase(changeFlightStatus.fulfilled, (state, action) =&gt; {
+      const flight = state.items.find((f) =&gt; f.id === action.payload.id);
+      if (flight) flight.status = action.payload.status;
+    });
+  },</code></pre>
+      </div>
+      <p>
+        Die Komponente ruft dann <code>dispatch(changeFlightStatus({ id, status }))</code> auf. F&uuml;r das Laden mit
+        Polling br&auml;uchte man zus&auml;tzlich Thunks f&uuml;r GET, POST und DELETE.
+      </p>
+      <p>
+        Einfacher geht es mit <strong>RTK Query</strong>, das in Redux Toolkit enthalten ist. Es ist das Gegenst&uuml;ck
+        zu unserem <code>useFlights</code>: Laden, Cache, Polling und das Neuladen nach &Auml;nderungen sind schon
+        eingebaut.
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">src/store/flights-api.ts (Skizze)</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { Flight, FlightStatus } from '../types/flight';
+
+export const flightsApi = createApi({
+  reducerPath: 'flightsApi',
+  baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:8000/api' }),
+  tagTypes: ['Flight'],
+  endpoints: (build) =&gt; ({
+    getFlights: build.query&lt;Flight[], void&gt;({
+      query: () =&gt; '/flights',
+      providesTags: ['Flight'],
+    }),
+    updateFlightStatus: build.mutation&lt;Flight, { id: number; status: FlightStatus }&gt;({
+      query: ({ id, status }) =&gt; ({
+        url: `/flights/${id}`,
+        method: 'PATCH',
+        body: { status },
+      }),
+      invalidatesTags: ['Flight'], // danach lädt getFlights automatisch neu
+    }),
+  }),
+});
+
+export const { useGetFlightsQuery, useUpdateFlightStatusMutation } = flightsApi;</code></pre>
+      </div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">src/store/index.ts (Erg&auml;nzung, Skizze)</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">export const store = configureStore({
+  reducer: {
+    [flightsApi.reducerPath]: flightsApi.reducer,
+  },
+  middleware: (getDefaultMiddleware) =&gt;
+    getDefaultMiddleware().concat(flightsApi.middleware),
+});</code></pre>
+      </div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Verwendung in einer Seite (Skizze)</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">// ersetzt useFlights(): Laden, Cache und Polling alle 30 Sekunden
+const { data: flights = [], isLoading, error, refetch } =
+  useGetFlightsQuery(undefined, { pollingInterval: 30_000 });
+const [updateFlightStatus] = useUpdateFlightStatusMutation();
+
+// statt updateStatus(id, status) aus useFlights:
+const handleStatusChange = (id: number, status: FlightStatus) =&gt; {
+  updateFlightStatus({ id, status });
+};</code></pre>
       </div>
     </section>
 
@@ -353,7 +494,12 @@ export function FlightBoard() {
           <span class="aufgabe-num">1</span>
           <span class="aufgabe-title">State-Inventur</span>
         </div>
-        <p>Liste f&uuml;r FlugBoard auf, welche Zust&auml;nde lokal bleiben und welche global werden sollten.</p>
+        <p>
+          Gehe den Code deines Projekts durch (<code>useFlights</code>, <code>useFlightFilters</code>,
+          <code>ThemeContext</code>, die <code>useState</code>-Aufrufe in den Seiten) und liste auf, welche Zust&auml;nde
+          lokal bleiben und welche global werden sollten. Begr&uuml;nde jeweils kurz, wer den Zustand liest und wer ihn
+          &auml;ndert.
+        </p>
       </div>
       <div class="aufgabe">
         <div class="aufgabe-header">
@@ -379,6 +525,8 @@ export function FlightBoard() {
   </nav>
 </main>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
 <script>
   const ham = document.getElementById('hamburger');
   const sb = document.getElementById('sidebar');
@@ -411,6 +559,8 @@ export function FlightBoard() {
     const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
     apply(next);
   });
+
+  hljs.highlightAll();
 </script>
 </body>
 </html>

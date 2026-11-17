@@ -89,7 +89,11 @@ if (!countRow || countRow.count === 0) {
       terminal: flight.terminal,
       gate: flight.gate ?? null,
     }))
-  ).run();
+  )
+    // Beim Build rendern mehrere Prozesse gleichzeitig und sehen alle eine leere
+    // Tabelle – bereits vorhandene IDs daher einfach überspringen
+    .onConflictDoNothing()
+    .run();
 }
 
 export const listFlights = (type?: string, status?: string): Flight[] => {

@@ -21,6 +21,7 @@ const FilterBar = ({
   return (
     <div className="filter-bar">
       <select
+        aria-label="Nach Status filtern"
         className="filter-select"
         value={statusFilter}
         onChange={(e) => onStatusChange(e.target.value as 'all' | FlightStatus)}

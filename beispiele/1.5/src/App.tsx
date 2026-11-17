@@ -8,15 +8,23 @@ import './App.css';
 
 type ViewFilter = 'all' | 'departure' | 'arrival';
 
+/** Sorts flights by scheduledTime string (HH:MM). */
+const sortByTime = (flights: Flight[]): Flight[] =>
+  [...flights].sort((a, b) => a.scheduledTime.localeCompare(b.scheduledTime));
+
 /**
- * Root application component — supports view filter, row selection, and detail panel.
+ * Root application component — includes sorting, filtering, and conditional rendering.
  */
 const App = () => {
   const [selectedFlight, setSelectedFlight] = useState<Flight | null>(null);
   const [filterType, setFilterType] = useState<ViewFilter>('all');
 
-  const departures = sampleFlights.filter((f) => f.type === 'departure');
-  const arrivals = sampleFlights.filter((f) => f.type === 'arrival');
+  const departures = sortByTime(
+    sampleFlights.filter((f) => f.type === 'departure'),
+  );
+  const arrivals = sortByTime(
+    sampleFlights.filter((f) => f.type === 'arrival'),
+  );
 
   const showDepartures = filterType === 'all' || filterType === 'departure';
   const showArrivals = filterType === 'all' || filterType === 'arrival';
@@ -25,7 +33,6 @@ const App = () => {
     <div className="app-page">
       <AirportHeader airportName="Flughafen Wien-Schwechat" />
 
-      {/* View toggle */}
       <div className="filter-bar">
         {(['all', 'departure', 'arrival'] as ViewFilter[]).map((v) => (
           <button

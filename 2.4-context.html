@@ -34,11 +34,8 @@
         <a class="nav-link" href="1.2-einfuehrung.html"><span class="ln">1.2</span>Einführung &amp; Umgebung</a>
         <a class="nav-link" href="1.3-komponenten-props-einfach.html"><span class="ln">1.3</span>Komponenten &amp; Props
           (einfach)</a>
-        <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten &amp;
-          Props (Vertiefung)</a>
+        <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten, Props &amp; Listen</a>
         <a class="nav-link" href="1.5-state-events.html"><span class="ln">1.5</span>State &amp; Events</a>
-        <a class="nav-link" href="1.6-listen-conditional.html"><span class="ln">1.6</span>Listen &amp; Conditional
-          Rendering</a>
       </div>
       <div class="nav-group">
         <div class="nav-group-label react-label">Teil 2 &mdash; React Praxis</div>
@@ -107,9 +104,9 @@
           Komponenten innerhalb eines Providers zug&auml;nglich ist.
         </p>
         <p>
-          React selbst verwendet Context intern, z.B. f&uuml;r die <code>SuspenseContext</code> oder den
-          Router-Context von React Router. Wir k&ouml;nnen eigene Contexts f&uuml;r anwendungsspezifische
-          Belange erstellen.
+          Viele Bibliotheken nutzen Context intern &ndash; React Router (Lektion 2.7) stellt so z.B. die
+          aktuelle Route allen Komponenten zur Verf&uuml;gung. Wir k&ouml;nnen eigene Contexts f&uuml;r
+          anwendungsspezifische Belange erstellen.
         </p>
 
         <p>Die Verwendung von Context besteht immer aus drei Schritten:</p>
@@ -160,7 +157,9 @@
         <p>
           Das klassische Beispiel f&uuml;r Context ist ein Theme-Switcher. Das Theme wird in der Root-Komponente
           verwaltet und muss f&uuml;r potenziell jede Komponente im Baum verf&uuml;gbar sein.
-          Ohne Context m&uuml;sste <code>theme</code> durch alle Zwischenebenen gereicht werden.
+          Ohne Context m&uuml;sste <code>theme</code> durch alle Zwischenebenen gereicht werden &ndash; genau das
+          Prop-Drilling-Beispiel aus Lektion 2.3 (<code>App</code> &rarr; <code>FlightBoard</code> &rarr;
+          <code>FlightCard</code> &rarr; <code>StatusIcon</code>), das wir jetzt l&ouml;sen.
         </p>
 
         <div class="code-block">
@@ -215,17 +214,17 @@ export const useTheme = () =&gt; useContext(ThemeContext);</code></pre>
             <span class="code-filename">src/main.tsx</span>
             <span class="code-lang">TypeScript</span>
           </div>
-          <pre><code class="language-typescript">import ReactDOM from 'react-dom/client';
+          <pre><code class="language-typescript">import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
 import { ThemeProvider } from './context/ThemeContext';
 import App from './App';
-import './index.css';
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  &lt;React.StrictMode&gt;
+createRoot(document.getElementById('root')!).render(
+  &lt;StrictMode&gt;
     &lt;ThemeProvider&gt;
       &lt;App /&gt;
     &lt;/ThemeProvider&gt;
-  &lt;/React.StrictMode&gt;
+  &lt;/StrictMode&gt;
 );</code></pre>
         </div>
 
@@ -236,44 +235,30 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 
         <div class="code-block">
           <div class="code-header">
-            <span class="code-filename">src/components/FlightStatusBadge.tsx</span>
+            <span class="code-filename">src/components/AirportHeader.tsx (Ausschnitt)</span>
             <span class="code-lang">TypeScript</span>
           </div>
           <pre><code class="language-typescript">import { useTheme } from '../context/ThemeContext';
-import { FlightStatus } from '../types/flight';
+import './AirportHeader.css';
 
-const STATUS_CONFIG: Record&lt;FlightStatus, { label: string; darkBg: string; lightBg: string }&gt; = {
-  'on-time':   { label: 'P&uuml;nktlich',   darkBg: '#1a3a2a', lightBg: '#d1fae5' },
-  'delayed':   { label: 'Versp&auml;tet',   darkBg: '#3a2a1a', lightBg: '#fef3c7' },
-  'boarding':  { label: 'Boarding',    darkBg: '#1a2a3a', lightBg: '#dbeafe' },
-  'departed':  { label: 'Abgeflogen',  darkBg: '#1e2a1e', lightBg: '#f0fdf4' },
-  'landed':    { label: 'Gelandet',    darkBg: '#1e2a1e', lightBg: '#f0fdf4' },
-  'cancelled': { label: 'Gestrichen', darkBg: '#3a1a1a', lightBg: '#fee2e2' },
-};
-
-interface FlightStatusBadgeProps {
-  status: FlightStatus;
-}
-
-const FlightStatusBadge = ({ status }: FlightStatusBadgeProps) =&gt; {
-  // Kein Prop Drilling n&ouml;tig! Direkt aus dem Context lesen.
-  const { theme } = useTheme();
-
-  const config = STATUS_CONFIG[status];
-  const bgColor = theme === 'dark' ? config.darkBg : config.lightBg;
+const AirportHeader = ({ airportName, children }: AirportHeaderProps) =&gt; {
+  // Kein Prop Drilling nötig! Direkt aus dem Context lesen.
+  const { theme, toggleTheme } = useTheme();
 
   return (
-    &lt;span
-      style={{
-        background: bgColor,
-        padding: '0.2rem 0.6rem',
-        borderRadius: '4px',
-        fontSize: '0.85rem',
-        fontWeight: 600,
-      }}
-    &gt;
-      {config.label}
-    &lt;/span&gt;
+    &lt;header className="airport-header"&gt;
+      {/* ... Titel wie bisher ... */}
+      &lt;div className="airport-header-actions"&gt;
+        {children}
+        &lt;button
+          onClick={toggleTheme}
+          title="Theme wechseln"
+          className="airport-header-theme-btn"
+        &gt;
+          {theme === 'dark' ? '☀️' : '🌙'}
+        &lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/header&gt;
   );
 };</code></pre>
         </div>
@@ -461,43 +446,77 @@ const { theme } = useTheme();  // direkt in Badge, ohne Drilling
               <span class="code-filename">src/context/ThemeContext.tsx</span>
               <span class="code-lang">TypeScript</span>
             </div>
-            <pre><code class="language-typescript">import { createContext, useContext, useState, ReactNode } from 'react';
+            <pre><code class="language-typescript">import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 type Theme = 'dark' | 'light';
 
 interface ThemeContextType {
   theme: Theme;
   toggleTheme: () =&gt; void;
+  colors: {
+    bg: string;
+    bgCard: string;
+    bgSidebar: string;
+    text: string;
+    textMuted: string;
+    border: string;
+    accent: string;
+  };
 }
 
-const ThemeContext = createContext&lt;ThemeContextType&gt;({
-  theme: 'dark',
-  toggleTheme: () =&gt; {},
-});
+// null als Default: So erkennt useTheme(), ob ein Provider vorhanden ist
+const ThemeContext = createContext&lt;ThemeContextType | null&gt;(null);
+
+// Farbpaletten für beide Themes
+const DARK = {
+  bg: '#0d1117',
+  bgCard: '#1c2128',
+  bgSidebar: '#161b22',
+  text: '#e6edf3',
+  textMuted: '#8b949e',
+  border: '#30363d',
+  accent: '#61dafb',
+};
+
+const LIGHT = {
+  bg: '#f6f8fa',
+  bgCard: '#ffffff',
+  bgSidebar: '#f0f2f5',
+  text: '#1c2128',
+  textMuted: '#57606a',
+  border: '#d0d7de',
+  accent: '#0969da',
+};
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) =&gt; {
-  // Initialen Wert aus localStorage lesen (f&uuml;r Aufgabe 1)
+  // Initialen Wert aus localStorage lesen (für Aufgabe 1)
   const [theme, setTheme] = useState&lt;Theme&gt;(() =&gt; {
-    const saved = localStorage.getItem('flugboard-theme');
-    return (saved === 'light' ? 'light' : 'dark');
+    return (localStorage.getItem('flugboard-theme') as Theme) ?? 'dark';
   });
 
-  const toggleTheme = () =&gt; {
-    setTheme(t =&gt; {
-      const next = t === 'dark' ? 'light' : 'dark';
-      localStorage.setItem('flugboard-theme', next);
-      return next;
-    });
-  };
+  // Bei jedem Wechsel speichern und den Seitenhintergrund anpassen
+  useEffect(() =&gt; {
+    localStorage.setItem('flugboard-theme', theme);
+    document.body.style.background = theme === 'dark' ? DARK.bg : LIGHT.bg;
+    document.body.style.color      = theme === 'dark' ? DARK.text : LIGHT.text;
+  }, [theme]);
+
+  const toggleTheme = () =&gt; setTheme((t) =&gt; (t === 'dark' ? 'light' : 'dark'));
+  const colors = theme === 'dark' ? DARK : LIGHT;
 
   return (
-    &lt;ThemeContext.Provider value={{ theme, toggleTheme }}&gt;
+    &lt;ThemeContext.Provider value={{ theme, toggleTheme, colors }}&gt;
       {children}
     &lt;/ThemeContext.Provider&gt;
   );
 };
 
-export const useTheme = () =&gt; useContext(ThemeContext);</code></pre>
+/** Hook für den Zugriff auf den ThemeContext; wirft einen Fehler außerhalb des Providers. */
+export const useTheme = (): ThemeContextType =&gt; {
+  const ctx = useContext(ThemeContext);
+  if (!ctx) throw new Error('useTheme muss innerhalb von ThemeProvider verwendet werden');
+  return ctx;
+};</code></pre>
           </div>
 
           <h4>Schritt 2: App in ThemeProvider einwickeln</h4>
@@ -506,93 +525,199 @@ export const useTheme = () =&gt; useContext(ThemeContext);</code></pre>
               <span class="code-filename">src/main.tsx</span>
               <span class="code-lang">TypeScript</span>
             </div>
-            <pre><code class="language-typescript">import ReactDOM from 'react-dom/client';
-import React from 'react';
+            <pre><code class="language-typescript">import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
 import { ThemeProvider } from './context/ThemeContext';
 import App from './App';
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  &lt;React.StrictMode&gt;
+createRoot(document.getElementById('root')!).render(
+  &lt;StrictMode&gt;
     &lt;ThemeProvider&gt;
       &lt;App /&gt;
     &lt;/ThemeProvider&gt;
-  &lt;/React.StrictMode&gt;
+  &lt;/StrictMode&gt;
 );</code></pre>
           </div>
 
           <h4>Schritt 3: Toggle-Button im AirportHeader</h4>
+          <p>
+            <code>AirportHeader</code> liest Theme und Umschalter direkt aus dem Context. Gleichzeitig zieht der
+            &bdquo;Aktualisieren&ldquo;-Button aus Lektion 2.2 in den Header um: Statt ihn in <code>App</code> als
+            <code>children</code> zu &uuml;bergeben, bekommt <code>AirportHeader</code> den Callback
+            <code>onRefresh</code> und rendert den Button selbst neben dem Theme-Umschalter.
+          </p>
           <div class="code-block">
             <div class="code-header">
               <span class="code-filename">src/components/AirportHeader.tsx</span>
               <span class="code-lang">TypeScript</span>
             </div>
-            <pre><code class="language-typescript">import { useTheme } from '../context/ThemeContext';
+            <pre><code class="language-typescript">import React from 'react';
+import { useTheme } from '../context/ThemeContext';
+import './AirportHeader.css';
 
-const AirportHeader = () =&gt; {
+interface AirportHeaderProps {
+  airportName: string;
+  lastUpdated?: Date | null;
+  isRefreshing?: boolean;
+  onRefresh?: () =&gt; void;
+  children?: React.ReactNode;
+}
+
+/**
+ * Page-level header that reads colors from ThemeContext.
+ * Shows last-updated timestamp and a theme toggle button.
+ */
+const AirportHeader = ({
+  airportName,
+  lastUpdated,
+  isRefreshing,
+  onRefresh,
+  children,
+}: AirportHeaderProps) =&gt; {
   const { theme, toggleTheme } = useTheme();
 
+  const formatTime = (d: Date) =&gt;
+    d.toLocaleTimeString('de-AT', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    });
+
   return (
-    &lt;header
-      style={{
-        background: theme === 'dark' ? '#161b22' : '#ffffff',
-        borderBottom: `1px solid ${theme === 'dark' ? '#30363d' : '#d0d7de'}`,
-        padding: '1rem 2rem',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-      }}
-    &gt;
-      &lt;div&gt;
-        &lt;h1 style={{ color: theme === 'dark' ? '#e6edf3' : '#1f2328' }}&gt;
-          &#9992; FlugBoard
-        &lt;/h1&gt;
-        &lt;p style={{ color: '#8b949e', margin: 0 }}&gt;
-          Internationaler Flughafen &ndash; Echtzeit-Abfahrtstafel
-        &lt;/p&gt;
+    &lt;header className="airport-header"&gt;
+      &lt;div className="airport-header-title-group"&gt;
+        &lt;h1 className="airport-header-title"&gt;✈ FlugBoard 2.4&lt;/h1&gt;
+        &lt;span className="airport-header-subtitle"&gt;{airportName}&lt;/span&gt;
+        {lastUpdated &amp;&amp; (
+          &lt;span className="airport-header-updated"&gt;
+            Aktualisiert: {formatTime(lastUpdated)}
+            {isRefreshing &amp;&amp; ' (wird aktualisiert...)'}
+          &lt;/span&gt;
+        )}
+        {!lastUpdated &amp;&amp; isRefreshing &amp;&amp; (
+          &lt;span className="airport-header-updated"&gt;(wird aktualisiert...)&lt;/span&gt;
+        )}
       &lt;/div&gt;
-      &lt;button
-        onClick={toggleTheme}
-        style={{
-          background: theme === 'dark' ? '#21262d' : '#f6f8fa',
-          color: theme === 'dark' ? '#e6edf3' : '#1f2328',
-          border: `1px solid ${theme === 'dark' ? '#30363d' : '#d0d7de'}`,
-          borderRadius: '6px',
-          padding: '0.5rem 1rem',
-          cursor: 'pointer',
-          fontSize: '1rem',
-        }}
-      &gt;
-        {theme === 'dark' ? '&#9728;&#65039; Hell' : '&#127769; Dunkel'}
-      &lt;/button&gt;
+      &lt;div className="airport-header-actions"&gt;
+        {children}
+        {onRefresh &amp;&amp; (
+          &lt;button
+            onClick={onRefresh}
+            disabled={isRefreshing}
+            className="airport-header-action-btn"
+          &gt;
+            {isRefreshing ? 'Lädt...' : 'Aktualisieren'}
+          &lt;/button&gt;
+        )}
+        &lt;button
+          onClick={toggleTheme}
+          title="Theme wechseln"
+          className="airport-header-theme-btn"
+        &gt;
+          {theme === 'dark' ? '☀️' : '🌙'}
+        &lt;/button&gt;
+      &lt;/div&gt;
     &lt;/header&gt;
   );
-};</code></pre>
+};
+
+export default AirportHeader;</code></pre>
           </div>
 
-          <h4>Schritt 4: Theme in FlightBoard und App anwenden</h4>
+          <h4>Schritt 4: Theme &uuml;ber CSS-Variablen anwenden</h4>
           <div class="code-block">
             <div class="code-header">
-              <span class="code-filename">src/App.tsx (Theme-Integration)</span>
+              <span class="code-filename">src/App.tsx (Ausschnitt: &Auml;nderungen gegen&uuml;ber 2.3)</span>
               <span class="code-lang">TypeScript</span>
             </div>
             <pre><code class="language-typescript">import { useTheme } from './context/ThemeContext';
+// ... übrige Imports wie in 2.3
 
-function App() {
-  const { theme } = useTheme();
+const App = () =&gt; {
+  const { colors } = useTheme();
+
+  // Farben aus dem Context als CSS-Variablen bereitstellen.
+  // Inline-Style ist hier nötig, weil sich die Werte zur Laufzeit ändern.
+  const themeVars = {
+    '--app-bg': colors.bg,
+    '--app-text': colors.text,
+    '--app-muted': colors.textMuted,
+    '--app-card-bg': colors.bgCard,
+    '--app-sidebar-bg': colors.bgSidebar,
+    '--app-border': colors.border,
+    '--app-accent': colors.accent,
+  } as React.CSSProperties;
+
+  // ... State, fetchFlights, Handler und Filterlogik wie in 2.3
+
+  if (error) {
+    return (
+      &lt;div className="status-screen status-screen-error" style={themeVars}&gt;
+        {/* ... Fehlermeldung wie in 2.3 ... */}
+      &lt;/div&gt;
+    );
+  }
 
   return (
-    &lt;div
-      style={{
-        minHeight: '100vh',
-        background: theme === 'dark' ? '#0d1117' : '#f6f8fa',
-        color: theme === 'dark' ? '#e6edf3' : '#1f2328',
-      }}
-    &gt;
-      &lt;AirportHeader /&gt;
-      {/* FlightBoard, FlightDetail etc. */}
+    &lt;div className="app-page" style={themeVars}&gt;
+      &lt;AirportHeader
+        airportName="Flughafen Wien-Schwechat"
+        lastUpdated={lastUpdated}
+        isRefreshing={isRefreshing}
+        onRefresh={() =&gt; fetchFlights()}
+      &gt;
+        {/* Der Aktualisieren-Button ist in den AirportHeader umgezogen */}
+        &lt;button
+          className="add-btn"
+          onClick={() =&gt; setShowAddForm((v) =&gt; !v)}
+        &gt;
+          {showAddForm ? 'Abbrechen' : '+ Flug hinzufügen'}
+        &lt;/button&gt;
+      &lt;/AirportHeader&gt;
+      {/* ... Formular, Suche, Filter, FlightBoards, FlightDetail wie in 2.3 ... */}
     &lt;/div&gt;
   );
+};</code></pre>
+          </div>
+          <p>
+            Die CSS-Dateien verwenden statt fixer Farben diese Variablen. Dadurch wechseln alle
+            Komponenten automatisch die Farben, ohne selbst <code>useTheme()</code> aufrufen zu m&uuml;ssen:
+          </p>
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-filename">src/App.css / src/components/FlightBoard.css (Ausschnitt)</span>
+              <span class="code-lang">CSS</span>
+            </div>
+            <pre><code class="language-css">.app-page {
+  background: var(--app-bg);
+  color: var(--app-text);
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.flight-table {
+  background: var(--app-card-bg);
+}
+
+.flight-table th {
+  border-bottom: 1px solid var(--app-border);
+  background: var(--app-sidebar-bg);
+  color: var(--app-muted);
 }</code></pre>
+          </div>
+
+          <div class="callout callout-info">
+            <div class="callout-icon">&#8505;</div>
+            <div class="callout-body">
+              <div class="callout-title">Warum hier kein useMemo f&uuml;r value?</div>
+              <p>
+                Unter &bdquo;H&auml;ufige Fehler&ldquo; steht, dass <code>value={{ ... }}</code> bei jedem Render ein
+                neues Objekt erzeugt. Beim <code>ThemeProvider</code> ist das unkritisch: Er sitzt ganz oben in
+                <code>main.tsx</code>, hat keine Eltern, die neu rendern, und rendert deshalb nur, wenn sich
+                <code>theme</code> selbst &auml;ndert &ndash; dann m&uuml;ssen die Consumer ohnehin neu rendern.
+                Wichtig wird <code>useMemo</code> erst bei Providern, deren Elternkomponente h&auml;ufig neu rendert.
+              </p>
+            </div>
           </div>
 
           <div class="callout callout-info">
@@ -640,9 +765,12 @@ function App() {
             durch &ndash; neues Objekt bedeutet neue Referenz, bedeutet alle Consumer re-rendern.
           </p>
           <p class="fehler-fix">
-            Fix: Das value-Objekt mit <code>useMemo</code> memoizieren:
+            Fix: Funktionen mit <code>useCallback</code> stabil halten und das value-Objekt mit
+            <code>useMemo</code> memoizieren:
+            <code>const toggleTheme = useCallback(() =&gt; setTheme(t =&gt; (t === 'dark' ? 'light' : 'dark')), []);</code>
             <code>const value = useMemo(() =&gt; ({ theme, toggleTheme }), [theme, toggleTheme]);</code>
-            Jetzt wird ein neues Objekt nur bei echter &Auml;nderung erstellt.
+            Ohne <code>useCallback</code> w&auml;re <code>toggleTheme</code> bei jedem Render neu &ndash; und
+            <code>useMemo</code> damit wirkungslos.
           </p>
         </div>
 
@@ -703,28 +831,22 @@ function App() {
         <div class="aufgabe">
           <div class="aufgabe-header">
             <span class="aufgabe-num">Aufgabe 2</span>
-            <span class="aufgabe-title">Theme in Komponenten anwenden</span>
+            <span class="aufgabe-title">Alle Komponenten auf CSS-Variablen umstellen</span>
           </div>
           <p>
-            Wende das Theme auf die wichtigsten Komponenten an, ohne Prop Drilling.
+            Damit wirklich die ganze Tafel das Theme wechselt, d&uuml;rfen in den CSS-Dateien keine fixen Farben
+            mehr stehen &ndash; ohne dass die Komponenten selbst <code>useTheme()</code> aufrufen.
           </p>
           <ul>
-            <li>
-              <code>AirportHeader</code>: Hintergrund Dark <code>#161b22</code> / Light <code>#ffffff</code>,
-              Toggle-Button rechts
-            </li>
-            <li>
-              <code>FlightBoard</code>: Tabellen-Header Dark <code>#161b22</code> / Light <code>#f6f8fa</code>
-            </li>
-            <li>
-              <code>FlightCard</code>: Zeilen-Hover Dark <code>#1c2128</code> / Light <code>#f6f8fa</code>
-            </li>
-            <li>
-              <code>App</code>: Seitenhintergrund Dark <code>#0d1117</code> / Light <code>#ffffff</code>
-            </li>
-            <li>
-              Verwende in jeder Komponente nur <code>const { theme } = useTheme()</code> &ndash; keine Theme-Props!
-            </li>
+            <li>Ersetze in <code>FlightBoard.css</code>, <code>FlightCard.css</code>, <code>FlightDetail.css</code>,
+              <code>SearchBar.css</code>, <code>FilterBar.css</code>, <code>AddFlightForm.css</code> und
+              <code>EmptyState.css</code> die Farbwerte durch <code>var(--app-bg)</code>, <code>var(--app-text)</code>,
+              <code>var(--app-border)</code> usw.</li>
+            <li>Nur <code>App</code> (setzt die Variablen) und <code>AirportHeader</code> (Umschalter) verwenden
+              <code>useTheme()</code></li>
+            <li>Teste im Light-Theme: Tabelle, Detail-Panel, Formular und Empty State m&uuml;ssen gut lesbar sein</li>
+            <li>Pr&uuml;fe die Status-Badges: Passen die Farben aus <code>FlightStatusBadge.css</code> auch auf hellem
+              Hintergrund? Falls nicht, eigene Variablen daf&uuml;r anlegen</li>
           </ul>
         </div>
 

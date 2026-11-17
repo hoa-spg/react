@@ -29,9 +29,8 @@
       <a class="nav-link" href="1.1-einfuehrung-spa.html"><span class="ln">1.1</span>Motivation &amp; SPA</a>
       <a class="nav-link" href="1.2-einfuehrung.html"><span class="ln">1.2</span>Einführung &amp; Umgebung</a>
       <a class="nav-link" href="1.3-komponenten-props-einfach.html"><span class="ln">1.3</span>Komponenten &amp; Props (einfach)</a>
-      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten &amp; Props (Vertiefung)</a>
+      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten, Props &amp; Listen</a>
       <a class="nav-link" href="1.5-state-events.html"><span class="ln">1.5</span>State &amp; Events</a>
-      <a class="nav-link" href="1.6-listen-conditional.html"><span class="ln">1.6</span>Listen &amp; Conditional Rendering</a>
     </div>
     <div class="nav-group">
       <div class="nav-group-label react-label">Teil 2 &mdash; React Praxis</div>
@@ -274,23 +273,24 @@ const App = () => {
           <span class="code-lang">TypeScript</span>
         </div>
         <pre><code class="language-typescript">import { useState } from 'react';
-import FlightBoard from './components/FlightBoard';
-import FlightDetail from './components/FlightDetail';
 import { sampleFlights } from './data/flights';
 import { Flight } from './types/flight';
+import AirportHeader from './components/AirportHeader';
+import FlightBoard from './components/FlightBoard';
+import FlightDetail from './components/FlightDetail';
+import './App.css';
 
 function App() {
   // State f&uuml;r den ausgew&auml;hlten Flug (null = keiner ausgew&auml;hlt)
   const [selectedFlight, setSelectedFlight] = useState&lt;Flight | null&gt;(null);
 
-  const departures = sampleFlights.filter(f => f.type === 'departure');
-  const arrivals   = sampleFlights.filter(f => f.type === 'arrival');
+  // sortByTime wie in Lektion 1.4
+  const departures = sortByTime(sampleFlights.filter(f => f.type === 'departure'));
+  const arrivals   = sortByTime(sampleFlights.filter(f => f.type === 'arrival'));
 
   return (
     &lt;div className="app-page"&gt;
-      &lt;header className="app-header"&gt;
-        &lt;h1 className="app-title"&gt;&#9992; FlugBoard &ndash; Wien International&lt;/h1&gt;
-      &lt;/header&gt;
+      &lt;AirportHeader airportName="Flughafen Wien-Schwechat" /&gt;
 
       {/* Detail-Panel nur anzeigen wenn ein Flug ausgew&auml;hlt ist */}
       {selectedFlight &amp;&amp; (
@@ -304,11 +304,13 @@ function App() {
       &lt;FlightBoard
         flights={departures}
         title="Abfl&uuml;ge"
+        selectedFlightId={selectedFlight?.id}
         onFlightSelect={setSelectedFlight}
       /&gt;
       &lt;FlightBoard
         flights={arrivals}
         title="Ank&uuml;nfte"
+        selectedFlightId={selectedFlight?.id}
         onFlightSelect={setSelectedFlight}
       /&gt;
     &lt;/div&gt;
@@ -323,6 +325,7 @@ export default App;</code></pre>
           <span class="code-lang">TypeScript</span>
         </div>
         <pre><code class="language-typescript">import { Flight } from '../types/flight';
+import FlightStatusBadge from './FlightStatusBadge';
 import './FlightDetail.css';
 
 interface FlightDetailProps {
@@ -335,26 +338,57 @@ interface FlightDetailProps {
  */
 const FlightDetail = ({ flight, onClose }: FlightDetailProps) => {
   return (
-    &lt;div className="detail-panel"&gt;
-      {/* Schlie&szlig;en-Button in der oberen rechten Ecke */}
-      &lt;button
-        onClick={onClose}
-        className="detail-close-btn"
-      &gt;
-        &times; Schlie&szlig;en
-      &lt;/button&gt;
+    // Halbtransparenter Hintergrund: Klick daneben schlie&szlig;t das Panel
+    &lt;div className="detail-overlay" onClick={onClose}&gt;
+      {/* stopPropagation: Klick im Panel soll es NICHT schlie&szlig;en */}
+      &lt;div className="detail-panel" onClick={(e) => e.stopPropagation()}&gt;
+        &lt;button className="detail-close" onClick={onClose}&gt;
+          Schlie&szlig;en
+        &lt;/button&gt;
 
-      &lt;h3 className="detail-title"&gt;
-        {flight.flightNumber} &ndash; {flight.airline}
-      &lt;/h3&gt;
-      &lt;p&gt;&lt;strong&gt;Typ:&lt;/strong&gt; {flight.type === 'departure' ? 'Abflug' : 'Ankunft'}&lt;/p&gt;
-      &lt;p&gt;&lt;strong&gt;{flight.type === 'departure' ? 'Ziel' : 'Herkunft'}:&lt;/strong&gt; {flight.airport}&lt;/p&gt;
-      &lt;p&gt;&lt;strong&gt;Geplante Zeit:&lt;/strong&gt; {flight.scheduledTime}&lt;/p&gt;
-      {flight.expectedTime &amp;&amp; (
-        &lt;p&gt;&lt;strong&gt;Erwartete Zeit:&lt;/strong&gt; {flight.expectedTime}&lt;/p&gt;
-      )}
-      &lt;p&gt;&lt;strong&gt;Terminal:&lt;/strong&gt; {flight.terminal}&lt;/p&gt;
-      &lt;p&gt;&lt;strong&gt;Gate:&lt;/strong&gt; {flight.gate ?? '&mdash;'}&lt;/p&gt;
+        &lt;div className="detail-number"&gt;{flight.flightNumber}&lt;/div&gt;
+
+        &lt;div className="detail-row"&gt;
+          &lt;span className="detail-label"&gt;Airline&lt;/span&gt;
+          &lt;span className="detail-value"&gt;{flight.airline}&lt;/span&gt;
+        &lt;/div&gt;
+        &lt;div className="detail-row"&gt;
+          &lt;span className="detail-label"&gt;Typ&lt;/span&gt;
+          &lt;span className="detail-value"&gt;
+            {flight.type === 'departure' ? 'Abflug' : 'Ankunft'}
+          &lt;/span&gt;
+        &lt;/div&gt;
+        &lt;div className="detail-row"&gt;
+          &lt;span className="detail-label"&gt;Ziel / Herkunft&lt;/span&gt;
+          &lt;span className="detail-value"&gt;{flight.airport}&lt;/span&gt;
+        &lt;/div&gt;
+        &lt;div className="detail-row"&gt;
+          &lt;span className="detail-label"&gt;Geplante Zeit&lt;/span&gt;
+          &lt;span className="detail-value"&gt;{flight.scheduledTime}&lt;/span&gt;
+        &lt;/div&gt;
+        {flight.expectedTime &amp;&amp; (
+          &lt;div className="detail-row"&gt;
+            &lt;span className="detail-label"&gt;Erwartete Zeit&lt;/span&gt;
+            &lt;span className="detail-value detail-value--warning"&gt;{flight.expectedTime}&lt;/span&gt;
+          &lt;/div&gt;
+        )}
+        &lt;div className="detail-row"&gt;
+          &lt;span className="detail-label"&gt;Status&lt;/span&gt;
+          &lt;span className="detail-value"&gt;
+            &lt;FlightStatusBadge status={flight.status} /&gt;
+          &lt;/span&gt;
+        &lt;/div&gt;
+        &lt;div className="detail-row"&gt;
+          &lt;span className="detail-label"&gt;Terminal&lt;/span&gt;
+          &lt;span className="detail-value"&gt;{flight.terminal}&lt;/span&gt;
+        &lt;/div&gt;
+        {flight.gate &amp;&amp; (
+          &lt;div className="detail-row"&gt;
+            &lt;span className="detail-label"&gt;Gate&lt;/span&gt;
+            &lt;span className="detail-value"&gt;{flight.gate}&lt;/span&gt;
+          &lt;/div&gt;
+        )}
+      &lt;/div&gt;
     &lt;/div&gt;
   );
 };
@@ -363,7 +397,9 @@ export default FlightDetail;</code></pre>
       </div>
       <p>
         <code>FlightBoard</code> erh&auml;lt den Callback als Prop und gibt ihn weiter an <code>FlightCard</code>.
-        In <code>FlightCard</code> wird der <code>onClick</code>-Handler auf die <code>&lt;tr&gt;</code>-Zeile gesetzt:
+        In <code>FlightCard</code> wird der <code>onClick</code>-Handler auf die <code>&lt;tr&gt;</code>-Zeile gesetzt.
+        Da eine Zeile jetzt gleichzeitig ausgew&auml;hlt <em>und</em> gestrichen sein kann, setzen wir die
+        CSS-Klassen aus einem Array zusammen und filtern leere Eintr&auml;ge heraus:
       </p>
       <div class="code-block">
         <div class="code-header">
@@ -381,9 +417,14 @@ interface FlightCardProps {
 }
 
 const FlightCard = ({ flight, isSelected, onSelect }: FlightCardProps) => {
+  const isCancelled = flight.status === 'cancelled';
+  // ... isDelayed, isBoarding, renderTime() wie in Lektion 1.4
+
+  // Mehrere bedingte Klassen: Array bauen, leere Strings entfernen, verbinden
   const rowClassName = [
     'flight-row',
-    isSelected ? 'is-selected' : '',
+    isSelected ? 'is-selected' : '',     // ausgew&auml;hlte Zeile hervorheben
+    isCancelled ? 'is-cancelled' : '',   // gestrichene Fl&uuml;ge ged&auml;mpft
   ].filter(Boolean).join(' ');
 
   return (
@@ -410,7 +451,7 @@ const FlightCard = ({ flight, isSelected, onSelect }: FlightCardProps) => {
         <ul>
           <li><code>App.tsx</code> erh&auml;lt <code>selectedFlight: Flight | null</code> als State</li>
           <li>Neue Komponente <code>FlightDetail</code> zeigt den ausgew&auml;hlten Flug an</li>
-          <li><code>FlightBoard</code> erh&auml;lt <code>onFlightSelect</code> als Prop und gibt es an <code>FlightCard</code> weiter</li>
+          <li><code>FlightBoard</code> erh&auml;lt <code>selectedFlightId</code> und <code>onFlightSelect</code> als Props und gibt sie an <code>FlightCard</code> weiter</li>
           <li><code>FlightCard</code> erh&auml;lt <code>isSelected</code> und <code>onSelect</code> als Props</li>
         </ul>
         <div class="callout callout-tip">
@@ -526,9 +567,28 @@ const FlightCard = ({ flight, isSelected, onSelect }: FlightCardProps) => {
           </ul>
         </div>
 
+        <div class="aufgabe">
+          <div class="aufgabe-header">
+            <span class="aufgabe-num">Aufgabe 4</span>
+            <span class="aufgabe-title">Status-Filter mit Empty State</span>
+          </div>
+          <p>
+            Erg&auml;nze zus&auml;tzlich zum Ansichts-Toggle einen Filter nach Flugstatus. Passt kein Flug,
+            erscheint der <code>EmptyState</code> aus Lektion 1.4.
+          </p>
+          <ul>
+            <li>State: <code>statusFilter: 'all' | FlightStatus</code>, Initialwert <code>'all'</code></li>
+            <li>Buttons wie beim Ansichts-Toggle: &bdquo;Alle&ldquo;, &bdquo;P&uuml;nktlich&ldquo;, &bdquo;Versp&auml;tet&ldquo;,
+              &bdquo;Gestrichen&ldquo;, &hellip;; der aktive Button ist hervorgehoben</li>
+            <li>Gefiltert wird vor dem Aufteilen in Abfl&uuml;ge und Ank&uuml;nfte:
+              <code>.filter(f =&gt; statusFilter === 'all' || f.status === statusFilter)</code></li>
+            <li>Teste: Bei &bdquo;Gestrichen&ldquo; zeigt das Ank&uuml;nfte-Board den Empty State</li>
+          </ul>
+        </div>
+
         <div class="aufgabe aufgabe-bonus">
           <div class="aufgabe-header">
-            <span class="aufgabe-num">Bonus</span>
+            <span class="aufgabe-num">Bonus 1</span>
             <span class="aufgabe-title">Favoriten-Funktion</span>
           </div>
           <p>
@@ -543,15 +603,33 @@ const FlightCard = ({ flight, isSelected, onSelect }: FlightCardProps) => {
           </ul>
         </div>
 
+
+        <div class="aufgabe aufgabe-bonus">
+          <div class="aufgabe-header">
+            <span class="aufgabe-num">Bonus 2</span>
+            <span class="aufgabe-title">Sortierbare Spalten</span>
+          </div>
+          <p>
+            F&uuml;ge eine Sortierfunktion hinzu: Klick auf einen Tabellen-Header sortiert die Spalte
+            auf- oder absteigend.
+          </p>
+          <ul>
+            <li>State: <code>sortBy: 'scheduledTime' | 'flightNumber' | 'airline'</code> und <code>sortDir: 'asc' | 'desc'</code></li>
+            <li>Klick auf den gleichen Header wechselt die Richtung; Klick auf anderen Header setzt <code>sortDir</code> auf <code>'asc'</code></li>
+            <li>Zeige einen Pfeil im aktiven Header: &#9650; (asc) oder &#9660; (desc)</li>
+            <li>Implementiere eine generische <code>sortFlights</code>-Hilfsfunktion (Kopie vor <code>.sort()</code>!)</li>
+          </ul>
+        </div>
+
       </div>
     </section>
 
   </div><!-- /content-area -->
 
         <nav class="lesson-nav">
-    <a class="nav-btn" href="1.4-komponenten-props-vertiefung.html">&larr; Lektion 1.4: Komponenten &amp; Props (Vertiefung)</a>
+    <a class="nav-btn" href="1.4-komponenten-props-vertiefung.html">&larr; Lektion 1.4: Komponenten, Props &amp; Listen</a>
     <span class="nav-center-info">Lektion 1.5</span>
-    <a class="nav-btn primary" href="1.6-listen-conditional.html">Lektion 1.6: Listen &amp; Conditional Rendering &rarr;</a>
+    <a class="nav-btn primary" href="2.1-formulare.html">Lektion 2.1: Formulare &amp; Inputs &rarr;</a>
   </nav>
 </main>
 

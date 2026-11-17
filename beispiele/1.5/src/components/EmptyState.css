@@ -1,0 +1,20 @@
+.empty-state {
+  align-items: center;
+  background: #1c2128;
+  border-radius: 8px;
+  color: #8b949e;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  justify-content: center;
+  padding: 3rem 1rem;
+}
+
+.empty-icon {
+  font-size: 2.5rem;
+  opacity: 0.4;
+}
+
+.empty-text {
+  font-size: 0.95rem;
+}

@@ -9,19 +9,22 @@ interface FlightBoardProps {
   title: string;
   selectedFlightId?: number;
   onFlightSelect: (flight: Flight) => void;
-  onDeleteFlight?: (id: number) => void;
+  onFlightDelete?: (id: number) => void;
+  onResetFilters?: () => void;
   count?: number;
 }
 
 /**
  * Renders a titled, filterable section of flight rows with delete support.
+ * @param onResetFilters - Optional callback; shows a reset button in the empty state.
  */
 const FlightBoard = ({
   flights,
   title,
   selectedFlightId,
   onFlightSelect,
-  onDeleteFlight,
+  onFlightDelete,
+  onResetFilters,
   count,
 }: FlightBoardProps) => {
   return (
@@ -33,7 +36,7 @@ const FlightBoard = ({
         )}
       </div>
       {flights.length === 0 ? (
-        <EmptyState />
+        <EmptyState onReset={onResetFilters} />
       ) : (
         <table className="flight-table">
           <thead>
@@ -45,7 +48,7 @@ const FlightBoard = ({
               <th>Status</th>
               <th>Terminal</th>
               <th>Gate</th>
-              {onDeleteFlight && <th></th>}
+              {onFlightDelete && <th></th>}
             </tr>
           </thead>
           <tbody>
@@ -55,7 +58,7 @@ const FlightBoard = ({
                 flight={flight}
                 isSelected={flight.id === selectedFlightId}
                 onSelect={onFlightSelect}
-                onDelete={onDeleteFlight}
+                onDelete={onFlightDelete}
               />
             ))}
           </tbody>

@@ -6,8 +6,8 @@
   gap: 0.75rem;
   padding: 3rem 1rem;
   border-radius: 8px;
-  background: var(--bg-card);
-  color: var(--text-muted);
+  background: var(--app-card-bg);
+  color: var(--app-muted);
 }
 
 .empty-icon {
@@ -22,9 +22,9 @@
 .empty-btn {
   margin-top: 0.25rem;
   padding: 6px 16px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--app-border);
   border-radius: 6px;
-  background: var(--bg-sidebar);
-  color: var(--text);
+  background: var(--app-sidebar-bg);
+  color: var(--app-text);
   font-size: 0.875rem;
 }

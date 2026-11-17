@@ -6,12 +6,18 @@ import {
   getFlightById,
   initializeDatabase,
   listFlights,
+  updateFlightStatus,
 } from './db.ts';
 
 const app = new Hono();
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-app.use('*', cors({ origin: 'http://localhost:5173' }));
+app.use('*', cors({
+  // Entwicklung: jedes Frontend auf localhost erlauben, egal auf welchem Port
+  // (Vite weicht auf 5174, 5175, ... aus, wenn 5173 schon belegt ist)
+  origin: (origin) =>
+    /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin) ? origin : null,
+}));
 
 app.get('/api/flights', async (c) => {
   await sleep(1000);
@@ -44,6 +50,15 @@ app.post('/api/flights', async (c) => {
     gate: body.gate,
   });
   return c.json(newFlight, 201);
+});
+
+app.patch('/api/flights/:id', async (c) => {
+  const id = Number(c.req.param('id'));
+  const body = await c.req.json();
+  if (!body.status) return c.json({ error: 'status fehlt' }, 400);
+  const updated = await updateFlightStatus(id, body.status);
+  if (!updated) return c.json({ error: 'Nicht gefunden' }, 404);
+  return c.json(updated);
 });
 
 app.delete('/api/flights/:id', async (c) => {

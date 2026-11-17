@@ -13,7 +13,6 @@ interface FlightCardProps {
 
 /**
  * A table row for a single flight.
- * Uses ThemeContext for row background colors (normal, hover, selected).
  */
 const FlightCard = ({
   flight,

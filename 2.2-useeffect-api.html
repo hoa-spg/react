@@ -29,9 +29,8 @@
       <a class="nav-link" href="1.1-einfuehrung-spa.html"><span class="ln">1.1</span>Motivation &amp; SPA</a>
       <a class="nav-link" href="1.2-einfuehrung.html"><span class="ln">1.2</span>Einführung &amp; Umgebung</a>
       <a class="nav-link" href="1.3-komponenten-props-einfach.html"><span class="ln">1.3</span>Komponenten &amp; Props (einfach)</a>
-      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten &amp; Props (Vertiefung)</a>
+      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten, Props &amp; Listen</a>
       <a class="nav-link" href="1.5-state-events.html"><span class="ln">1.5</span>State &amp; Events</a>
-      <a class="nav-link" href="1.6-listen-conditional.html"><span class="ln">1.6</span>Listen &amp; Conditional Rendering</a>
     </div>
     <div class="nav-group">
       <div class="nav-group-label react-label">Teil 2 &mdash; React Praxis</div>
@@ -328,10 +327,13 @@ import { flights } from './data.ts';
 
 const app = new Hono();
 
-// CORS aktivieren: erlaubt Anfragen vom Frontend (localhost:5173)
+// CORS aktivieren: erlaubt Anfragen vom Frontend (z.B. localhost:5173)
 // Ohne CORS: Browser blockiert Anfragen von unterschiedlichen Origins
 app.use('*', cors({
-  origin: 'http://localhost:5173',
+  // Entwicklung: jedes Frontend auf localhost erlauben, egal auf welchem Port
+  // (Vite weicht auf 5174, 5175, ... aus, wenn 5173 schon belegt ist)
+  origin: (origin) =&gt;
+    /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin) ? origin : null,
 }));
 
 // GET /api/flights &ndash; alle Fl&uuml;ge, optional gefiltert
@@ -359,9 +361,41 @@ app.get('/api/flights/:id', (c) => {
   return c.json(flight);
 });
 
+// POST /api/flights &ndash; neuen Flug anlegen
+app.post('/api/flights', async (c) =&gt; {
+  const body = await c.req.json();
+  if (!body.flightNumber || !body.airline || !body.scheduledTime) {
+    return c.json({ error: 'Pflichtfelder fehlen' }, 400);
+  }
+  const newFlight = { id: Date.now(), status: 'on-time' as const, ...body };
+  flights.push(newFlight);
+  return c.json(newFlight, 201);   // 201 = Created
+});
+
+// DELETE /api/flights/:id &ndash; Flug l&ouml;schen
+app.delete('/api/flights/:id', (c) =&gt; {
+  const id  = Number(c.req.param('id'));
+  const idx = flights.findIndex(f =&gt; f.id === id);
+  if (idx === -1) return c.json({ error: 'Nicht gefunden' }, 404);
+  const deleted = flights.splice(idx, 1)[0];
+  return c.json(deleted);
+});
+
 // Server starten auf Port 8000
 Deno.serve({ port: 8000 }, app.fetch);
 console.log('FlugBoard API l&auml;uft auf http://localhost:8000');</code></pre>
+      </div>
+      <div class="callout callout-info">
+        <div class="callout-icon">&#8505;</div>
+        <div class="callout-body">
+          <div class="callout-title">Daten nur im Arbeitsspeicher</div>
+          <p>
+            <code>POST</code> und <code>DELETE</code> ver&auml;ndern das Array <code>flights</code> im
+            Arbeitsspeicher des Backends. Nach einem Neustart (auch durch <code>--watch</code> beim
+            Speichern) sind wieder die 8 Beispielfl&uuml;ge da. Dauerhaft speichern wir die Daten
+            erst in Lektion 2.8 mit einer Datenbank.
+          </p>
+        </div>
       </div>
       <div class="code-block">
         <div class="code-header">
@@ -390,7 +424,13 @@ deno task dev
 # API testen im Browser oder mit curl:
 curl http://localhost:8000/api/flights
 curl http://localhost:8000/api/flights?type=departure
-curl http://localhost:8000/api/flights/1</code></pre>
+curl http://localhost:8000/api/flights/1
+
+# Flug anlegen und wieder l&ouml;schen:
+curl -X POST http://localhost:8000/api/flights \
+  -H "Content-Type: application/json" \
+  -d '{"flightNumber":"XX100","airline":"Test Air","type":"departure","scheduledTime":"18:00","airport":"Rom (FCO)","terminal":"T1"}'
+curl -X DELETE http://localhost:8000/api/flights/1</code></pre>
       </div>
       <div class="callout callout-info">
         <div class="callout-icon">&#8505;</div>
@@ -416,14 +456,19 @@ curl http://localhost:8000/api/flights/1</code></pre>
         <code>useEffect</code> kann keine asynchrone Funktion direkt sein &ndash; deshalb definieren
         wir eine innere <code>async</code>-Funktion und rufen sie sofort auf.
       </p>
+      <p>
+        Das folgende Beispiel zeigt nur das Grundmuster in einer stark vereinfachten <code>App</code>.
+        Wie es sich in unser FlugBoard aus Lektion 2.1 einf&uuml;gt, zeigt der Projektschritt.
+      </p>
       <div class="code-block">
         <div class="code-header">
-          <span class="code-filename">src/App.tsx &ndash; Daten vom Backend laden</span>
+          <span class="code-filename">Grundmuster (vereinfacht) &ndash; Daten vom Backend laden</span>
           <span class="code-lang">TypeScript</span>
         </div>
         <pre><code class="language-typescript">import { useState, useEffect } from 'react';
 import { Flight } from './types/flight';
-import FlightBoard from './components/FlightBoard';
+import AirportHeader from './components/AirportHeader';
+import './App.css';
 
 const API_URL = 'http://localhost:8000';
 
@@ -465,7 +510,7 @@ function App() {
   if (error) {
     return (
       &lt;div className="status-screen status-screen-error"&gt;
-        &lt;p className="error-text"&gt;Fehler beim Laden: {error}&lt;/p&gt;
+        &lt;p className="error-title"&gt;Fehler beim Laden: {error}&lt;/p&gt;
         &lt;button
           onClick={() => window.location.reload()}
           className="retry-btn"
@@ -479,23 +524,18 @@ function App() {
   // Normaler Zustand
   return (
     &lt;div className="app-page"&gt;
-      &lt;h1 className="app-title"&gt;&#9992; FlugBoard&lt;/h1&gt;
+      &lt;AirportHeader airportName="Flughafen Wien-Schwechat" /&gt;
       {isLoading ? (
         &lt;div className="board-loading board-loading--muted"&gt;
           &lt;div className="status-icon"&gt;&#9992;&lt;/div&gt;
           &lt;p&gt;Flugdaten werden geladen...&lt;/p&gt;
         &lt;/div&gt;
       ) : (
-        &lt;&gt;
-          &lt;FlightBoard
-            flights={flights.filter(f =&gt; f.type === 'departure')}
-            title="Abfl&uuml;ge"
-          /&gt;
-          &lt;FlightBoard
-            flights={flights.filter(f =&gt; f.type === 'arrival')}
-            title="Ank&uuml;nfte"
-          /&gt;
-        &lt;/&gt;
+        &lt;ul&gt;
+          {flights.map(f =&gt; (
+            &lt;li key={f.id}&gt;{f.flightNumber} &ndash; {f.airport}&lt;/li&gt;
+          ))}
+        &lt;/ul&gt;
       )}
     &lt;/div&gt;
   );
@@ -536,11 +576,11 @@ export default App;</code></pre>
     <section class="section">
       <h2>AbortController &ndash; Fetch sauber abbrechen</h2>
       <p>
-        In React (<em>StrictMode</em>) wird jeder Effect zweimal ausgef&uuml;hrt: einmal gemountet, einmal
-        unmountet, einmal wieder gemountet. Ohne Cleanup k&ouml;nnte ein veralteter Fetch-Request nach dem
-        Unmount noch State aktualisieren &ndash; das f&uuml;hrt zu einem React-Warning:
-        <em>"Can't perform a React state update on an unmounted component."</em>
-        Die L&ouml;sung: <code>AbortController</code>.
+        Ein Fetch-Request kann noch unterwegs sein, wenn der Effect schon wieder aufger&auml;umt wird
+        &ndash; etwa weil die Komponente verschwindet oder (im Entwicklungsmodus mit
+        <em>StrictMode</em>) der Effect absichtlich zweimal hintereinander l&auml;uft. Ohne Cleanup setzt
+        die veraltete Antwort dann trotzdem noch State und kann im schlimmsten Fall neuere Daten
+        &uuml;berschreiben. Die L&ouml;sung: <code>AbortController</code> bricht den Request im Cleanup ab.
       </p>
       <div class="code-block">
         <div class="code-header">
@@ -636,11 +676,12 @@ useEffect(() => {
 }, []);  // Einmalig beim Mount starten
 
 // In JSX: Letztes Update anzeigen
+// (im Projekt &uuml;bernimmt das AirportHeader &uuml;ber die Props lastUpdated und isRefreshing)
 {lastUpdated &amp;&amp; (
-  &lt;p style={{ color: '#8b949e', fontSize: '0.8rem' }}&gt;
-    Zuletzt aktualisiert: {lastUpdated.toLocaleTimeString('de-AT')}
+  &lt;span className="airport-header-updated"&gt;
+    Aktualisiert: {lastUpdated.toLocaleTimeString('de-AT')}
     {isRefreshing &amp;&amp; ' (wird aktualisiert...)'}
-  &lt;/p&gt;
+  &lt;/span&gt;
 )}</code></pre>
       </div>
     </section>
@@ -655,23 +696,174 @@ useEffect(() => {
         <p>
           Das FlugBoard l&auml;dt seine Daten ab jetzt vom Deno+Hono-Backend. Die Beispieldaten aus
           <code>src/data/flights.ts</code> werden nur noch als Fallback oder f&uuml;r Tests verwendet.
+          Suche, Filter, Formular, Auswahl und Sortierung aus Lektion 2.1 bleiben unver&auml;ndert.
         </p>
         <p><strong>Schritte in dieser Lektion:</strong></p>
         <ul>
           <li>Ordner <code>backend/</code> mit <code>main.ts</code>, <code>data.ts</code> und <code>deno.json</code> anlegen</li>
           <li><code>deno task dev</code> starten und API unter <code>http://localhost:8000/api/flights</code> testen</li>
-          <li><code>App.tsx</code> um <code>isLoading</code>- und <code>error</code>-State erweitern</li>
-          <li>Daten per <code>useEffect</code> laden (mit <code>AbortController</code> f&uuml;r sauberes Cleanup)</li>
-          <li>Loading-Anzeige w&auml;hrend der Daten geladen werden</li>
-          <li>Fehler-Anzeige mit &bdquo;Neu laden&ldquo;-Button wenn das Backend nicht erreichbar ist</li>
+          <li>In <code>App.tsx</code>: <code>flights</code> startet leer, dazu <code>isLoading</code>-,
+            <code>error</code>-, <code>lastUpdated</code>- und <code>isRefreshing</code>-State</li>
+          <li>Daten per <code>useEffect</code> laden, mit <code>AbortController</code> und Polling alle 30 Sekunden</li>
+          <li>Flug anlegen und l&ouml;schen &uuml;ber <code>POST</code> bzw. <code>DELETE</code> statt nur im lokalen State</li>
+          <li>Loading-Anzeige, Fehler-Anzeige mit &bdquo;Neu laden&ldquo;-Button und &bdquo;Aktualisieren&ldquo;-Button im Header</li>
         </ul>
+        <div class="callout callout-warning">
+          <div class="callout-icon">&#9888;</div>
+          <div class="callout-body">
+            <div class="callout-title">Warum Anlegen und L&ouml;schen jetzt das Backend brauchen</div>
+            <p>
+              In Lektion 2.1 haben <code>handleAddFlight</code> und <code>handleDeleteFlight</code> nur den
+              lokalen State ge&auml;ndert. Sobald die Liste vom Backend kommt und alle 30 Sekunden neu geladen
+              wird, w&uuml;rde jede lokale &Auml;nderung beim n&auml;chsten Polling wieder &uuml;berschrieben:
+              angelegte Fl&uuml;ge verschwinden, gel&ouml;schte tauchen wieder auf. Deshalb schicken wir
+              &Auml;nderungen jetzt an das Backend &ndash; es ist die einzige &bdquo;Source of Truth&ldquo;.
+            </p>
+          </div>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">src/App.tsx &ndash; &Auml;nderungen gegen&uuml;ber Lektion 2.1</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">import { useState, useEffect } from 'react';
+// import { sampleFlights } from './data/flights';   &larr; entf&auml;llt
+// ... &uuml;brige Imports wie in 2.1
+
+const API_URL = 'http://localhost:8000';
+
+function App() {
+  // API-State: flights startet leer statt mit sampleFlights
+  const [flights, setFlights]           = useState&lt;Flight[]&gt;([]);
+  const [isLoading, setIsLoading]       = useState&lt;boolean&gt;(true);
+  const [error, setError]               = useState&lt;string | null&gt;(null);
+  const [lastUpdated, setLastUpdated]   = useState&lt;Date | null&gt;(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  // ... searchQuery, typeFilter, statusFilter, showAddForm, selectedFlight wie in 2.1
+
+  const fetchFlights = async (signal?: AbortSignal) =&gt; {
+    let isAborted = false;
+    try {
+      setIsRefreshing(true);
+      setError(null);
+      const response = await fetch(`${API_URL}/api/flights`, { signal });
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      const data: Flight[] = await response.json();
+      setFlights(data);
+      setLastUpdated(new Date());
+    } catch (err) {
+      if (err instanceof Error &amp;&amp; err.name === 'AbortError') {
+        isAborted = true;   // Cleanup, kein echter Fehler
+        return;
+      }
+      setError(err instanceof Error ? err.message : 'Unbekannter Fehler');
+    } finally {
+      if (!isAborted) {
+        setIsLoading(false);
+        setIsRefreshing(false);
+      }
+    }
+  };
+
+  useEffect(() =&gt; {
+    const controller = new AbortController();
+    fetchFlights(controller.signal);
+    const intervalId = setInterval(() =&gt; fetchFlights(controller.signal), 30_000);
+    return () =&gt; {
+      clearInterval(intervalId);
+      controller.abort();
+    };
+  }, []);
+
+  // Neu: Anlegen &uuml;ber POST, danach Liste neu laden
+  const handleAddFlight = async (flight: Flight) =&gt; {
+    try {
+      const res = await fetch(`${API_URL}/api/flights`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(flight),
+      });
+      if (!res.ok) throw new Error('Fehler beim Hinzuf&uuml;gen des Flugs');
+      await fetchFlights();
+      setShowAddForm(false);
+    } catch (err) {
+      console.error('Fehler beim Hinzuf&uuml;gen:', err);
+    }
+  };
+
+  // Neu: L&ouml;schen &uuml;ber DELETE, danach lokal entfernen
+  const handleDeleteFlight = async (id: number) =&gt; {
+    if (!window.confirm('Flug wirklich l&ouml;schen?')) return;
+    try {
+      const res = await fetch(`${API_URL}/api/flights/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Fehler beim L&ouml;schen des Flugs');
+      setFlights((prev) =&gt; prev.filter((f) =&gt; f.id !== id));
+      setSelectedFlight((prev) =&gt; (prev?.id === id ? null : prev));
+    } catch (err) {
+      console.error('Fehler beim L&ouml;schen:', err);
+    }
+  };
+
+  // ... handleReset, Filterlogik (mit sortByTime), showDepartures/showArrivals wie in 2.1
+
+  // Fehler-Zustand: statt der Tafel eine Meldung mit &bdquo;Neu laden&ldquo;
+  if (error) {
+    return (
+      &lt;div className="status-screen status-screen-error"&gt;
+        &lt;p className="error-title"&gt;Fehler: {error}&lt;/p&gt;
+        &lt;button onClick={() =&gt; fetchFlights()} className="retry-btn"&gt;
+          Neu laden
+        &lt;/button&gt;
+      &lt;/div&gt;
+    );
+  }
+
+  return (
+    &lt;div className="app-page"&gt;
+      &lt;AirportHeader
+        airportName="Flughafen Wien-Schwechat"
+        lastUpdated={lastUpdated}
+        isRefreshing={isRefreshing}
+      &gt;
+        &lt;button className="refresh-btn" onClick={() =&gt; fetchFlights()} disabled={isRefreshing}&gt;
+          {isRefreshing ? 'L&auml;dt...' : 'Aktualisieren'}
+        &lt;/button&gt;
+        {/* + Flug hinzuf&uuml;gen-Button wie in 2.1 */}
+      &lt;/AirportHeader&gt;
+
+      {/* AddFlightForm, SearchBar und FilterBar wie in 2.1 */}
+
+      {isLoading ? (
+        &lt;div className="board-loading board-loading--muted"&gt;
+          &lt;div className="loading-spinner" aria-hidden="true"&gt;&lt;/div&gt;
+          &lt;p&gt;Flugdaten werden geladen...&lt;/p&gt;
+        &lt;/div&gt;
+      ) : (
+        &lt;&gt;
+          {/* beide FlightBoards wie in 2.1 */}
+        &lt;/&gt;
+      )}
+
+      {/* FlightDetail wie in 2.1 */}
+    &lt;/div&gt;
+  );
+}</code></pre>
+        </div>
+        <p>
+          <code>AirportHeader</code> bekommt zwei neue optionale Props, <code>lastUpdated</code> und
+          <code>isRefreshing</code>, und zeigt damit unter dem Flughafennamen &bdquo;Aktualisiert: 14:32:05&ldquo; an
+          (siehe Abschnitt &bdquo;Automatisches Polling&ldquo;).
+        </p>
         <div class="callout callout-tip">
           <div class="callout-icon">&#10003;</div>
           <div class="callout-body">
             <div class="callout-title">Zwei Terminals gleichzeitig</div>
             <p>
-              Im Entwicklungsmodus laufen Frontend (Vite, Port 5173) und Backend (Deno, Port 8000)
-              als separate Prozesse. &Ouml;ffne daf&uuml;r zwei Terminal-Fenster oder verwende Terminal-Tabs.
+              Im Entwicklungsmodus laufen Frontend (Vite, normalerweise Port 5173) und Backend
+              (Deno, Port 8000) als separate Prozesse. Ist 5173 schon belegt, weicht Vite auf 5174 usw.
+              aus &ndash; die tats&auml;chliche Adresse steht beim Start im Terminal. &Ouml;ffne daf&uuml;r zwei Terminal-Fenster oder verwende Terminal-Tabs.
               Im ersten Fenster: <code>npm run dev</code> (im <code>flugboard/</code>-Ordner),
               im zweiten: <code>deno task dev</code> (im <code>backend/</code>-Ordner).
             </p>
@@ -710,7 +902,14 @@ useEffect(() => {
           blocked by CORS policy."</em> &ndash; Das Backend gibt keine CORS-Header zur&uuml;ck. Der Browser
           blockiert die Antwort.
         </p>
-        <p class="fehler-fix">Im Hono-Backend <code>app.use('*', cors())</code> aktivieren und die erlaubte Origin korrekt konfigurieren.</p>
+        <p>
+          H&auml;ufige Ursache: Das Frontend l&auml;uft nicht auf Port 5173. Ist 5173 schon belegt (z.B. durch ein
+          zweites Projekt), weicht Vite still auf 5174 aus &ndash; erlaubt das Backend nur
+          <code>http://localhost:5173</code>, fehlt der CORS-Header.
+        </p>
+        <p class="fehler-fix">Im Hono-Backend <code>cors()</code> aktivieren und die Origin passend konfigurieren &ndash;
+          f&uuml;r die Entwicklung am besten jeden <code>localhost</code>-Port erlauben (siehe Code oben). Die
+          tats&auml;chliche Adresse zeigt Vite beim Start im Terminal an.</p>
       </div>
 
       <div class="fehler-item">
@@ -741,6 +940,8 @@ useEffect(() => {
             <li>Starte mit <code>deno task dev</code> und rufe <code>http://localhost:8000/api/flights</code> im Browser auf</li>
             <li>Teste die Query-Parameter: <code>?type=departure</code>, <code>?status=delayed</code></li>
             <li>Teste den Endpunkt f&uuml;r einzelne Fl&uuml;ge: <code>/api/flights/1</code> und <code>/api/flights/999</code></li>
+            <li>Lege mit <code>curl -X POST</code> einen Flug an, l&ouml;sche ihn mit <code>curl -X DELETE</code> und
+              pr&uuml;fe jeweils die Liste</li>
           </ul>
         </div>
 

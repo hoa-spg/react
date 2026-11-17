@@ -1,22 +1,26 @@
 import { Link, NavLink, Outlet } from 'react-router-dom';
 import { CSSProperties } from 'react';
 import { useTheme } from '../context/ThemeContext';
+import useFlights from '../hooks/useFlights';
 import './Layout.css';
 
 /**
  * Shared layout with top navigation bar.
  * NavLinks highlight the active route; theme toggle is always visible.
+ * Loads the flights once and passes them to every page via the Outlet context,
+ * so switching between pages does not trigger a new request.
  */
 const Layout = () => {
   const { colors, theme, toggleTheme } = useTheme();
+  const flightData = useFlights();
   const themeVars = {
-    '--bg': colors.bg,
-    '--bg-card': colors.bgCard,
-    '--bg-sidebar': colors.bgSidebar,
-    '--text': colors.text,
-    '--text-muted': colors.textMuted,
-    '--border': colors.border,
-    '--accent': colors.accent,
+    '--app-bg': colors.bg,
+    '--app-card-bg': colors.bgCard,
+    '--app-sidebar-bg': colors.bgSidebar,
+    '--app-text': colors.text,
+    '--app-muted': colors.textMuted,
+    '--app-border': colors.border,
+    '--app-accent': colors.accent,
   } as CSSProperties;
 
   return (
@@ -49,7 +53,7 @@ const Layout = () => {
       </header>
 
       <main className="page-content">
-        <Outlet />
+        <Outlet context={flightData} />
       </main>
     </div>
   );

@@ -15,8 +15,9 @@ const sortByTime = (flights: Flight[]): Flight[] =>
   [...flights].sort((a, b) => a.scheduledTime.localeCompare(b.scheduledTime));
 
 /**
- * Root application component for L07.
- * Demonstrates lifting state up: status changes and deletions bubble up via callbacks.
+ * Root application component for lesson 2.3.
+ * Demonstrates lifting state up: status changes and deletions bubble up via callbacks
+ * from FlightCard through FlightBoard to App, which saves them via the API.
  */
 const App = () => {
   // ── API state ─────────────────────────────────────────────────────────────
@@ -85,23 +86,39 @@ const App = () => {
   };
 
   /**
-   * Updates a single flight's status immutably (lifted state).
+   * Saves a new status via PATCH, then updates the flight immutably (lifted state).
    * Demonstrates the "lifting state up" pattern: FlightCard → FlightBoard → App.
    */
-  const handleStatusChange = (id: number, newStatus: FlightStatus) => {
-    setFlights((prev) =>
-      prev.map((f) => (f.id === id ? { ...f, status: newStatus } : f)),
-    );
-    setSelectedFlight((prev) =>
-      prev?.id === id ? { ...prev, status: newStatus } : prev,
-    );
+  const handleStatusChange = async (id: number, newStatus: FlightStatus) => {
+    try {
+      const res = await fetch(`${API_URL}/api/flights/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      if (!res.ok) throw new Error('Fehler beim Ändern des Status');
+      setFlights((prev) =>
+        prev.map((f) => (f.id === id ? { ...f, status: newStatus } : f)),
+      );
+      setSelectedFlight((prev) =>
+        prev?.id === id ? { ...prev, status: newStatus } : prev,
+      );
+    } catch (err) {
+      console.error('Fehler beim Ändern des Status:', err);
+    }
   };
 
-  /** Confirms and removes a flight from state. */
-  const handleDeleteFlight = (id: number) => {
+  /** Confirms, deletes via API and removes the flight from state. */
+  const handleDeleteFlight = async (id: number) => {
     if (!window.confirm('Flug wirklich löschen?')) return;
-    setFlights((prev) => prev.filter((f) => f.id !== id));
-    setSelectedFlight((prev) => (prev?.id === id ? null : prev));
+    try {
+      const res = await fetch(`${API_URL}/api/flights/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Fehler beim Löschen des Flugs');
+      setFlights((prev) => prev.filter((f) => f.id !== id));
+      setSelectedFlight((prev) => (prev?.id === id ? null : prev));
+    } catch (err) {
+      console.error('Fehler beim Löschen:', err);
+    }
   };
 
   const handleReset = () => {
@@ -205,7 +222,7 @@ const App = () => {
 
       {isLoading ? (
         <div className="board-loading board-loading--muted">
-          <div className="status-icon">✈</div>
+          <div className="loading-spinner" aria-hidden="true"></div>
           <p>Flugdaten werden geladen...</p>
         </div>
       ) : (
@@ -218,6 +235,7 @@ const App = () => {
               selectedFlightId={selectedFlight?.id}
               onFlightSelect={setSelectedFlight}
               onFlightDelete={handleDeleteFlight}
+              onResetFilters={hasActiveFilters ? handleReset : undefined}
               onStatusChange={handleStatusChange}
             />
           )}
@@ -229,6 +247,7 @@ const App = () => {
               selectedFlightId={selectedFlight?.id}
               onFlightSelect={setSelectedFlight}
               onFlightDelete={handleDeleteFlight}
+              onResetFilters={hasActiveFilters ? handleReset : undefined}
               onStatusChange={handleStatusChange}
             />
           )}

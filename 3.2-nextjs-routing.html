@@ -29,9 +29,8 @@
       <a class="nav-link" href="1.1-einfuehrung-spa.html"><span class="ln">1.1</span>Motivation &amp; SPA</a>
       <a class="nav-link" href="1.2-einfuehrung.html"><span class="ln">1.2</span>Einführung &amp; Umgebung</a>
       <a class="nav-link" href="1.3-komponenten-props-einfach.html"><span class="ln">1.3</span>Komponenten &amp; Props (einfach)</a>
-      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten &amp; Props (Vertiefung)</a>
+      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten, Props &amp; Listen</a>
       <a class="nav-link" href="1.5-state-events.html"><span class="ln">1.5</span>State &amp; Events</a>
-      <a class="nav-link" href="1.6-listen-conditional.html"><span class="ln">1.6</span>Listen &amp; Conditional Rendering</a>
     </div>
     <div class="nav-group">
       <div class="nav-group-label react-label">Teil 2 &mdash; React Praxis</div>
@@ -242,21 +241,17 @@ export default function BoardLayout({
   children: React.ReactNode;
 }) {
   return (
-    &lt;div className="board-layout"&gt;
-      &lt;header className="board-header"&gt;
-        &lt;Link href="/" className="board-logo"&gt;
-          &#9992; FlugBoard M&uuml;nchen
+    &lt;div&gt;
+      {/* Tab-Navigation nur für die Board-Seiten */}
+      &lt;nav className="board-nav"&gt;
+        &lt;Link href="/departures" className="board-nav-link"&gt;
+          ✈ Abflüge
         &lt;/Link&gt;
-        &lt;nav className="board-tabs"&gt;
-          &lt;Link href="/departures" className="board-tab"&gt;
-            &#10132; Abfl&uuml;ge
-          &lt;/Link&gt;
-          &lt;Link href="/arrivals" className="board-tab"&gt;
-            &#10132; Ank&uuml;nfte
-          &lt;/Link&gt;
-        &lt;/nav&gt;
-      &lt;/header&gt;
-      &lt;main className="board-content"&gt;
+        &lt;Link href="/arrivals" className="board-nav-link"&gt;
+          🛬 Ankünfte
+        &lt;/Link&gt;
+      &lt;/nav&gt;
+      &lt;main className="page-wrap"&gt;
         {children}
       &lt;/main&gt;
     &lt;/div&gt;
@@ -308,6 +303,11 @@ export default function BoardLayout({
       Da Next.js das Suspense automatisch einf&uuml;gt, musst du nichts an
       <code>page.tsx</code> &auml;ndern. Das Loading-UI erscheint sofort beim Navigieren
       und verschwindet, sobald die Seite fertig gerendert ist.
+    </p>
+    <p>
+      Unsere Datenbankabfrage ist so schnell, dass du die Lade-Anzeige kaum zu sehen bekommst. Zum
+      Ausprobieren im Dev-Server die Seite kurz bremsen: Komponente <code>async</code> machen und
+      <code>await new Promise((r) =&gt; setTimeout(r, 2000));</code> an den Anfang setzen.
     </p>
 
     <div class="callout callout-tip">
@@ -362,20 +362,16 @@ interface ErrorProps {
 export default function DeparturesError({ error, reset }: ErrorProps) {
   useEffect(() =&gt; {
     // Fehler in einem Logging-Service erfassen
-    console.error('Fehler beim Laden der Abfl&uuml;ge:', error);
+    console.error('Fehler beim Laden der Abflüge:', error);
   }, [error]);
 
   return (
-    &lt;div className="error-container"&gt;
-      &lt;div className="error-icon"&gt;&#9888;&lt;/div&gt;
-      &lt;h2&gt;Fl&uuml;ge konnten nicht geladen werden&lt;/h2&gt;
-      &lt;p className="error-message"&gt;
+    &lt;div className="state-screen state-screen--error"&gt;
+      &lt;h2 className="state-title"&gt;Fehler beim Laden&lt;/h2&gt;
+      &lt;p className="state-text"&gt;
         {error.message || 'Ein unbekannter Fehler ist aufgetreten.'}
       &lt;/p&gt;
-      &lt;button
-        className="error-reset-btn"
-        onClick={reset}
-      &gt;
+      &lt;button onClick={reset} className="ghost-btn"&gt;
         Erneut versuchen
       &lt;/button&gt;
     &lt;/div&gt;
@@ -396,7 +392,7 @@ export default function DeparturesError({ error, reset }: ErrorProps) {
     <p>
       Dynamische Segmente in eckigen Klammern (<code>[id]</code>) erlauben es, beliebige
       Werte als URL-Parameter zu empfangen. Die Flugdetailseite nutzt das, um den
-      konkreten Flug anhand der ID zu laden.
+      konkreten Flug mit <code>getFlightById</code> aus <code>flights-db.ts</code> zu laden.
     </p>
 
     <div class="callout callout-warning">
@@ -417,49 +413,77 @@ export default function DeparturesError({ error, reset }: ErrorProps) {
         <span class="code-filename">src/app/flight/[id]/page.tsx</span>
         <span class="code-lang">TypeScript</span>
       </div>
-      <pre><code class="language-typescript">import { notFound } from 'next/navigation';
-import { listFlights } from '@/lib/flights-db';
-import type { Metadata } from 'next';
+      <pre><code class="language-typescript">import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import Link from 'next/link';
+import { getFlightById } from '@/lib/flights-db';
 
-interface PageProps {
+interface Props {
   params: Promise&lt;{ id: string }&gt;;
 }
 
-export default async function FlightDetailPage({ params }: PageProps) {
+export async function generateMetadata({ params }: Props): Promise&lt;Metadata&gt; {
+  const { id } = await params;
+  const flight = getFlightById(Number(id));
+  if (!flight) return { title: 'Flug nicht gefunden' };
+  return {
+    title: `Flug ${flight.flightNumber} – ${flight.airport}`,
+    description: `Details zu Flug ${flight.flightNumber} am Flughafen Wien.`,
+  };
+}
+
+export default async function FlightDetailPage({ params }: Props) {
   // params MUSS in Next.js 15 awaited werden
   const { id } = await params;
-
-  const flight = listFlights().find(f =&gt; f.id === Number(id));
+  const flight = getFlightById(Number(id));
 
   if (!flight) {
     // Löst die not-found.tsx aus
     notFound();
   }
 
+  const statusLabels: Record&lt;string, string&gt; = {
+    'on-time':   'Pünktlich',
+    'delayed':   'Verspätet',
+    'boarding':  'Boarding',
+    'departed':  'Gestartet',
+    'landed':    'Gelandet',
+    'cancelled': 'Gestrichen',
+  };
+
+  const details: [string, string][] = [
+    ['Richtung',      flight.type === 'departure' ? 'Abflug' : 'Ankunft'],
+    ['Ziel/Herkunft', flight.airport],
+    ['Geplante Zeit', flight.scheduledTime],
+    ...(flight.expectedTime ? [['Erwartete Zeit', flight.expectedTime] as [string, string]] : []),
+    ['Status',        statusLabels[flight.status]],
+    ['Terminal',      flight.terminal],
+    ...(flight.gate ? [['Gate', flight.gate] as [string, string]] : []),
+  ];
+
   return (
-    &lt;article className="flight-detail"&gt;
-      &lt;h1&gt;Flug {flight.flightNumber}&lt;/h1&gt;
-      &lt;dl className="flight-detail-grid"&gt;
-        &lt;dt&gt;Airline&lt;/dt&gt;
-        &lt;dd&gt;{flight.airline}&lt;/dd&gt;
-        &lt;dt&gt;Typ&lt;/dt&gt;
-        &lt;dd&gt;{flight.type}&lt;/dd&gt;
-        &lt;dt&gt;Airport&lt;/dt&gt;
-        &lt;dd&gt;{flight.airport}&lt;/dd&gt;
-        &lt;dt&gt;Geplant&lt;/dt&gt;
-        &lt;dd&gt;{flight.scheduledTime}&lt;/dd&gt;
-        &lt;dt&gt;Status&lt;/dt&gt;
-        &lt;dd className={`status status-${flight.status}`}&gt;
-          {flight.status}
-        &lt;/dd&gt;
-        {flight.gate &amp;&amp; (
-          &lt;&gt;
-            &lt;dt&gt;Gate&lt;/dt&gt;
-            &lt;dd&gt;{flight.gate}&lt;/dd&gt;
-          &lt;/&gt;
-        )}
-      &lt;/dl&gt;
-    &lt;/article&gt;
+    &lt;main className="detail-wrap"&gt;
+      &lt;Link
+        href={flight.type === 'departure' ? '/departures' : '/arrivals'}
+        className="detail-back"
+      &gt;
+        ← Zurück
+      &lt;/Link&gt;
+      &lt;div className="detail-card"&gt;
+        &lt;div className="detail-head"&gt;
+          &lt;div className="detail-number"&gt;{flight.flightNumber}&lt;/div&gt;
+          &lt;div className="detail-airline"&gt;{flight.airline}&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div className="detail-body"&gt;
+          {details.map(([label, value]) =&gt; (
+            &lt;div key={label} className="detail-row"&gt;
+              &lt;span className="detail-label"&gt;{label}&lt;/span&gt;
+              &lt;span className="detail-value"&gt;{value}&lt;/span&gt;
+            &lt;/div&gt;
+          ))}
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/main&gt;
   );
 }</code></pre>
     </div>
@@ -481,43 +505,27 @@ export default async function FlightDetailPage({ params }: PageProps) {
         <span class="code-filename">src/app/flight/[id]/page.tsx &mdash; mit generateMetadata</span>
         <span class="code-lang">TypeScript</span>
       </div>
-      <pre><code class="language-typescript">import { notFound } from 'next/navigation';
-import { listFlights } from '@/lib/flights-db';
-import type { Metadata } from 'next';
+      <pre><code class="language-typescript">import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import { getFlightById } from '@/lib/flights-db';
 
-interface PageProps {
+interface Props {
   params: Promise&lt;{ id: string }&gt;;
 }
 
 // Wird VOR dem Rendern aufgerufen und setzt &lt;title&gt; + &lt;meta&gt;
-export async function generateMetadata(
-  { params }: PageProps
-): Promise&lt;Metadata&gt; {
+export async function generateMetadata({ params }: Props): Promise&lt;Metadata&gt; {
   const { id } = await params;
-  const flight = listFlights().find(f =&gt; f.id === Number(id));
-
-  if (!flight) {
-    return { title: 'Flug nicht gefunden' };
-  }
-
+  const flight = getFlightById(Number(id));
+  if (!flight) return { title: 'Flug nicht gefunden' };
   return {
     title: `Flug ${flight.flightNumber} – ${flight.airport}`,
-    description: `Details zu Flug ${flight.flightNumber} (${flight.type}) am Flughafen Wien.`,
+    description: `Details zu Flug ${flight.flightNumber} am Flughafen Wien.`,
   };
 }
 
-export default async function FlightDetailPage({ params }: PageProps) {
-  const { id } = await params;
-  const flight = listFlights().find(f =&gt; f.id === Number(id));
-
-  if (!flight) notFound();
-
-  return (
-    &lt;article className="flight-detail"&gt;
-      &lt;h1&gt;{flight.flightNumber}&lt;/h1&gt;
-      {/* ... Restliche Anzeige */}
-    &lt;/article&gt;
-  );
+export default async function FlightDetailPage({ params }: Props) {
+  // ... wie oben
 }</code></pre>
     </div>
 
@@ -529,8 +537,8 @@ export default async function FlightDetailPage({ params }: PageProps) {
           Wenn <code>generateMetadata</code> und die Seitenkomponente denselben
           <code>fetch</code>-Aufruf machen, dedupliziert Next.js die Anfrage automatisch.
           Die API wird also nur <em>einmal</em> aufgerufen, nicht zweimal.
-          Bei direktem Datenimport (wie hier mit <code>listFlights().find()</code>) entf&auml;llt
-          dieses Problem vollst&auml;ndig.
+          Bei direktem Datenbankzugriff (wie hier mit <code>getFlightById</code>) entf&auml;llt
+          dieses Problem &mdash; die Abfrage ist lokal und schnell.
         </p>
       </div>
     </div>
@@ -557,7 +565,12 @@ export default async function FlightDetailPage({ params }: PageProps) {
         </li>
         <li>
           <strong>Board-Layout:</strong> Erstelle <code>src/app/(board)/layout.tsx</code> mit
-          dem Header und der Tab-Navigation (Abfl&uuml;ge / Ank&uuml;nfte).
+          der Tab-Navigation (Abfl&uuml;ge / Ank&uuml;nfte). Die Kopfzeile mit dem Logo bleibt im
+          Root-Layout aus Lektion 3.1 &mdash; so erscheint sie auch auf Startseite und Detailseite.
+        </li>
+        <li>
+          <strong>Tabellen statt Listen:</strong> Ersetze die einfachen Listen aus Lektion 3.1 durch
+          Tabellen, sortiert nach Zeit, mit Status-Badge und Link zur Detailseite (Code unten).
         </li>
         <li>
           <strong>loading.tsx hinzuf&uuml;gen:</strong> Erstelle <code>loading.tsx</code> f&uuml;r
@@ -576,6 +589,87 @@ export default async function FlightDetailPage({ params }: PageProps) {
           Seitentitel im Browser-Tab, und teste eine nicht-existierende ID.
         </li>
       </ol>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">src/app/(board)/departures/page.tsx</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import type { Metadata } from 'next';
+import Link from 'next/link';
+import { listFlights } from '@/lib/flights-db';
+import { Flight, FlightStatus } from '@/types/flight';
+
+// Inline StatusBadge – wird in Lektion 3.3 in eine eigene Komponente ausgelagert
+export const metadata: Metadata = {
+  title: 'Abflüge',
+};
+
+function StatusBadge({ status }: { status: FlightStatus }) {
+  const config: Record&lt;FlightStatus, { label: string; className: string }&gt; = {
+    'on-time': { label: 'Pünktlich', className: 'status-on-time' },
+    'delayed': { label: 'Verspätet', className: 'status-delayed' },
+    'boarding': { label: 'Boarding', className: 'status-boarding' },
+    'departed': { label: 'Gestartet', className: 'status-departed' },
+    'landed': { label: 'Gelandet', className: 'status-landed' },
+    'cancelled': { label: 'Gestrichen', className: 'status-cancelled' },
+  };
+  const cfg = config[status];
+  return &lt;span className={`status-pill ${cfg.className}`}&gt;{cfg.label}&lt;/span&gt;;
+}
+
+export default function DeparturePage() {
+  const departures = [...listFlights()]
+    .filter((f: Flight) =&gt; f.type === 'departure')
+    .sort((a, b) =&gt; a.scheduledTime.localeCompare(b.scheduledTime));
+
+  return (
+    &lt;div&gt;
+      &lt;h1 className="board-page-title"&gt;
+        Abflüge ({departures.length})
+      &lt;/h1&gt;
+      &lt;table className="table-base"&gt;
+        &lt;thead&gt;
+          &lt;tr&gt;
+            {['Flug', 'Airline', 'Ziel', 'Zeit', 'Status', 'Gate'].map((h) =&gt; (
+              &lt;th key={h}&gt;
+                {h}
+              &lt;/th&gt;
+            ))}
+          &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+          {departures.map((f) =&gt; (
+            &lt;tr key={f.id}&gt;
+              &lt;td&gt;
+                &lt;Link href={`/flight/${f.id}`} className="table-link"&gt;
+                  {f.flightNumber}
+                &lt;/Link&gt;
+              &lt;/td&gt;
+              &lt;td className="text-muted"&gt;{f.airline}&lt;/td&gt;
+              &lt;td className="text-main"&gt;{f.airport}&lt;/td&gt;
+              &lt;td className="text-main"&gt;
+                {f.scheduledTime}
+                {f.expectedTime &amp;&amp; (
+                  &lt;span className="time-delayed"&gt;→ {f.expectedTime}&lt;/span&gt;
+                )}
+              &lt;/td&gt;
+              &lt;td&gt;
+                &lt;StatusBadge status={f.status} /&gt;
+              &lt;/td&gt;
+              &lt;td className="text-muted"&gt;{f.gate ?? '—'}&lt;/td&gt;
+            &lt;/tr&gt;
+          ))}
+        &lt;/tbody&gt;
+      &lt;/table&gt;
+    &lt;/div&gt;
+  );
+}</code></pre>
+      </div>
+      <p>
+        <code>arrivals/page.tsx</code> ist gleich aufgebaut (<code>type === 'arrival'</code>, Spalte
+        &bdquo;Herkunft&ldquo; statt &bdquo;Ziel&ldquo;). Dass Badge und Tabelle doppelt vorkommen, &auml;ndern wir in
+        Lektion 3.3: Dort werden sie zu eigenen Komponenten.
+      </p>
     </div>
   </section>
 
@@ -587,9 +681,9 @@ export default async function FlightDetailPage({ params }: PageProps) {
       <div class="fehler-title">Fehler: <code>params</code> nicht awaited</div>
       <p>
         Du schreibst <code>const { id } = params;</code> anstatt <code>const { id } = await params;</code>.
-        TypeScript zeigt keinen Fehler, aber <code>id</code> ist ein unaufgel&ouml;stes
-        Promise-Objekt &mdash; dein <code>find()</code>-Aufruf findet nichts und die Seite
-        zeigt immer &bdquo;Flug nicht gefunden&ldquo;.
+        Ist <code>params</code> korrekt als <code>Promise</code> typisiert, meldet TypeScript den Fehler.
+        Ohne Typangabe f&auml;llt er erst zur Laufzeit auf: <code>id</code> ist <code>undefined</code>,
+        es wird kein Flug gefunden und die Seite zeigt immer &bdquo;Flug nicht gefunden&ldquo;.
       </p>
       <p class="fehler-fix">
         <strong>Fix:</strong> Markiere die Komponente als <code>async</code> und
@@ -656,7 +750,7 @@ export default async function FlightDetailPage({ params }: PageProps) {
         <ul>
           <li>Erstelle den Ordner <code>src/app/(board)/</code></li>
           <li>Verschiebe <code>departures/</code> und <code>arrivals/</code> in die Route Group</li>
-          <li>Erstelle <code>(board)/layout.tsx</code> mit Header und Tab-Navigation</li>
+          <li>Erstelle <code>(board)/layout.tsx</code> mit der Tab-Navigation</li>
           <li>Hebe den aktiven Tab visuell hervor (verwende <code>usePathname()</code>)</li>
         </ul>
       </div>
@@ -690,7 +784,7 @@ export default async function FlightDetailPage({ params }: PageProps) {
           <li>Awaite <code>params</code> korrekt und lese <code>id</code> aus</li>
           <li>Zeige alle Flugdetails an (Flugnummer, Airline, Route, Status, Gate)</li>
           <li>Rufe <code>notFound()</code> auf, wenn kein Flug gefunden wurde</li>
-          <li>F&uuml;ge von den Abflug-Listenseiten Links zu <code>/flight/{'{flight.id}'}</code> hinzu</li>
+          <li>F&uuml;ge in beiden Tabellen Links zu <code>/flight/[id]</code> hinzu (z.B. <code>/flight/1</code>)</li>
         </ul>
       </div>
 

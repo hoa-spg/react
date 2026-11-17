@@ -27,3 +27,9 @@
   line-height: 1;
   cursor: pointer;
 }
+
+/* Browser-eigenen Löschen-Button von type="search" ausblenden – wir haben einen eigenen */
+.search-input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}

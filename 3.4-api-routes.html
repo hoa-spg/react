@@ -29,9 +29,8 @@
       <a class="nav-link" href="1.1-einfuehrung-spa.html"><span class="ln">1.1</span>Motivation &amp; SPA</a>
       <a class="nav-link" href="1.2-einfuehrung.html"><span class="ln">1.2</span>Einführung &amp; Umgebung</a>
       <a class="nav-link" href="1.3-komponenten-props-einfach.html"><span class="ln">1.3</span>Komponenten &amp; Props (einfach)</a>
-      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten &amp; Props (Vertiefung)</a>
+      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten, Props &amp; Listen</a>
       <a class="nav-link" href="1.5-state-events.html"><span class="ln">1.5</span>State &amp; Events</a>
-      <a class="nav-link" href="1.6-listen-conditional.html"><span class="ln">1.6</span>Listen &amp; Conditional Rendering</a>
     </div>
     <div class="nav-group">
       <div class="nav-group-label react-label">Teil 2 &mdash; React Praxis</div>
@@ -518,7 +517,7 @@ export default function AddFlightForm() {
         &lt;input
           id="scheduledTime"
           name="scheduledTime"
-          type="datetime-local"
+          type="time"
           required
         /&gt;
       &lt;/div&gt;
@@ -531,6 +530,58 @@ export default function AddFlightForm() {
       &lt;/button&gt;
     &lt;/form&gt;
   );
+}</code></pre>
+    </div>
+
+    <p>
+      Das Projekt enth&auml;lt noch keine Formular-Styles. Wenn du <code>AddFlightForm</code>
+      einbaust, erg&auml;nze diese Regeln in <code>globals.css</code>:
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">src/app/globals.css (Erg&auml;nzung)</span>
+        <span class="code-lang">CSS</span>
+      </div>
+      <pre><code class="language-css">.add-flight-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1.25rem;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  background: #161b22;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.form-group label {
+  color: #8b949e;
+  font-size: 0.8rem;
+}
+
+.form-group input {
+  padding: 8px 12px;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  background: #21262d;
+  color: #e6edf3;
+}
+
+.btn-primary {
+  align-self: end;
+  padding: 8px 20px;
+  border: none;
+  border-radius: 6px;
+  background: #3fb950;
+  color: #0d1117;
+  font-weight: 600;
+  cursor: pointer;
 }</code></pre>
     </div>
 

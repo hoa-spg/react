@@ -11,12 +11,13 @@ interface FlightBoardProps {
   onFlightSelect: (flight: Flight) => void;
   onFlightDelete?: (id: number) => void;
   onStatusChange: (id: number, status: FlightStatus) => void;
+  onResetFilters?: () => void;
   count?: number;
 }
 
 /**
  * Renders a titled section of flight rows.
- * Uses ThemeContext for background and border colors.
+ * @param onResetFilters - Optional callback; shows a reset button in the empty state.
  */
 const FlightBoard = ({
   flights,
@@ -25,6 +26,7 @@ const FlightBoard = ({
   onFlightSelect,
   onFlightDelete,
   onStatusChange,
+  onResetFilters,
   count,
 }: FlightBoardProps) => {
   return (
@@ -36,7 +38,7 @@ const FlightBoard = ({
         )}
       </div>
       {flights.length === 0 ? (
-        <EmptyState />
+        <EmptyState onReset={onResetFilters} />
       ) : (
         <table className="flight-table">
           <thead>

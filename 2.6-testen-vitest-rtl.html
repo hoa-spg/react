@@ -29,9 +29,8 @@
       <a class="nav-link" href="1.1-einfuehrung-spa.html"><span class="ln">1.1</span>Motivation &amp; SPA</a>
       <a class="nav-link" href="1.2-einfuehrung.html"><span class="ln">1.2</span>Einführung &amp; Umgebung</a>
       <a class="nav-link" href="1.3-komponenten-props-einfach.html"><span class="ln">1.3</span>Komponenten &amp; Props (einfach)</a>
-      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten &amp; Props (Vertiefung)</a>
+      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten, Props &amp; Listen</a>
       <a class="nav-link" href="1.5-state-events.html"><span class="ln">1.5</span>State &amp; Events</a>
-      <a class="nav-link" href="1.6-listen-conditional.html"><span class="ln">1.6</span>Listen &amp; Conditional Rendering</a>
     </div>
     <div class="nav-group">
       <div class="nav-group-label react-label">Teil 2 &mdash; React Praxis</div>
@@ -82,7 +81,8 @@
         <li>Mit React Testing Library benutzerzentriert testen</li>
         <li>Interaktionen mit <code>@testing-library/user-event</code> abdecken</li>
         <li><code>@testing-library/jest-dom</code> Matchers sinnvoll einsetzen</li>
-        <li>Integrationstests mit API-Mocks (MSW) kurz einordnen</li>
+        <li>Komponenten &uuml;ber Labels und Rollen testbar (und barrierefrei) machen</li>
+        <li>Im Integrationstest das Backend durch einen <code>fetch</code>-Mock ersetzen</li>
       </ul>
     </section>
 
@@ -114,8 +114,8 @@
     <section class="section">
       <h2>2. Setup mit Vitest, RTL und jest-dom</h2>
       <p>
-        Wir nutzen das Beispiel unter <code>beispiele/2.6</code>. Das Setup ist bewusst
-        leichtgewichtig und bleibt nahe an Vite.
+        Wir erweitern das FlugBoard aus Lektion 2.5 um Tests (fertiges Beispiel: <code>beispiele/2.6</code>).
+        An der App selbst &auml;ndert sich fast nichts &ndash; dazu kommen nur Pakete, Konfiguration und Testdateien.
       </p>
       <div class="code-block">
         <div class="code-header">
@@ -127,16 +127,33 @@
 # einmalig ausf&uuml;hren
 npm run test
 
-# beim Entwickeln
+# beim Entwickeln: Tests laufen bei jeder &Auml;nderung neu
 npm run test:watch</code></pre>
       </div>
-
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">package.json (Scripts)</span>
+          <span class="code-lang">JSON</span>
+        </div>
+        <pre><code class="language-json">"scripts": {
+  "dev": "vite",
+  "build": "vite build",
+  "preview": "vite preview",
+  "test": "vitest run",
+  "test:watch": "vitest"
+}</code></pre>
+      </div>
+      <p>
+        Vitest liest seine Einstellungen aus <code>vite.config.ts</code>. Damit TypeScript den Block
+        <code>test</code> kennt, kommt <code>defineConfig</code> jetzt aus <code>vitest/config</code> statt aus
+        <code>vite</code>:
+      </p>
       <div class="code-block">
         <div class="code-header">
           <span class="code-filename">vite.config.ts</span>
           <span class="code-lang">TypeScript</span>
         </div>
-        <pre><code class="language-typescript">import { defineConfig } from 'vite';
+        <pre><code class="language-typescript">import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
@@ -146,7 +163,50 @@ export default defineConfig({
     globals: true,
     setupFiles: './src/test/setup.ts',
   },
+  optimizeDeps: {
+    esbuildOptions: {
+      sourcemap: false,
+    },
+  },
 });</code></pre>
+      </div>
+      <p>
+        Mit <code>globals: true</code> stehen <code>test</code>, <code>expect</code> und <code>vi</code> ohne Import
+        zur Verf&uuml;gung. Damit auch der Editor sie kennt, erg&auml;nzen wir in <code>tsconfig.json</code> unter
+        <code>compilerOptions</code>:
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">tsconfig.json (Erg&auml;nzung)</span>
+          <span class="code-lang">JSON</span>
+        </div>
+        <pre><code class="language-json">"types": ["vitest/globals"]</code></pre>
+      </div>
+      <p>
+        Die Setup-Datei l&auml;uft vor jedem Test. Sie bindet die zus&auml;tzlichen Matcher von jest-dom ein
+        (z.B. <code>toBeInTheDocument()</code>) und stellt einen einfachen <code>localStorage</code> bereit, den
+        unsere Hooks <code>useLocalStorage</code> und <code>ThemeProvider</code> brauchen:
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">src/test/setup.ts</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import '@testing-library/jest-dom/vitest';
+
+// Einfacher localStorage im Arbeitsspeicher für alle Tests.
+// Grund: Ab Node 25 gibt es ein eigenes globales localStorage, das ohne
+// Speicherdatei nicht funktioniert und das localStorage von jsdom überdeckt.
+const data = new Map&lt;string, string&gt;();
+const memoryStorage: Storage = {
+  get length() { return data.size; },
+  clear: () =&gt; data.clear(),
+  getItem: (key) =&gt; data.get(key) ?? null,
+  key: (index) =&gt; [...data.keys()][index] ?? null,
+  removeItem: (key) =&gt; { data.delete(key); },
+  setItem: (key, value) =&gt; { data.set(key, String(value)); },
+};
+Object.defineProperty(globalThis, 'localStorage', { value: memoryStorage, configurable: true });</code></pre>
       </div>
 
       <div class="callout callout-tip">
@@ -162,68 +222,234 @@ export default defineConfig({
     </section>
 
     <section class="section">
-      <h2>3. Erster Komponententest</h2>
+      <h2>3. Komponenten testbar machen: Labels und Rollen</h2>
       <p>
         React Testing Library testet aus Sicht von Nutzerinnen und Nutzern.
         Deshalb fragen wir Elemente bevorzugt &uuml;ber Rollen, Labels und sichtbaren Text
         ab &ndash; nicht &uuml;ber CSS-Selektoren oder Implementierungsdetails.
       </p>
+      <p>
+        Das funktioniert nur, wenn die Elemente richtig beschriftet sind. In unserem Formular standen
+        <code>&lt;label&gt;</code> und <code>&lt;input&gt;</code> bisher nur nebeneinander &ndash; verkn&uuml;pft sind sie
+        erst &uuml;ber <code>htmlFor</code> und <code>id</code>. Das Suchfeld und die Filter-Selects hatten gar keine
+        Beschriftung; sie bekommen ein <code>aria-label</code>, das Suchfeld au&szlig;erdem <code>type="search"</code>
+        (Rolle <code>searchbox</code>).
+      </p>
       <div class="code-block">
         <div class="code-header">
-          <span class="code-filename">src/components/flight-form.test.tsx</span>
+          <span class="code-filename">src/components/AddFlightForm.tsx (Ausschnitt)</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">        &lt;div className="form-field"&gt;
+          &lt;label className="form-label" htmlFor="add-flight-number"&gt;Flugnummer *&lt;/label&gt;
+          &lt;input
+            id="add-flight-number"
+            className={inputClass('flightNumber')}
+            value={flightNumber}
+            onChange={(e) =&gt; setFlightNumber(e.target.value)}
+            placeholder="z.B. OS123"
+          /&gt;
+          {errors.flightNumber &amp;&amp; (
+            &lt;span className="form-error"&gt;{errors.flightNumber}&lt;/span&gt;
+          )}
+        &lt;/div&gt;</code></pre>
+      </div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">src/components/SearchBar.tsx (Ausschnitt)</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">      &lt;input
+        type="search"
+        aria-label="Flüge suchen"
+        className="search-input"
+        value={value}
+        placeholder={placeholder}
+        onChange={(e) =&gt; onChange(e.target.value)}
+      /&gt;</code></pre>
+      </div>
+
+      <div class="callout callout-info">
+        <div class="callout-icon">&#8505;</div>
+        <div class="callout-body">
+          <div class="callout-title">Barrierefrei = gut testbar</div>
+          <p>
+            Screenreader finden Elemente &uuml;ber genau dieselben Beschriftungen wie
+            <code>getByLabelText</code> und <code>getByRole</code>. Was sich schlecht testen l&auml;sst, ist oft
+            auch schlecht zug&auml;nglich &ndash; und umgekehrt.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>4. Komponententests</h2>
+      <p>
+        Ein Komponententest rendert eine einzelne Komponente mit festen Props und pr&uuml;ft, was sichtbar ist.
+        Der einfachste Fall: Zeigt das Badge zum Status das richtige Label?
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">src/components/FlightStatusBadge.test.tsx</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import { render, screen } from '@testing-library/react';
+
+import FlightStatusBadge from './FlightStatusBadge';
+
+test('zeigt das deutsche Label zum Status', () =&gt; {
+  render(&lt;FlightStatusBadge status="delayed" /&gt;);
+
+  expect(screen.getByText('Verspätet')).toBeInTheDocument();
+});</code></pre>
+      </div>
+      <p>
+        Beim Formular simulieren wir Eingaben und Klicks mit <code>userEvent</code>. Statt einer echten
+        Callback-Funktion &uuml;bergeben wir eine Attrappe (<code>vi.fn()</code>) und pr&uuml;fen, ob und womit sie
+        aufgerufen wurde:
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">src/components/AddFlightForm.test.tsx</span>
           <span class="code-lang">TypeScript</span>
         </div>
         <pre><code class="language-typescript">import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import FlightForm from './FlightForm';
 
-test('sendet Callback mit Formdaten', async () =&gt; {
+import AddFlightForm from './AddFlightForm';
+
+test('zeigt Fehler und ruft onAdd nicht auf, wenn Pflichtfelder fehlen', async () =&gt; {
   const user = userEvent.setup();
-  const onCreate = vi.fn();
+  const onAdd = vi.fn();
 
-  render(&lt;FlightForm onCreate={onCreate} /&gt;);
+  render(&lt;AddFlightForm onAdd={onAdd} onCancel={vi.fn()} /&gt;);
 
-  await user.type(screen.getByLabelText(/flugnummer/i), 'LH123');
-  await user.type(screen.getByLabelText(/airline/i), 'Lufthansa');
-  await user.click(screen.getByRole('button', { name: /flug anlegen/i }));
+  await user.click(screen.getByRole('button', { name: 'Hinzufügen' }));
 
-  expect(onCreate).toHaveBeenCalledWith({
-    flightNumber: 'LH123',
-    airline: 'Lufthansa',
-  });
+  expect(screen.getByText('Flugnummer ist erforderlich.')).toBeInTheDocument();
+  expect(onAdd).not.toHaveBeenCalled();
+});
+
+test('ruft onAdd mit den eingegebenen Daten auf', async () =&gt; {
+  const user = userEvent.setup();
+  const onAdd = vi.fn();
+
+  render(&lt;AddFlightForm onAdd={onAdd} onCancel={vi.fn()} /&gt;);
+
+  await user.type(screen.getByLabelText(/flugnummer/i), 'os123');
+  await user.type(screen.getByLabelText(/airline/i), 'Austrian Airlines');
+  await user.type(screen.getByLabelText(/abflugzeit/i), '10:30');
+  await user.type(screen.getByLabelText(/ziel/i), 'London Heathrow (LHR)');
+  await user.click(screen.getByRole('button', { name: 'Hinzufügen' }));
+
+  expect(onAdd).toHaveBeenCalledWith(
+    expect.objectContaining({
+      flightNumber: 'OS123', // wird in Großbuchstaben umgewandelt
+      airline: 'Austrian Airlines',
+      type: 'departure',
+      scheduledTime: '10:30',
+      airport: 'London Heathrow (LHR)',
+    }),
+  );
 });</code></pre>
       </div>
     </section>
 
     <section class="section">
-      <h2>4. Kurzer Integrationsteil: Komponente + State + Mock</h2>
+      <h2>5. Integrationstest: App + State + gemocktes Backend</h2>
       <p>
-        Nur kurz zur Einordnung: Ein Integrationstest verbindet mehrere Bausteine,
-        etwa Formular + Liste + Filter-Logik oder UI + API-Aufruf.
-      </p>
-      <p>
-        Im Kapitel bleibt das bewusst klein: eine Seite mit Eingabe und gefilterter
-        Liste. F&uuml;r API-Tests kannst du zus&auml;tzlich MSW einsetzen, um Endpunkte
-        realistisch zu mocken.
+        Ein Integrationstest verbindet mehrere Bausteine. Hier rendern wir die ganze <code>App</code>:
+        <code>useFlights</code> l&auml;dt die Daten, <code>useFlightFilters</code> filtert, <code>FlightBoard</code>
+        zeigt sie an. Nur das Backend ersetzen wir: <code>vi.stubGlobal('fetch', ...)</code> tauscht das globale
+        <code>fetch</code> gegen eine Funktion aus, die immer unsere Testfl&uuml;ge liefert.
       </p>
       <div class="code-block">
         <div class="code-header">
-          <span class="code-filename">src/integration/flight-board.integration.test.tsx</span>
+          <span class="code-filename">src/App.integration.test.tsx</span>
           <span class="code-lang">TypeScript</span>
         </div>
         <pre><code class="language-typescript">import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import FlightBoardPage from '../pages/FlightBoardPage';
 
-test('filtert die Liste nach Eingabe', async () =&gt; {
+import App from './App';
+import { ThemeProvider } from './context/ThemeContext';
+import { Flight } from './types/flight';
+
+const testFlights: Flight[] = [
+  {
+    id: 1, flightNumber: 'OS123', airline: 'Austrian Airlines', type: 'departure',
+    scheduledTime: '10:30', status: 'boarding', airport: 'London Heathrow (LHR)', terminal: 'T3',
+  },
+  {
+    id: 2, flightNumber: 'LH456', airline: 'Lufthansa', type: 'departure',
+    scheduledTime: '11:15', status: 'on-time', airport: 'Frankfurt (FRA)', terminal: 'T2',
+  },
+  {
+    id: 3, flightNumber: 'EK789', airline: 'Emirates', type: 'arrival',
+    scheduledTime: '09:45', status: 'landed', airport: 'Dubai (DXB)', terminal: 'T1',
+  },
+];
+
+beforeEach(() =&gt; {
+  localStorage.clear(); // gespeicherte Filter aus useLocalStorage entfernen
+  // fetch durch eine Attrappe ersetzen: Statt des Backends kommen immer die Testflüge
+  vi.stubGlobal('fetch', vi.fn(async () =&gt; new Response(JSON.stringify(testFlights))));
+});
+
+afterEach(() =&gt; {
+  vi.unstubAllGlobals();
+});
+
+// App braucht den ThemeProvider – wie in main.tsx
+const renderApp = () =&gt;
+  render(
+    &lt;ThemeProvider&gt;
+      &lt;App /&gt;
+    &lt;/ThemeProvider&gt;,
+  );
+
+test('zeigt die Flüge aus dem Backend an', async () =&gt; {
+  renderApp();
+
+  // findBy… wartet, bis die Daten geladen sind
+  expect(await screen.findByText('OS123')).toBeInTheDocument();
+  expect(screen.getByText('EK789')).toBeInTheDocument();
+});
+
+test('Suche filtert die Tabelle, ohne Treffer erscheint der Empty State', async () =&gt; {
   const user = userEvent.setup();
-  render(&lt;FlightBoardPage /&gt;);
+  renderApp();
+  await screen.findByText('OS123');
 
-  await user.type(screen.getByRole('searchbox', { name: /suche/i }), 'LH');
+  const search = screen.getByRole('searchbox', { name: 'Flüge suchen' });
+  await user.type(search, 'Frankfurt');
 
-  expect(screen.getByText('LH123')).toBeInTheDocument();
-  expect(screen.queryByText('OS404')).not.toBeInTheDocument();
+  expect(screen.getByText('LH456')).toBeInTheDocument();
+  expect(screen.queryByText('OS123')).not.toBeInTheDocument();
+
+  await user.clear(search);
+  await user.type(search, 'xyz');
+
+  // Abflüge und Ankünfte sind leer → zwei Empty States mit Reset-Button
+  expect(screen.getAllByText('Keine Flüge gefunden')).toHaveLength(2);
+
+  await user.click(screen.getAllByRole('button', { name: 'Filter zurücksetzen' })[0]);
+
+  expect(screen.getByText('OS123')).toBeInTheDocument();
 });</code></pre>
+      </div>
+
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#128161;</div>
+        <div class="callout-body">
+          <div class="callout-title">getBy, queryBy, findBy</div>
+          <p>
+            <code>getBy&hellip;</code> erwartet, dass das Element <em>jetzt</em> da ist, sonst schl&auml;gt der Test fehl.
+            <code>queryBy&hellip;</code> liefert <code>null</code> statt eines Fehlers &ndash; ideal f&uuml;r
+            &bdquo;ist nicht da&ldquo;. <code>findBy&hellip;</code> wartet, bis das Element erscheint &ndash; n&ouml;tig, wenn
+            Daten erst asynchron geladen werden.
+          </p>
+        </div>
       </div>
 
       <div class="callout callout-info">
@@ -231,9 +457,8 @@ test('filtert die Liste nach Eingabe', async () =&gt; {
         <div class="callout-body">
           <div class="callout-title">MSW nur als Ausblick</div>
           <p>
-            Vollst&auml;ndige API-Integrationsstrategien mit MSW vertiefen wir hier
-            bewusst nicht weiter. Ziel ist, die Grundlagen in einem Kapitel sauber
-            zu etablieren.
+            F&uuml;r gr&ouml;&szlig;ere Projekte gibt es MSW (Mock Service Worker), das echte HTTP-Endpunkte nachbildet.
+            F&uuml;r unser Projekt reicht der einfache <code>fetch</code>-Mock.
           </p>
         </div>
       </div>
@@ -247,11 +472,15 @@ test('filtert die Liste nach Eingabe', async () =&gt; {
           <h3>Test-Basis f&uuml;r FlugBoard einziehen</h3>
         </div>
         <ol>
-          <li>Testabh&auml;ngigkeiten installieren und Scripts in <code>package.json</code> erg&auml;nzen.</li>
-          <li><code>src/test/setup.ts</code> mit <code>@testing-library/jest-dom</code> erstellen.</li>
-          <li>Einen Komponententest f&uuml;r ein Formular oder ein Badge schreiben.</li>
-          <li>Einen kurzen Integrationstest f&uuml;r Suche + Liste erg&auml;nzen.</li>
-          <li>Alle Tests gr&uuml;n halten, bevor du zu Router/Backend weitergehst.</li>
+          <li>Testpakete installieren, Scripts in <code>package.json</code> erg&auml;nzen.</li>
+          <li><code>vite.config.ts</code> auf <code>vitest/config</code> umstellen und den Block <code>test</code> einf&uuml;gen;
+            <code>"types": ["vitest/globals"]</code> in <code>tsconfig.json</code> erg&auml;nzen.</li>
+          <li><code>src/test/setup.ts</code> anlegen.</li>
+          <li>Komponenten beschriften: <code>htmlFor</code>/<code>id</code> in <code>AddFlightForm</code>,
+            <code>aria-label</code> f&uuml;r Suchfeld und Filter-Selects, Suchfeld als <code>type="search"</code>.</li>
+          <li>Die Tests <code>FlightStatusBadge.test.tsx</code>, <code>AddFlightForm.test.tsx</code> und
+            <code>App.integration.test.tsx</code> anlegen.</li>
+          <li><code>npm run test</code>: Alle Tests m&uuml;ssen gr&uuml;n sein, bevor du mit Lektion 2.7 weitermachst.</li>
         </ol>
       </div>
     </section>
@@ -278,6 +507,27 @@ test('filtert die Liste nach Eingabe', async () =&gt; {
         <p class="fehler-fix">
           Fix: <code>const user = userEvent.setup()</code> und alle Interaktionen
           mit <code>await</code> ausf&uuml;hren.
+        </p>
+      </div>
+      <div class="fehler-item">
+        <div class="fehler-title">Fehler: getByLabelText findet das Feld nicht</div>
+        <p>
+          <code>Unable to find a label with the text of: Flugnummer</code> &ndash; das <code>&lt;label&gt;</code> steht
+          zwar neben dem Feld, ist aber nicht damit verkn&uuml;pft.
+        </p>
+        <p class="fehler-fix">
+          Fix: <code>&lt;label htmlFor="add-flight-number"&gt;</code> und <code>&lt;input id="add-flight-number"&gt;</code>
+          &ndash; oder das Feld in das <code>&lt;label&gt;</code> hineinschreiben.
+        </p>
+      </div>
+      <div class="fehler-item">
+        <div class="fehler-title">Fehler: getBy statt findBy bei geladenen Daten</div>
+        <p>
+          Direkt nach <code>render()</code> sind die Daten aus <code>fetch</code> noch nicht da.
+          <code>screen.getByText('OS123')</code> schl&auml;gt deshalb fehl, obwohl die App funktioniert.
+        </p>
+        <p class="fehler-fix">
+          Fix: Auf das erste asynchron geladene Element mit <code>await screen.findByText(...)</code> warten.
         </p>
       </div>
       <div class="fehler-item">
@@ -312,9 +562,9 @@ test('filtert die Liste nach Eingabe', async () =&gt; {
           <span class="aufgabe-title">Komponententest schreiben</span>
         </div>
         <ul>
-          <li>Teste ein Formular oder eine Filter-Komponente aus FlugBoard.</li>
-          <li>Simuliere Eingabe und Klick mit <code>userEvent</code>.</li>
-          <li>Verifiziere den Callback mit den erwarteten Daten.</li>
+          <li>Teste <code>SearchBar</code>: Eine Eingabe ruft <code>onChange</code> mit dem Text auf.</li>
+          <li>Ist ein Wert gesetzt, l&ouml;scht der Button &bdquo;Suche l&ouml;schen&ldquo; ihn (<code>onChange('')</code>).</li>
+          <li>Ohne Wert gibt es keinen L&ouml;schen-Button (<code>queryByRole</code> liefert <code>null</code>).</li>
         </ul>
       </div>
       <div class="aufgabe">
@@ -323,9 +573,10 @@ test('filtert die Liste nach Eingabe', async () =&gt; {
           <span class="aufgabe-title">Kurzer Integrationstest</span>
         </div>
         <ul>
-          <li>Teste eine kleine Benutzerstrecke: Sucheingabe &rarr; gefilterte Liste.</li>
-          <li>Verifiziere sichtbare und nicht sichtbare Eintr&auml;ge.</li>
-          <li>Optional: Mocke API-Response mit MSW als kurzen Zusatz.</li>
+          <li>Erweitere <code>App.integration.test.tsx</code> um einen Test f&uuml;r den Status-Filter.</li>
+          <li>W&auml;hle im Select &bdquo;Nach Status filtern&ldquo; den Wert &bdquo;P&uuml;nktlich&ldquo;
+            (<code>user.selectOptions(...)</code>).</li>
+          <li>Pr&uuml;fe: LH456 ist sichtbar, OS123 (Boarding) nicht.</li>
         </ul>
       </div>
       <div class="aufgabe aufgabe-bonus">
@@ -334,7 +585,8 @@ test('filtert die Liste nach Eingabe', async () =&gt; {
           <span class="aufgabe-title">Test-Helfer abstrahieren</span>
         </div>
         <ul>
-          <li>Erstelle eine eigene <code>renderWithProviders()</code>-Funktion.</li>
+          <li>Erstelle eine eigene <code>renderWithProviders()</code>-Funktion, die eine Komponente in
+            <code>ThemeProvider</code> einwickelt.</li>
           <li>Nutze sie in mindestens zwei Tests.</li>
           <li>Vergleiche Lesbarkeit vor/nach der Abstraktion.</li>
         </ul>

@@ -9,10 +9,10 @@
 .search-input {
   width: 100%;
   padding: 8px 36px 8px 12px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--app-border);
   border-radius: 6px;
-  background: var(--bg-sidebar);
-  color: var(--text);
+  background: var(--app-sidebar-bg);
+  color: var(--app-text);
   font-size: 0.875rem;
 }
 
@@ -22,7 +22,13 @@
   padding: 2px 4px;
   border: none;
   background: none;
-  color: var(--text-muted);
+  color: var(--app-muted);
   font-size: 1rem;
   line-height: 1;
+}
+
+/* Browser-eigenen Löschen-Button von type="search" ausblenden – wir haben einen eigenen */
+.search-input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
 }

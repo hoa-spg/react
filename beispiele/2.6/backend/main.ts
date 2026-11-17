@@ -5,7 +5,12 @@ import { flights } from './data.ts';
 const app = new Hono();
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-app.use('*', cors({ origin: 'http://localhost:5173' }));
+app.use('*', cors({
+  // Entwicklung: jedes Frontend auf localhost erlauben, egal auf welchem Port
+  // (Vite weicht auf 5174, 5175, ... aus, wenn 5173 schon belegt ist)
+  origin: (origin) =>
+    /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin) ? origin : null,
+}));
 
 app.get('/api/flights', async (c) => {
   await sleep(1000);
@@ -32,6 +37,15 @@ app.post('/api/flights', async (c) => {
   const newFlight = { id: Date.now(), status: 'on-time' as const, ...body };
   flights.push(newFlight);
   return c.json(newFlight, 201);
+});
+
+app.patch('/api/flights/:id', async (c) => {
+  const id = Number(c.req.param('id'));
+  const flight = flights.find((f) => f.id === id);
+  if (!flight) return c.json({ error: 'Nicht gefunden' }, 404);
+  const body = await c.req.json();
+  if (body.status) flight.status = body.status;
+  return c.json(flight);
 });
 
 app.delete('/api/flights/:id', (c) => {

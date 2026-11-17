@@ -10,13 +10,13 @@
 }
 
 .board-title {
-  color: var(--text);
+  color: var(--app-text);
   font-size: 1.2rem;
   font-weight: 600;
 }
 
 .board-count {
-  color: var(--text-muted);
+  color: var(--app-muted);
   font-size: 0.8rem;
 }
 
@@ -25,14 +25,14 @@
   border-collapse: collapse;
   border-radius: 8px;
   overflow: hidden;
-  background: var(--bg-card);
+  background: var(--app-card-bg);
 }
 
 .flight-table th {
   padding: 0.6rem 1rem;
-  border-bottom: 1px solid var(--border);
-  background: var(--bg-sidebar);
-  color: var(--text-muted);
+  border-bottom: 1px solid var(--app-border);
+  background: var(--app-sidebar-bg);
+  color: var(--app-muted);
   text-align: left;
   font-size: 0.75rem;
   font-weight: 600;

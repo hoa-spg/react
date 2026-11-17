@@ -29,9 +29,8 @@
       <a class="nav-link" href="1.1-einfuehrung-spa.html"><span class="ln">1.1</span>Motivation &amp; SPA</a>
       <a class="nav-link" href="1.2-einfuehrung.html"><span class="ln">1.2</span>Einführung &amp; Umgebung</a>
       <a class="nav-link" href="1.3-komponenten-props-einfach.html"><span class="ln">1.3</span>Komponenten &amp; Props (einfach)</a>
-      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten &amp; Props (Vertiefung)</a>
+      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten, Props &amp; Listen</a>
       <a class="nav-link" href="1.5-state-events.html"><span class="ln">1.5</span>State &amp; Events</a>
-      <a class="nav-link" href="1.6-listen-conditional.html"><span class="ln">1.6</span>Listen &amp; Conditional Rendering</a>
     </div>
     <div class="nav-group">
       <div class="nav-group-label react-label">Teil 2 &mdash; React Praxis</div>
@@ -80,7 +79,7 @@
         <li>Verstehen, warum In-Memory-Daten f&uuml;r echte Apps nicht ausreichen</li>
         <li>Ein Deno+Hono-Backend auf Drizzle ORM und SQLite umstellen</li>
         <li>Seed-Daten einmalig in die Datenbank schreiben</li>
-        <li>GET/POST/DELETE-Endpunkte gegen die Datenbank ausf&uuml;hren</li>
+        <li>GET-, POST-, PATCH- und DELETE-Endpunkte gegen die Datenbank ausf&uuml;hren</li>
       </ul>
     </section>
 
@@ -106,20 +105,48 @@
     <section class="section">
       <h2>Drizzle + SQLite im Deno-Backend</h2>
       <p>
-        Das Beispielprojekt liegt unter <code>beispiele/2.8</code>. Der Backend-Teil nutzt
-        Drizzle mit einer lokalen SQLite-Datei <code>flugboard.db</code>.
+        <strong>SQLite</strong> speichert die ganze Datenbank in einer einzigen Datei &ndash; kein eigener
+        Datenbankserver n&ouml;tig. <strong>Drizzle</strong> ist ein ORM: Wir beschreiben die Tabelle in TypeScript und
+        schreiben Abfragen als typisierte Funktionsaufrufe statt als SQL-Strings. Die Pakete l&auml;dt Deno direkt
+        &uuml;ber <code>npm:</code>-Imports, eine Installation ist nicht n&ouml;tig.
+      </p>
+      <p>
+        Der SQLite-Treiber <code>libsql</code> braucht mehr Rechte als unser bisheriges Backend (Dateizugriff und eine
+        native Bibliothek, siehe &bdquo;H&auml;ufige Fehler&ldquo;):
       </p>
       <div class="code-block">
         <div class="code-header">
-          <span class="code-filename">backend/db.ts (Auszug)</span>
+          <span class="code-filename">backend/deno.json</span>
+          <span class="code-lang">JSON</span>
+        </div>
+        <pre><code class="language-json">{
+  "tasks": {
+    "start": "deno run --allow-net --allow-read --allow-write --allow-env --allow-sys --allow-ffi main.ts",
+    "dev": "deno run --allow-net --allow-read --allow-write --allow-env --allow-sys --allow-ffi --watch main.ts"
+  }
+}</code></pre>
+      </div>
+      <p>
+        Die Tabelle beschreiben wir mit <code>sqliteTable</code>. In der Datenbank hei&szlig;en die Spalten im
+        &uuml;blichen <code>snake_case</code>, in TypeScript bleiben die Namen aus unserem <code>Flight</code>-Interface:
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">backend/db.ts (Verbindung und Tabelle)</span>
           <span class="code-lang">TypeScript</span>
         </div>
         <pre><code class="language-typescript">import { createClient } from 'npm:@libsql/client';
+import { and, eq } from 'npm:drizzle-orm';
 import { drizzle } from 'npm:drizzle-orm/libsql';
-import { sqliteTable, integer, text } from 'npm:drizzle-orm/sqlite-core';
+import {
+  integer,
+  sqliteTable,
+  text,
+} from 'npm:drizzle-orm/sqlite-core';
+
+import { Flight, FlightStatus, FlightType, seedFlights } from './data.ts';
 
 const client = createClient({ url: 'file:./flugboard.db' });
-const db = drizzle(client);
 
 export const flightsTable = sqliteTable('flights', {
   id: integer('id').primaryKey(),
@@ -132,6 +159,30 @@ export const flightsTable = sqliteTable('flights', {
   airport: text('airport').notNull(),
   terminal: text('terminal').notNull(),
   gate: text('gate'),
+});
+
+const db = drizzle(client);</code></pre>
+      </div>
+      <p>
+        Datenbankzeilen kennen kein <code>undefined</code>, sondern nur <code>null</code>. <code>mapFlight</code> wandelt
+        eine Zeile deshalb in unser <code>Flight</code>-Objekt um:
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">backend/db.ts (Zeile &rarr; Flight)</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">const mapFlight = (row: typeof flightsTable.$inferSelect): Flight =&gt; ({
+  id: row.id,
+  flightNumber: row.flightNumber,
+  airline: row.airline,
+  type: row.type as FlightType,
+  scheduledTime: row.scheduledTime,
+  expectedTime: row.expectedTime ?? undefined,
+  status: row.status as FlightStatus,
+  airport: row.airport,
+  terminal: row.terminal,
+  gate: row.gate ?? undefined,
 });</code></pre>
       </div>
     </section>
@@ -139,15 +190,16 @@ export const flightsTable = sqliteTable('flights', {
     <section class="section">
       <h2>Initialisierung und Seed</h2>
       <p>
-        Beim Start wird die Tabelle erzeugt (falls sie noch nicht existiert). Wenn die Tabelle leer ist,
-        werden die Seed-Fl&uuml;ge eingef&uuml;gt.
+        Beim Start wird die Tabelle erzeugt (falls sie noch nicht existiert). Ist sie leer, kommen die
+        Beispielfl&uuml;ge hinein. Dazu hei&szlig;t das Array in <code>data.ts</code> jetzt <code>seedFlights</code> statt
+        <code>flights</code> &ndash; es ist nur noch der Startbestand, nicht mehr die aktuelle Liste.
       </p>
       <div class="code-block">
         <div class="code-header">
           <span class="code-filename">backend/db.ts &ndash; initializeDatabase</span>
           <span class="code-lang">TypeScript</span>
         </div>
-        <pre><code class="language-typescript">export const initializeDatabase = async () => {
+        <pre><code class="language-typescript">export const initializeDatabase = async () =&gt; {
   await client.execute(`
     CREATE TABLE IF NOT EXISTS flights (
       id INTEGER PRIMARY KEY,
@@ -165,9 +217,120 @@ export const flightsTable = sqliteTable('flights', {
 
   const countResult = await client.execute('SELECT COUNT(*) as count FROM flights');
   const count = Number(countResult.rows[0]?.count ?? 0);
+
   if (count === 0) {
-    // seedFlights in DB schreiben
+    await db.insert(flightsTable).values(
+      seedFlights.map((flight) =&gt; ({
+        id: flight.id,
+        flightNumber: flight.flightNumber,
+        airline: flight.airline,
+        type: flight.type,
+        scheduledTime: flight.scheduledTime,
+        expectedTime: flight.expectedTime ?? null,
+        status: flight.status,
+        airport: flight.airport,
+        terminal: flight.terminal,
+        gate: flight.gate ?? null,
+      }))
+    );
   }
+};</code></pre>
+      </div>
+      <div class="callout callout-info">
+        <div class="callout-icon">&#8505;</div>
+        <div class="callout-body">
+          <div class="callout-title">Warum CREATE TABLE per SQL?</div>
+          <p>
+            Drizzle kennt das Schema zwar, legt die Tabelle aber nicht selbst an. Daf&uuml;r gibt es das Werkzeug
+            <code>drizzle-kit</code>, das aus dem Schema Migrationen erzeugt. F&uuml;r unser kleines Projekt reicht ein
+            <code>CREATE TABLE IF NOT EXISTS</code> beim Start &ndash; in gr&ouml;&szlig;eren Projekten verwendet man
+            Migrationen, damit Schema&auml;nderungen nachvollziehbar bleiben.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Abfragen mit Drizzle</h2>
+      <p>
+        F&uuml;r jeden Endpunkt gibt es eine Funktion. Wo vorher Array-Methoden standen (<code>filter</code>,
+        <code>find</code>, <code>push</code>, <code>splice</code>), stehen jetzt <code>select</code>, <code>insert</code>,
+        <code>update</code> und <code>delete</code>. Alle Funktionen sind <code>async</code>, weil die Datenbank
+        asynchron antwortet.
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">backend/db.ts &ndash; Abfragen</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">export const listFlights = async (type?: string, status?: string): Promise&lt;Flight[]&gt; =&gt; {
+  const filters = [];
+  if (type) {
+    filters.push(eq(flightsTable.type, type));
+  }
+  if (status) {
+    filters.push(eq(flightsTable.status, status));
+  }
+
+  const rows = filters.length
+    ? await db.select().from(flightsTable).where(and(...filters))
+    : await db.select().from(flightsTable);
+
+  return rows.map(mapFlight);
+};
+
+export const getFlightById = async (id: number): Promise&lt;Flight | null&gt; =&gt; {
+  const rows = await db.select().from(flightsTable).where(eq(flightsTable.id, id)).limit(1);
+  if (rows.length === 0) {
+    return null;
+  }
+  return mapFlight(rows[0]);
+};
+
+export const createFlight = async (input: Omit&lt;Flight, 'id' | 'status'&gt;): Promise&lt;Flight&gt; =&gt; {
+  const newFlight: Flight = {
+    id: Date.now(),
+    status: 'on-time',
+    ...input,
+  };
+
+  await db.insert(flightsTable).values({
+    id: newFlight.id,
+    flightNumber: newFlight.flightNumber,
+    airline: newFlight.airline,
+    type: newFlight.type,
+    scheduledTime: newFlight.scheduledTime,
+    expectedTime: newFlight.expectedTime ?? null,
+    status: newFlight.status,
+    airport: newFlight.airport,
+    terminal: newFlight.terminal,
+    gate: newFlight.gate ?? null,
+  });
+
+  return newFlight;
+};
+
+export const updateFlightStatus = async (
+  id: number,
+  status: FlightStatus,
+): Promise&lt;Flight | null&gt; =&gt; {
+  const flight = await getFlightById(id);
+  if (!flight) {
+    return null;
+  }
+
+  await db.update(flightsTable).set({ status }).where(eq(flightsTable.id, id));
+  return { ...flight, status };
+};
+
+export const deleteFlight = async (id: number): Promise&lt;Flight | null&gt; =&gt; {
+  const flight = await getFlightById(id);
+  if (!flight) {
+    return null;
+  }
+
+  await db.delete(flightsTable).where(eq(flightsTable.id, id));
+  return flight;
 };</code></pre>
       </div>
     </section>
@@ -175,16 +338,100 @@ export const flightsTable = sqliteTable('flights', {
     <section class="section">
       <h2>Routen bleiben gleich</h2>
       <p>
-        Die API-Endpunkte bleiben identisch. Dadurch muss das React-Frontend nicht umgebaut werden.
-        Die in 2.7 eingeführte Router-Struktur bleibt ebenfalls: separate Seiten für Abflüge und
-        Ankünfte, mit Suche + Statusfilter (kein zusätzlicher Typ-Filter).
+        Die API-Endpunkte bleiben identisch &ndash; dadurch muss das React-Frontend aus Lektion 2.7 nicht ge&auml;ndert
+        werden:
       </p>
       <ul>
         <li><code>GET /api/flights</code> mit optionalen Query-Parametern</li>
         <li><code>GET /api/flights/:id</code></li>
         <li><code>POST /api/flights</code></li>
+        <li><code>PATCH /api/flights/:id</code> (Status &auml;ndern, seit Lektion 2.3)</li>
         <li><code>DELETE /api/flights/:id</code></li>
       </ul>
+      <p>
+        In <code>main.ts</code> ersetzen die Funktionen aus <code>db.ts</code> die Array-Operationen. Die Handler werden
+        <code>async</code>, und vor dem Serverstart wird die Datenbank initialisiert:
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">backend/main.ts</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">import { Hono } from 'npm:hono';
+import { cors } from 'npm:hono/cors';
+import {
+  createFlight,
+  deleteFlight,
+  getFlightById,
+  initializeDatabase,
+  listFlights,
+  updateFlightStatus,
+} from './db.ts';
+
+const app = new Hono();
+const sleep = (ms: number) =&gt; new Promise((resolve) =&gt; setTimeout(resolve, ms));
+
+app.use('*', cors({
+  // Entwicklung: jedes Frontend auf localhost erlauben, egal auf welchem Port
+  // (Vite weicht auf 5174, 5175, ... aus, wenn 5173 schon belegt ist)
+  origin: (origin) =&gt;
+    /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin) ? origin : null,
+}));
+
+app.get('/api/flights', async (c) =&gt; {
+  await sleep(1000);
+  const type = c.req.query('type');
+  const status = c.req.query('status');
+  const result = await listFlights(type ?? undefined, status ?? undefined);
+  return c.json(result);
+});
+
+app.get('/api/flights/:id', async (c) =&gt; {
+  const id = Number(c.req.param('id'));
+  const flight = await getFlightById(id);
+  if (!flight) return c.json({ error: 'Flug nicht gefunden' }, 404);
+  return c.json(flight);
+});
+
+app.post('/api/flights', async (c) =&gt; {
+  const body = await c.req.json();
+  if (!body.flightNumber || !body.airline || !body.scheduledTime) {
+    return c.json({ error: 'Pflichtfelder fehlen' }, 400);
+  }
+  const newFlight = await createFlight({
+    flightNumber: body.flightNumber,
+    airline: body.airline,
+    type: body.type ?? 'departure',
+    scheduledTime: body.scheduledTime,
+    expectedTime: body.expectedTime,
+    airport: body.airport,
+    terminal: body.terminal ?? 'T1',
+    gate: body.gate,
+  });
+  return c.json(newFlight, 201);
+});
+
+app.patch('/api/flights/:id', async (c) =&gt; {
+  const id = Number(c.req.param('id'));
+  const body = await c.req.json();
+  if (!body.status) return c.json({ error: 'status fehlt' }, 400);
+  const updated = await updateFlightStatus(id, body.status);
+  if (!updated) return c.json({ error: 'Nicht gefunden' }, 404);
+  return c.json(updated);
+});
+
+app.delete('/api/flights/:id', async (c) =&gt; {
+  const id = Number(c.req.param('id'));
+  const deleted = await deleteFlight(id);
+  if (!deleted) return c.json({ error: 'Nicht gefunden' }, 404);
+  return c.json(deleted);
+});
+
+await initializeDatabase();
+
+Deno.serve({ port: 8000 }, app.fetch);
+console.log('FlugBoard API (Drizzle + SQLite) läuft auf http://localhost:8000');</code></pre>
+      </div>
       <div class="callout callout-tip">
         <div class="callout-icon">&#10003;</div>
         <div class="callout-body">
@@ -204,11 +451,19 @@ export const flightsTable = sqliteTable('flights', {
           <span class="projekt-step">Persistenz aktivieren</span>
           <h3>FlugBoard auf Drizzle + SQLite umstellen</h3>
         </div>
+        <p>Wir bauen das Backend aus Lektion 2.7 um. Das Frontend bleibt unver&auml;ndert.</p>
         <ol>
-          <li>Starte das Backend: <code>cd beispiele/2.8/backend &amp;&amp; deno task dev</code></li>
-          <li>Teste die API: <code>http://localhost:8000/api/flights</code></li>
-          <li>Lege einen neuen Flug per POST an und starte den Server neu</li>
-          <li>Pr&uuml;fe: der neue Flug bleibt in der Liste erhalten</li>
+          <li><code>backend/deno.json</code>: Rechte f&uuml;r <code>dev</code> und <code>start</code> erg&auml;nzen (siehe oben).</li>
+          <li><code>backend/data.ts</code>: <code>export let flights</code> in <code>export const seedFlights</code> umbenennen.</li>
+          <li><code>backend/db.ts</code> anlegen: Tabelle, <code>mapFlight</code>, <code>initializeDatabase</code> und die
+            f&uuml;nf Abfragefunktionen &ndash; auch <code>updateFlightStatus</code>, sonst funktioniert die
+            Status&auml;nderung aus Lektion 2.3 nicht mehr.</li>
+          <li><code>backend/main.ts</code>: Funktionen aus <code>db.ts</code> verwenden, Handler <code>async</code> machen,
+            vor <code>Deno.serve</code> <code>await initializeDatabase()</code> aufrufen.</li>
+          <li><code>backend/.gitignore</code> mit der Zeile <code>flugboard.db</code> anlegen &ndash; die Datei entsteht beim
+            ersten Start von selbst und geh&ouml;rt nicht ins Repository.</li>
+          <li>Im Ordner <code>backend/</code> mit <code>deno task dev</code> starten, im Frontend einen Flug anlegen und einen
+            Status &auml;ndern, Backend neu starten: Beides muss erhalten bleiben.</li>
         </ol>
       </div>
     </section>
@@ -216,16 +471,38 @@ export const flightsTable = sqliteTable('flights', {
     <section class="section section-fehler">
       <h2>H&auml;ufige Fehler</h2>
       <div class="fehler-item">
-        <h3>Keine Schreibrechte auf DB-Datei</h3>
+        <h3>Fehlende Deno-Rechte (<code>NotCapable</code>)</h3>
+        <p>
+          Die Datenbank-Datei braucht Lese- und Schreibrechte. Zus&auml;tzlich l&auml;dt der SQLite-Treiber
+          <code>libsql</code> eine native Bibliothek und liest dabei Umgebungsvariablen und Systeminfos.
+          Fehlt ein Recht, bricht der Start mit <em>&bdquo;NotCapable: Requires env access &hellip;&ldquo;</em>
+          (bzw. <em>sys</em>) ab oder Deno fragt im Terminal nach.
+        </p>
         <p class="fehler-fix">
-          Starte Deno mit <code>--allow-read --allow-write</code>. In dieser Lektion sind die Rechte
-          bereits in <code>backend/deno.json</code> eingetragen.
+          Starte Deno mit <code>--allow-net --allow-read --allow-write --allow-env --allow-sys --allow-ffi</code>.
+          Am einfachsten tr&auml;gst du die Rechte in <code>backend/deno.json</code> ein und startest mit
+          <code>deno task dev</code>.
         </p>
       </div>
       <div class="fehler-item">
-        <h3>Tabelle wird immer wieder neu angelegt</h3>
+        <h3>Ge&auml;nderte Daten sind nach dem Neustart weg</h3>
+        <p>
+          Der Pfad <code>file:./flugboard.db</code> gilt relativ zu dem Ordner, in dem Deno gestartet wird. Wer z.B. aus
+          dem Projektordner <code>deno run ... backend/main.ts</code> startet, bekommt dort eine zweite, neue Datenbank
+          mit den Beispielfl&uuml;gen.
+        </p>
         <p class="fehler-fix">
-          Achte auf den konstanten DB-Pfad <code>file:./flugboard.db</code> im Backend-Ordner.
+          Immer im Ordner <code>backend/</code> mit <code>deno task dev</code> starten.
+        </p>
+      </div>
+      <div class="fehler-item">
+        <h3><code>status</code> &auml;ndern liefert 500, Backend meldet <code>flights is not defined</code></h3>
+        <p>
+          Beim Umbau wurden GET, POST und DELETE umgestellt, der PATCH-Endpunkt aus Lektion 2.3 greift aber noch auf
+          das alte Array zu.
+        </p>
+        <p class="fehler-fix">
+          <code>updateFlightStatus</code> in <code>db.ts</code> anlegen und im PATCH-Handler verwenden.
         </p>
       </div>
     </section>
@@ -244,14 +521,21 @@ export const flightsTable = sqliteTable('flights', {
           <span class="aufgabe-num">2</span>
           <span class="aufgabe-title">Neuen Flug speichern</span>
         </div>
-        <p>Lege einen Flug an und verifiziere, dass er nach Neustart weiterhin existiert.</p>
+        <p>Lege einen Flug an, &auml;ndere bei einem anderen den Status und verifiziere, dass beides nach einem
+          Neustart des Backends weiterhin gilt.</p>
       </div>
       <div class="aufgabe aufgabe-bonus">
         <div class="aufgabe-header">
           <span class="aufgabe-num">★</span>
-          <span class="aufgabe-title">PATCH-Endpunkt bauen</span>
+          <span class="aufgabe-title">Sortieren in der Datenbank</span>
         </div>
-        <p>Erweitere das Backend um <code>PATCH /api/flights/:id</code> f&uuml;r Status-&Auml;nderungen.</p>
+        <p>
+          Bisher sortiert das Frontend die Fl&uuml;ge (<code>sortByTime</code> in <code>useFlightFilters</code>). Lass die
+          Datenbank sortieren: In <code>listFlights</code> an beide Abfragen
+          <code>.orderBy(asc(flightsTable.scheduledTime))</code> anh&auml;ngen (<code>asc</code> zus&auml;tzlich aus
+          <code>npm:drizzle-orm</code> importieren). Pr&uuml;fe mit
+          <code>curl http://localhost:8000/api/flights</code>, dass die Liste nach Zeit sortiert ankommt.
+        </p>
       </div>
     </section>
   </div><!-- /content-area -->
@@ -266,6 +550,7 @@ export const flightsTable = sqliteTable('flights', {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
 <script>
   const ham = document.getElementById('hamburger');
   const sb = document.getElementById('sidebar');

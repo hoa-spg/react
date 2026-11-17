@@ -1,7 +1,7 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { listFlights } from '@/lib/flights-db';
+import { getFlightById } from '@/lib/flights-db';
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -9,20 +9,23 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const flights = listFlights();
-  const flight = flights.find(f => f.id === Number(id));
+  const flight = getFlightById(Number(id));
   if (!flight) return { title: 'Flug nicht gefunden' };
   return {
-    title: `${flight.flightNumber} – FlugBoard 3.2`,
-    description: `Details für Flug ${flight.flightNumber} nach ${flight.airport}`,
+    title: `Flug ${flight.flightNumber} – ${flight.airport}`,
+    description: `Details zu Flug ${flight.flightNumber} am Flughafen Wien.`,
   };
 }
 
 export default async function FlightDetailPage({ params }: Props) {
+  // params MUSS in Next.js 15 awaited werden
   const { id } = await params;
-  const flights = listFlights();
-  const flight = flights.find(f => f.id === Number(id));
-  if (!flight) notFound();
+  const flight = getFlightById(Number(id));
+
+  if (!flight) {
+    // Löst die not-found.tsx aus
+    notFound();
+  }
 
   const statusLabels: Record<string, string> = {
     'on-time':   'Pünktlich',

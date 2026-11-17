@@ -29,9 +29,8 @@
       <a class="nav-link" href="1.1-einfuehrung-spa.html"><span class="ln">1.1</span>Motivation &amp; SPA</a>
       <a class="nav-link" href="1.2-einfuehrung.html"><span class="ln">1.2</span>Einführung &amp; Umgebung</a>
       <a class="nav-link" href="1.3-komponenten-props-einfach.html"><span class="ln">1.3</span>Komponenten &amp; Props (einfach)</a>
-      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten &amp; Props (Vertiefung)</a>
+      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten, Props &amp; Listen</a>
       <a class="nav-link" href="1.5-state-events.html"><span class="ln">1.5</span>State &amp; Events</a>
-      <a class="nav-link" href="1.6-listen-conditional.html"><span class="ln">1.6</span>Listen &amp; Conditional Rendering</a>
     </div>
     <div class="nav-group">
       <div class="nav-group-label react-label">Teil 2 &mdash; React Praxis</div>
@@ -111,10 +110,17 @@
         <p>
           Next.js <em>verwendet</em> React intern. Du schreibst weiterhin React-Komponenten mit JSX,
           Props und Hooks &mdash; Next.js f&uuml;gt nur Schichten hinzu, die React allein nicht bietet.
-          Alles, was du in Teil&nbsp;1 gelernt hast, gilt hier weiterhin.
+          Alles, was du in Teil&nbsp;1 und 2 gelernt hast, gilt hier weiterhin.
         </p>
       </div>
     </div>
+
+    <p>
+      F&uuml;r FlugBoard bedeutet das: Wir legen ein neues Projekt an. Mit dabei sind die Typen aus
+      <code>src/types/flight.ts</code>, das Datenbankschema aus Lektion 2.8 und sp&auml;ter unsere Komponenten.
+      Wegfallen werden Vite, React Router (Next.js routet &uuml;ber Ordner) und das eigene Deno-Backend
+      (Next.js liest die Datenbank selbst und bringt eigene API-Routen mit).
+    </p>
 
     <h3>Vergleichstabelle: React SPA vs. Next.js</h3>
     <div style="overflow-x:auto;">
@@ -209,8 +215,8 @@
         <div class="callout-title">FlugBoard &amp; SSR</div>
         <p>
           Unser FlugBoard zeigt Live-Flugdaten: Abfl&uuml;ge und Ank&uuml;nfte &auml;ndern sich st&auml;ndig.
-          SSR mit <code>revalidate: 30</code> ist deshalb der perfekte Ansatz &mdash; aktuelle Daten,
-          ohne unn&ouml;tige Server-Last bei jedem Request.
+          Daf&uuml;r eignet sich SSR (immer aktuell) oder ISR mit <code>revalidate: 30</code> (h&ouml;chstens
+          30&nbsp;Sekunden alt, aber weniger Server-Last). Wie man das pro Seite einstellt, sehen wir in Lektion 3.3.
         </p>
       </div>
     </div>
@@ -221,7 +227,8 @@
     <h2>3 &mdash; Projekt erstellen</h2>
     <p>
       Next.js bringt ein offizielles CLI-Tool mit, das alle n&ouml;tigen Dateien und Konfigurationen
-      automatisch einrichtet. F&uuml;hre folgende Befehle in deinem Terminal aus:
+      automatisch einrichtet. Wir legen die Version 15 fest, mit der die Beispiele des Kurses erstellt sind &ndash;
+      neuere Versionen stellen teilweise andere Fragen. F&uuml;hre folgenden Befehl in deinem Terminal aus:
     </p>
 
     <div class="code-block">
@@ -229,7 +236,7 @@
         <span class="code-filename">Terminal</span>
         <span class="code-lang">Bash</span>
       </div>
-      <pre><code class="language-bash">npx create-next-app@latest flugboard-next</code></pre>
+      <pre><code class="language-bash">npx create-next-app@15 flugboard-next</code></pre>
     </div>
 
     <p>Der Setup-Wizard stellt folgende Fragen &mdash; w&auml;hle genau diese Antworten:</p>
@@ -355,16 +362,19 @@ npm run dev
         <span class="code-lang">TypeScript</span>
       </div>
       <pre><code class="language-typescript">import type { Metadata } from 'next';
+import Link from 'next/link';
 import './globals.css';
 
 export const metadata: Metadata = {
   title: {
     template: '%s | FlugBoard',
-    default: 'FlugBoard – Flughafen München',
+    default: 'FlugBoard – Flughafen Wien',
   },
-  description:
-    'Echtzeit-Abflug- und Ankunftstafel für den Flughafen München.',
-  keywords: ['Flug', 'Abflug', 'Ankunft', 'München', 'Airport'],
+  description: 'Aktuelle Abflüge und Ankünfte – Flughafen Wien-Schwechat',
+  keywords: ['Flug', 'Abflug', 'Ankunft', 'Wien', 'Airport'],
+  icons: {
+    icon: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='50' font-size='48'%3E%E2%9C%88%EF%B8%8F%3C/text%3E%3C/svg%3E",
+  },
 };
 
 export default function RootLayout({
@@ -375,6 +385,10 @@ export default function RootLayout({
   return (
     &lt;html lang="de"&gt;
       &lt;body&gt;
+        {/* Kopfzeile erscheint auf jeder Seite */}
+        &lt;header className="app-header"&gt;
+          &lt;Link href="/" className="app-brand"&gt;✈ FlugBoard 3.1&lt;/Link&gt;
+        &lt;/header&gt;
         {children}
       &lt;/body&gt;
     &lt;/html&gt;
@@ -393,7 +407,8 @@ export default function RootLayout({
       Im Gegensatz zum React-Projekt mit Vite ist <code>page.tsx</code> standardm&auml;&szlig;ig
       eine <strong>Server Component</strong>. Das bedeutet: kein <code>'use client'</code>,
       kein <code>useState</code>, kein <code>useEffect</code> &mdash; der Code l&auml;uft auf dem
-      Server und liefert fertiges HTML.
+      Server und liefert fertiges HTML. Deshalb kann die Startseite die n&auml;chsten Abfl&uuml;ge direkt aus der
+      Datenbank lesen &mdash; ohne <code>fetch</code>, ohne Ladezustand (<code>listFlights</code> kommt in Abschnitt 6).
     </p>
 
     <div class="code-block">
@@ -403,26 +418,52 @@ export default function RootLayout({
       </div>
       <pre><code class="language-typescript">import Link from 'next/link';
 import type { Metadata } from 'next';
+import { listFlights } from '@/lib/flights-db';
 
 export const metadata: Metadata = {
   title: 'Startseite',
 };
 
 export default function HomePage() {
+  const departures = listFlights('departure').slice(0, 3);
+
   return (
-    &lt;main className="home-container"&gt;
-      &lt;h1&gt;&#9992; FlugBoard M&uuml;nchen&lt;/h1&gt;
+    &lt;main className="page-wrap"&gt;
+      &lt;h1 className="home-title"&gt;✈ FlugBoard 3.1&lt;/h1&gt;
       &lt;p className="home-subtitle"&gt;
-        Ihre Echtzeit-Flugtafel f&uuml;r alle Abfl&uuml;ge und Ank&uuml;nfte.
+        Flughafen Wien-Schwechat – aktuelle Abflüge und Ankünfte
       &lt;/p&gt;
-      &lt;nav className="home-nav"&gt;
-        &lt;Link href="/departures" className="home-btn"&gt;
-          &#10132; Abfl&uuml;ge
+
+      &lt;div className="home-links"&gt;
+        &lt;Link href="/departures" className="home-link home-link--primary"&gt;
+          ✈ Abflüge anzeigen
         &lt;/Link&gt;
-        &lt;Link href="/arrivals" className="home-btn home-btn--secondary"&gt;
-          &#10132; Ank&uuml;nfte
+        &lt;Link href="/arrivals" className="home-link home-link--secondary"&gt;
+          🛬 Ankünfte anzeigen
         &lt;/Link&gt;
-      &lt;/nav&gt;
+      &lt;/div&gt;
+
+      &lt;h2 className="section-title"&gt;Nächste Abflüge&lt;/h2&gt;
+      &lt;table className="table-base"&gt;
+        &lt;thead&gt;
+          &lt;tr&gt;
+            &lt;th&gt;Flug&lt;/th&gt;
+            &lt;th&gt;Ziel&lt;/th&gt;
+            &lt;th&gt;Zeit&lt;/th&gt;
+          &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+          {departures.map((f) =&gt; (
+            &lt;tr key={f.id}&gt;
+              &lt;td&gt;
+                &lt;span className="table-link"&gt;{f.flightNumber}&lt;/span&gt;
+              &lt;/td&gt;
+              &lt;td className="text-main"&gt;{f.airport}&lt;/td&gt;
+              &lt;td className="text-main"&gt;{f.scheduledTime}&lt;/td&gt;
+            &lt;/tr&gt;
+          ))}
+        &lt;/tbody&gt;
+      &lt;/table&gt;
     &lt;/main&gt;
   );
 }</code></pre>
@@ -480,22 +521,226 @@ export interface Flight {
 }</code></pre>
     </div>
 
+    <h3>Datenzugriff: <code>src/lib/flights-db.ts</code></h3>
     <p>
-      Statt lokaler Testdaten greifen wir direkt auf den Datenbankzugriff aus Lektion 2.8 auf.
-      In Next.js kannst du daf&uuml;r entweder die bestehenden API-Endpunkte nutzen oder
-      sp&auml;ter in Server Components direkt auf die Datenbank zugreifen.
+      Statt eines eigenen Backends liest Next.js die Datenbank direkt. Tabelle, <code>mapFlight</code> und
+      Beispielfl&uuml;ge &uuml;bernehmen wir aus <code>backend/db.ts</code> von Lektion 2.8. Zwei Dinge sind anders:
     </p>
+    <div style="overflow-x:auto;">
+      <table class="compare-table">
+        <thead>
+          <tr><th></th><th>Lektion 2.8 (Deno)</th><th>Ab 3.1 (Next.js / Node)</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Treiber</strong></td>
+            <td><code>@libsql/client</code> &mdash; asynchron (<code>await</code>)</td>
+            <td><code>better-sqlite3</code> &mdash; synchron (<code>.all()</code>, <code>.get()</code>, <code>.run()</code>)</td>
+          </tr>
+          <tr>
+            <td><strong>Datei</strong></td>
+            <td><code>backend/flugboard.db</code></td>
+            <td><code>flugboard.sqlite</code> im Projektordner</td>
+          </tr>
+          <tr>
+            <td><strong>Funktionen</strong></td>
+            <td><code>createFlight</code>, <code>updateFlightStatus</code>, <code>deleteFlight</code></td>
+            <td><code>insertFlight</code>, <code>updateFlight</code> (beliebige Felder), <code>removeFlight</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p>
+      <code>better-sqlite3</code> ist in Node.js der &uuml;bliche SQLite-Treiber und funktioniert in Next.js ohne
+      Zusatzkonfiguration. Weil er synchron arbeitet, brauchen unsere Datenbankfunktionen kein
+      <code>await</code>. Die globale Variable <code>__flugboardDb</code> sorgt daf&uuml;r, dass der Dev-Server beim
+      Neuladen nicht jedes Mal eine neue Verbindung &ouml;ffnet.
+    </p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">src/lib/flights-db.ts</span>
+        <span class="code-lang">TypeScript</span>
+      </div>
+      <pre><code class="language-typescript">import Database from 'better-sqlite3';
+import { and, eq } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/better-sqlite3';
+import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+
+import type { Flight } from '@/types/flight';
+
+const flightsTable = sqliteTable('flights', {
+  id: integer('id').primaryKey(),
+  flightNumber: text('flight_number').notNull(),
+  airline: text('airline').notNull(),
+  type: text('type').notNull(),
+  scheduledTime: text('scheduled_time').notNull(),
+  expectedTime: text('expected_time'),
+  status: text('status').notNull(),
+  airport: text('airport').notNull(),
+  terminal: text('terminal').notNull(),
+  gate: text('gate'),
+});
+
+const seedFlights: Flight[] = [
+  { id: 1, flightNumber: 'OS123', airline: 'Austrian Airlines', type: 'departure', scheduledTime: '10:30', status: 'boarding', airport: 'London Heathrow (LHR)', terminal: 'T3', gate: 'B12' },
+  { id: 2, flightNumber: 'LH456', airline: 'Lufthansa', type: 'departure', scheduledTime: '11:15', expectedTime: '11:45', status: 'delayed', airport: 'Frankfurt (FRA)', terminal: 'T2', gate: 'A07' },
+  { id: 3, flightNumber: 'EK789', airline: 'Emirates', type: 'arrival', scheduledTime: '09:45', status: 'landed', airport: 'Dubai (DXB)', terminal: 'T1' },
+  { id: 4, flightNumber: 'BA234', airline: 'British Airways', type: 'departure', scheduledTime: '12:00', status: 'on-time', airport: 'London Heathrow (LHR)', terminal: 'T3', gate: 'C22' },
+  { id: 5, flightNumber: 'TK567', airline: 'Turkish Airlines', type: 'arrival', scheduledTime: '13:20', expectedTime: '14:05', status: 'delayed', airport: 'Istanbul (IST)', terminal: 'T2' },
+  { id: 6, flightNumber: 'FR890', airline: 'Ryanair', type: 'departure', scheduledTime: '14:50', status: 'on-time', airport: 'Dublin (DUB)', terminal: 'T1', gate: 'D05' },
+  { id: 7, flightNumber: 'WZ112', airline: 'Wizz Air', type: 'arrival', scheduledTime: '15:30', status: 'on-time', airport: 'Budapest (BUD)', terminal: 'T2' },
+  { id: 8, flightNumber: 'VY334', airline: 'Vueling', type: 'departure', scheduledTime: '16:10', status: 'cancelled', airport: 'Barcelona (BCN)', terminal: 'T1' },
+];
+
+type Row = typeof flightsTable.$inferSelect;
+
+const mapFlight = (row: Row): Flight =&gt; ({
+  id: row.id,
+  flightNumber: row.flightNumber,
+  airline: row.airline,
+  type: row.type as Flight['type'],
+  scheduledTime: row.scheduledTime,
+  expectedTime: row.expectedTime ?? undefined,
+  status: row.status as Flight['status'],
+  airport: row.airport,
+  terminal: row.terminal,
+  gate: row.gate ?? undefined,
+});
+
+declare global {
+  // eslint-disable-next-line no-var
+  var __flugboardDb: Database.Database | undefined;
+}
+
+const sqlite = global.__flugboardDb ?? new Database('flugboard.sqlite');
+if (!global.__flugboardDb) {
+  global.__flugboardDb = sqlite;
+}
+
+const db = drizzle(sqlite);
+
+sqlite.exec(`
+  CREATE TABLE IF NOT EXISTS flights (
+    id INTEGER PRIMARY KEY,
+    flight_number TEXT NOT NULL,
+    airline TEXT NOT NULL,
+    type TEXT NOT NULL,
+    scheduled_time TEXT NOT NULL,
+    expected_time TEXT,
+    status TEXT NOT NULL,
+    airport TEXT NOT NULL,
+    terminal TEXT NOT NULL,
+    gate TEXT
+  );
+`);
+
+const countRow = sqlite.prepare('SELECT COUNT(*) as count FROM flights').get() as
+  | { count: number }
+  | undefined;
+
+if (!countRow || countRow.count === 0) {
+  db.insert(flightsTable).values(
+    seedFlights.map((flight) =&gt; ({
+      id: flight.id,
+      flightNumber: flight.flightNumber,
+      airline: flight.airline,
+      type: flight.type,
+      scheduledTime: flight.scheduledTime,
+      expectedTime: flight.expectedTime ?? null,
+      status: flight.status,
+      airport: flight.airport,
+      terminal: flight.terminal,
+      gate: flight.gate ?? null,
+    }))
+  )
+    // Beim Build rendern mehrere Prozesse gleichzeitig und sehen alle eine leere
+    // Tabelle – bereits vorhandene IDs daher einfach überspringen
+    .onConflictDoNothing()
+    .run();
+}
+
+export const listFlights = (type?: string, status?: string): Flight[] =&gt; {
+  const filters = [];
+  if (type) filters.push(eq(flightsTable.type, type));
+  if (status) filters.push(eq(flightsTable.status, status));
+  const rows = filters.length
+    ? db.select().from(flightsTable).where(and(...filters)).all()
+    : db.select().from(flightsTable).all();
+  return rows.map(mapFlight);
+};
+
+export const getFlightById = (id: number): Flight | null =&gt; {
+  const row = db.select().from(flightsTable).where(eq(flightsTable.id, id)).get();
+  return row ? mapFlight(row) : null;
+};
+
+export const insertFlight = (input: Omit&lt;Flight, 'id' | 'status'&gt;): Flight =&gt; {
+  const newFlight: Flight = {
+    id: Date.now(),
+    status: 'on-time',
+    ...input,
+  };
+
+  db.insert(flightsTable)
+    .values({
+      id: newFlight.id,
+      flightNumber: newFlight.flightNumber,
+      airline: newFlight.airline,
+      type: newFlight.type,
+      scheduledTime: newFlight.scheduledTime,
+      expectedTime: newFlight.expectedTime ?? null,
+      status: newFlight.status,
+      airport: newFlight.airport,
+      terminal: newFlight.terminal,
+      gate: newFlight.gate ?? null,
+    })
+    .run();
+
+  return newFlight;
+};
+
+export const removeFlight = (id: number): Flight | null =&gt; {
+  const flight = getFlightById(id);
+  if (!flight) return null;
+  db.delete(flightsTable).where(eq(flightsTable.id, id)).run();
+  return flight;
+};
+
+export const updateFlight = (id: number, payload: Partial&lt;Flight&gt;): Flight | null =&gt; {
+  const current = getFlightById(id);
+  if (!current) return null;
+
+  db.update(flightsTable)
+    .set({
+      flightNumber: payload.flightNumber ?? current.flightNumber,
+      airline: payload.airline ?? current.airline,
+      type: payload.type ?? current.type,
+      scheduledTime: payload.scheduledTime ?? current.scheduledTime,
+      expectedTime: payload.expectedTime ?? current.expectedTime ?? null,
+      status: payload.status ?? current.status,
+      airport: payload.airport ?? current.airport,
+      terminal: payload.terminal ?? current.terminal,
+      gate: payload.gate ?? current.gate ?? null,
+    })
+    .where(eq(flightsTable.id, id))
+    .run();
+
+  return getFlightById(id);
+};</code></pre>
+    </div>
 
     <div class="code-block">
       <div class="code-header">
-        <span class="code-filename">Terminal &mdash; Dateien kopieren</span>
+        <span class="code-filename">Terminal &mdash; Pakete installieren und Typen &uuml;bernehmen</span>
         <span class="code-lang">Bash</span>
       </div>
-      <pre><code class="language-bash"># Aus dem bestehenden Projekt Typen und Komponenten übernehmen
-cp ../flugboard/src/types/flight.ts   src/types/flight.ts
+      <pre><code class="language-bash"># Datenbank-Pakete
+npm install drizzle-orm better-sqlite3
+npm install -D @types/better-sqlite3
 
-# Ordner anlegen falls noch nicht vorhanden
-mkdir -p src/types src/lib src/components</code></pre>
+# Ordner anlegen, dann die Typen aus dem bisherigen Projekt kopieren
+mkdir -p src/types src/lib src/components
+cp ../flugboard/src/types/flight.ts src/types/flight.ts</code></pre>
     </div>
   </section>
 
@@ -514,13 +759,12 @@ mkdir -p src/types src/lib src/components</code></pre>
       </p>
       <ol>
         <li>
-          <strong>Projekt erstellen:</strong> F&uuml;hre <code>npx create-next-app@latest flugboard-next</code>
+          <strong>Projekt erstellen:</strong> F&uuml;hre <code>npx create-next-app@15 flugboard-next</code>
           aus und w&auml;hle die oben gezeigten Optionen.
         </li>
         <li>
-          <strong>Typen &amp; DB-Utility vorbereiten:</strong> &Uuml;bertrage
-          <code>src/types/flight.ts</code> und richte eine zentrale Datenzugriffsdatei
-          unter <code>src/lib/</code> ein.
+          <strong>Typen &amp; Datenzugriff:</strong> Pakete installieren, <code>src/types/flight.ts</code>
+          kopieren und <code>src/lib/flights-db.ts</code> wie in Abschnitt 6 anlegen.
         </li>
         <li>
           <strong>layout.tsx aktualisieren:</strong> Setze Title-Template, Description und
@@ -528,11 +772,16 @@ mkdir -p src/types src/lib src/components</code></pre>
         </li>
         <li>
           <strong>page.tsx ersetzen:</strong> Schreibe die Startseite mit &Uuml;berschrift,
-          Untertitel und Links zu <code>/departures</code> und <code>/arrivals</code>.
+          Links zu <code>/departures</code> und <code>/arrivals</code> und den n&auml;chsten drei Abfl&uuml;gen.
         </li>
         <li>
-          <strong>Platzhalter-Seiten:</strong> Lege <code>src/app/departures/page.tsx</code>
-          und <code>src/app/arrivals/page.tsx</code> mit einfachen &ldquo;Kommt bald&rdquo;-Texten an.
+          <strong>Erste Listen-Seiten:</strong> Lege <code>src/app/departures/page.tsx</code>
+          und <code>src/app/arrivals/page.tsx</code> an, die die Fl&uuml;ge als einfache Liste aus der Datenbank
+          zeigen. Die richtige Tabelle folgt in Lektion 3.2.
+        </li>
+        <li>
+          <strong><code>.gitignore</code> erg&auml;nzen:</strong> <code>flugboard.sqlite</code> entsteht beim ersten
+          Start und geh&ouml;rt nicht ins Repository.
         </li>
         <li>
           <strong>Testen:</strong> Starte den Dev-Server und navigiere zwischen den Seiten.
@@ -546,25 +795,29 @@ mkdir -p src/types src/lib src/components</code></pre>
           <span class="code-lang">TypeScript</span>
         </div>
         <pre><code class="language-typescript">import type { Metadata } from 'next';
+import Link from 'next/link';
 import { listFlights } from '@/lib/flights-db';
 
 export const metadata: Metadata = {
-  title: 'Abfl&uuml;ge',
+  title: 'Abflüge',
 };
 
 export default function DeparturePage() {
   const departures = listFlights('departure');
 
   return (
-    &lt;main&gt;
-      &lt;h1&gt;Abfl&uuml;ge &mdash; {departures.length} Fl&uuml;ge&lt;/h1&gt;
+    &lt;main className="page-wrap"&gt;
+      &lt;h1 className="board-page-title"&gt;Abflüge – {departures.length} Flüge&lt;/h1&gt;
       &lt;ul&gt;
-        {departures.map(flight =&gt; (
-          &lt;li key={flight.id}&gt;
-            {flight.flightNumber} &ndash; {flight.airport} &ndash; {flight.status}
+        {departures.map((flight) =&gt; (
+          &lt;li key={flight.id} className="text-main"&gt;
+            {flight.flightNumber} – {flight.airport} – {flight.status}
           &lt;/li&gt;
         ))}
       &lt;/ul&gt;
+      &lt;Link href="/" className="detail-back"&gt;
+        ← Startseite
+      &lt;/Link&gt;
     &lt;/main&gt;
   );
 }</code></pre>
@@ -586,7 +839,7 @@ export default function DeparturePage() {
       <p class="fehler-fix">
         <strong>Fix:</strong> Stelle sicher, dass alle Seiten im <code>src/app/</code>-Ordner liegen.
         Im App Router gibt es kein <code>getServerSideProps</code> &mdash; stattdessen sind
-        async Server Components der neue Ansatz (Lektion 3.1).
+        async Server Components der neue Ansatz (Lektion 3.3).
       </p>
     </div>
 
@@ -645,7 +898,7 @@ export default function DeparturePage() {
           und passe anschlie&szlig;end <code>layout.tsx</code> an.
         </p>
         <ul>
-          <li>F&uuml;hre <code>npx create-next-app@latest flugboard-next</code> aus</li>
+          <li>F&uuml;hre <code>npx create-next-app@15 flugboard-next</code> aus</li>
           <li>Ersetze den Standard-Inhalt in <code>layout.tsx</code> durch das FlugBoard-Metadata-Objekt</li>
           <li>Setze <code>lang="de"</code> im <code>&lt;html&gt;</code>-Tag</li>
           <li>Starte den Dev-Server und &uuml;berpr&uuml;fe <code>http://localhost:3000</code></li>

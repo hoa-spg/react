@@ -74,8 +74,9 @@ const AddFlightForm = ({ onAdd, onCancel }: AddFlightFormProps) => {
 
       <div className="add-form-grid">
         <div className="form-field">
-          <label className="form-label">Flugnummer *</label>
+          <label className="form-label" htmlFor="add-flight-number">Flugnummer *</label>
           <input
+            id="add-flight-number"
             className={inputClass('flightNumber')}
             value={flightNumber}
             onChange={(e) => setFlightNumber(e.target.value)}
@@ -87,8 +88,9 @@ const AddFlightForm = ({ onAdd, onCancel }: AddFlightFormProps) => {
         </div>
 
         <div className="form-field">
-          <label className="form-label">Airline *</label>
+          <label className="form-label" htmlFor="add-flight-airline">Airline *</label>
           <input
+            id="add-flight-airline"
             className={inputClass('airline')}
             value={airline}
             onChange={(e) => setAirline(e.target.value)}
@@ -100,8 +102,9 @@ const AddFlightForm = ({ onAdd, onCancel }: AddFlightFormProps) => {
         </div>
 
         <div className="form-field">
-          <label className="form-label">Typ</label>
+          <label className="form-label" htmlFor="add-flight-type">Typ</label>
           <select
+            id="add-flight-type"
             className="form-select"
             value={type}
             onChange={(e) => setType(e.target.value as FlightType)}
@@ -112,8 +115,9 @@ const AddFlightForm = ({ onAdd, onCancel }: AddFlightFormProps) => {
         </div>
 
         <div className="form-field">
-          <label className="form-label">Abflugzeit *</label>
+          <label className="form-label" htmlFor="add-flight-time">Abflugzeit *</label>
           <input
+            id="add-flight-time"
             type="time"
             className={inputClass('scheduledTime')}
             value={scheduledTime}
@@ -125,8 +129,9 @@ const AddFlightForm = ({ onAdd, onCancel }: AddFlightFormProps) => {
         </div>
 
         <div className="form-field">
-          <label className="form-label">Ziel / Herkunft *</label>
+          <label className="form-label" htmlFor="add-flight-airport">Ziel / Herkunft *</label>
           <input
+            id="add-flight-airport"
             className={inputClass('airport')}
             value={airport}
             onChange={(e) => setAirport(e.target.value)}
@@ -138,8 +143,9 @@ const AddFlightForm = ({ onAdd, onCancel }: AddFlightFormProps) => {
         </div>
 
         <div className="form-field">
-          <label className="form-label">Terminal</label>
+          <label className="form-label" htmlFor="add-flight-terminal">Terminal</label>
           <select
+            id="add-flight-terminal"
             className="form-select"
             value={terminal}
             onChange={(e) => setTerminal(e.target.value)}
@@ -151,8 +157,9 @@ const AddFlightForm = ({ onAdd, onCancel }: AddFlightFormProps) => {
         </div>
 
         <div className="form-field">
-          <label className="form-label">Gate (optional)</label>
+          <label className="form-label" htmlFor="add-flight-gate">Gate (optional)</label>
           <input
+            id="add-flight-gate"
             className="form-input"
             value={gate}
             onChange={(e) => setGate(e.target.value)}

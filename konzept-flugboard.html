@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Konzept-Vorlage: FlugBoard | React Kurs</title>
+  <script>(function () { var t = localStorage.getItem('kurs-theme') || 'dark'; document.documentElement.setAttribute('data-theme', t); })();</script>
+  <link rel="stylesheet" href="assets/kurs.css">
+  <link rel="stylesheet" id="hljs-theme"
+    href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+</head>
+
+<body>
+
+  <button class="hamburger" id="hamburger" aria-label="Navigation &ouml;ffnen">&#9776;</button>
+  <div class="sidebar-overlay" id="overlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <a href="index.html">
+        <span class="brand-icon">&#9992;</span>
+        <div>
+          <div class="brand-name">React Kurs</div>
+          <div class="brand-sub">Web &amp; Mobile</div>
+        </div>
+      </a>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Dark/Light Mode"
+        title="Theme wechseln">&#9728;</button>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-group">
+        <div class="nav-group-label react-label">Teil 1 &mdash; React Einführung</div>
+        <a class="nav-link" href="1.1-einfuehrung-spa.html"><span class="ln">1.1</span>Motivation &amp; SPA</a>
+        <a class="nav-link" href="1.2-einfuehrung.html"><span class="ln">1.2</span>Einführung &amp; Umgebung</a>
+        <a class="nav-link" href="1.3-komponenten-props-einfach.html"><span class="ln">1.3</span>Komponenten
+          &amp; Props (einfach)</a>
+        <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten, Props &amp; Listen</a>
+        <a class="nav-link" href="1.5-state-events.html"><span class="ln">1.5</span>State &amp; Events</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label react-label">Teil 2 &mdash; React Praxis</div>
+        <a class="nav-link" href="2.1-formulare.html"><span class="ln">2.1</span>Formulare &amp; Inputs</a>
+        <a class="nav-link" href="2.2-useeffect-api.html"><span class="ln">2.2</span>useEffect &amp; API</a>
+        <a class="nav-link" href="2.3-kommunikation.html"><span class="ln">2.3</span>Komponentenkommunikation</a>
+        <a class="nav-link" href="2.4-context.html"><span class="ln">2.4</span>Context API</a>
+        <a class="nav-link" href="2.5-custom-hooks.html"><span class="ln">2.5</span>Custom Hooks</a>
+        <a class="nav-link" href="2.6-testen-vitest-rtl.html"><span class="ln">2.6</span>Testen mit Vitest + RTL</a>
+        <a class="nav-link" href="2.7-react-router.html"><span class="ln">2.7</span>React Router</a>
+        <a class="nav-link" href="2.8-datenbank-drizzle-sqlite.html"><span class="ln">2.8</span>Datenbankzugriff mit
+          Drizzle + SQLite</a>
+        <a class="nav-link" href="2.9-redux-state-management.html"><span class="ln">2.9</span>State Management mit Redux
+          (Überblick)</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label next-label">Teil 3 &mdash; Next.js</div>
+        <a class="nav-link" href="3.1-nextjs-einfuehrung.html"><span class="ln">3.1</span>Einführung Next.js</a>
+        <a class="nav-link" href="3.2-nextjs-routing.html"><span class="ln">3.2</span>Routing &amp; Layouts</a>
+        <a class="nav-link" href="3.3-server-client.html"><span class="ln">3.3</span>Server &amp; Client Components</a>
+        <a class="nav-link" href="3.4-api-routes.html"><span class="ln">3.4</span>API Routes &amp; Datenabruf</a>
+        <a class="nav-link" href="3.5-playwright-e2e.html"><span class="ln">3.5</span>Playwright E2E</a>
+      <a class="nav-link" href="3.6-deployment.html"><span class="ln">3.6</span>Deployment</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label rn-label">Teil 4 &mdash; React Native</div>
+        <a class="nav-link" href="4.1-rn-einfuehrung.html"><span class="ln">4.1</span>Einführung React Native</a>
+        <a class="nav-link" href="4.2-rn-komponenten.html"><span class="ln">4.2</span>Native Komponenten &amp;
+          Styling</a>
+        <a class="nav-link" href="4.3-rn-navigation.html"><span class="ln">4.3</span>Navigation &amp; State</a>
+      </div>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <header class="lesson-header">
+      <p class="lesson-eyebrow">Vorlage &mdash; Konzeptdokument</p>
+      <h1>Konzept: FlugBoard</h1>
+      <div class="lesson-tags">
+        <span class="tag tag-react">React</span>
+        <span class="tag tag-level">Beispiel-Konzept</span>
+      </div>
+    </header>
+
+    <div class="content-area">
+
+      <div class="callout callout-info">
+        <div class="callout-icon">&#8505;</div>
+        <div class="callout-body">
+          <div class="callout-title">Wozu diese Seite?</div>
+          <p>
+            So sieht ein grobes Konzept f&uuml;r unser Kursprojekt <strong>FlugBoard</strong> aus (Stand Lektion 2.8).
+            Verwende denselben Aufbau f&uuml;r deine eigene App: kurze Beschreibung, Funktionen, Datenmodell,
+            Ansichten, Komponenten und Umsetzungsschritte. Ein bis zwei Seiten reichen &ndash; es ist ein Plan,
+            kein Roman. Er darf sich w&auml;hrend der Umsetzung &auml;ndern.
+          </p>
+        </div>
+      </div>
+
+      <section class="section">
+        <h2>1 &mdash; Idee</h2>
+        <p>
+          FlugBoard ist eine Anzeigetafel f&uuml;r den Flughafen Wien-Schwechat. Sie zeigt Abfl&uuml;ge und Ank&uuml;nfte
+          als Tabelle, aktualisiert sich automatisch und erlaubt dem Flughafenpersonal, Fl&uuml;ge anzulegen,
+          zu l&ouml;schen und ihren Status zu &auml;ndern. Die Daten kommen von einem eigenen Backend mit Datenbank.
+        </p>
+      </section>
+
+      <section class="section">
+        <h2>2 &mdash; Funktionen</h2>
+        <ul>
+          <li>Abfl&uuml;ge und Ank&uuml;nfte auf getrennten Seiten anzeigen, nach geplanter Zeit sortiert</li>
+          <li>Status farbig hervorheben (P&uuml;nktlich, Versp&auml;tet, Boarding, Gestartet, Gelandet, Gestrichen);
+            bei Versp&auml;tung alte und neue Zeit zeigen</li>
+          <li>Suche nach Flugnummer, Airline oder Ziel; Filter nach Status</li>
+          <li>Flug &uuml;ber ein Formular anlegen, l&ouml;schen und den Status direkt in der Tabelle &auml;ndern</li>
+          <li>Klick auf einen Flug &ouml;ffnet eine Detailseite</li>
+          <li>Daten alle 30 Sekunden automatisch neu laden, zus&auml;tzlich manuell &uuml;ber &bdquo;Aktualisieren&ldquo;</li>
+          <li>Dark/Light-Theme; Filter und Theme bleiben nach dem Neuladen erhalten</li>
+        </ul>
+      </section>
+
+      <section class="section">
+        <h2>3 &mdash; Datenmodell</h2>
+        <p>Ein einziger Datentyp reicht: der Flug.</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Feld</th><th>Typ</th><th>Beispiel</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>id</code></td><td>Zahl</td><td>1</td></tr>
+              <tr><td><code>flightNumber</code></td><td>Text</td><td>OS123</td></tr>
+              <tr><td><code>airline</code></td><td>Text</td><td>Austrian Airlines</td></tr>
+              <tr><td><code>type</code></td><td><code>'departure'</code> | <code>'arrival'</code></td><td>departure</td></tr>
+              <tr><td><code>airport</code></td><td>Text (Ziel bzw. Herkunft)</td><td>London Heathrow (LHR)</td></tr>
+              <tr><td><code>scheduledTime</code></td><td>Text &bdquo;HH:MM&ldquo;</td><td>10:30</td></tr>
+              <tr><td><code>expectedTime</code></td><td>Text, optional</td><td>11:45 (nur bei Versp&auml;tung)</td></tr>
+              <tr><td><code>status</code></td><td>einer von 6 Werten</td><td>boarding</td></tr>
+              <tr><td><code>terminal</code></td><td>Text</td><td>T3</td></tr>
+              <tr><td><code>gate</code></td><td>Text, optional</td><td>B12</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>4 &mdash; Ansichten</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Seite</th><th>URL</th><th>Inhalt</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Abfl&uuml;ge</td><td><code>/departures</code></td><td>Kopf mit Aktionen, Suche/Filter, Tabelle der Abfl&uuml;ge (Startseite)</td></tr>
+              <tr><td>Ank&uuml;nfte</td><td><code>/arrivals</code></td><td>wie Abfl&uuml;ge, nur Ank&uuml;nfte</td></tr>
+              <tr><td>Flugdetails</td><td><code>/flight/:id</code></td><td>alle Daten eines Flugs, Zur&uuml;ck-Button</td></tr>
+              <tr><td>Nicht gefunden</td><td>alle anderen</td><td>Hinweis und Link zur Startseite</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>5 &mdash; Komponenten</h2>
+        <p>
+          Die Oberfl&auml;che wird in kleine Komponenten zerlegt, jede mit genau einer Aufgabe.
+          Daten flie&szlig;en als Props nach unten, &Auml;nderungen gehen &uuml;ber Callbacks nach oben.
+        </p>
+        <a href="misc/flugboard-komponenten.png" target="_blank" rel="noopener">
+          <img
+            src="misc/flugboard-komponenten.png"
+            alt="Screenshot der Abflug-Seite von FlugBoard 2.8 mit eingezeichneten Komponenten: Layout (Navigationsleiste), DeparturePage (Seiteninhalt), SearchBar, FilterBar, FlightBoard (Tabelle), FlightCard (eine Zeile) und FlightStatusBadge (Status-Label)"
+            style="display:block;width:100%;border:1px solid var(--border);border-radius:8px;margin:0.6rem 0 0.4rem;"
+          >
+        </a>
+        <p style="color:var(--text-muted);font-size:0.9rem;">
+          Die Abflug-Seite mit ihren Komponenten (Klick &ouml;ffnet das Bild in voller Gr&ouml;&szlig;e). Nicht zu sehen:
+          <code>AddFlightForm</code> erscheint erst nach &bdquo;+ Flug hinzuf&uuml;gen&ldquo;, <code>EmptyState</code> nur
+          bei einer leeren Liste.
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">Komponentenbaum</span>
+            <span class="code-lang">Text</span>
+          </div>
+          <pre><code class="language-plaintext">App                                     Routen festlegen
+└── Layout                              Navigation (Abflüge | Ankünfte), Theme-Umschalter
+    ├── DeparturePage                   lädt Flüge, hält Filter, Kopf mit Aktionen
+    │   ├── AddFlightForm               Formular für neuen Flug (ein-/ausblendbar)
+    │   ├── SearchBar                   Suchfeld
+    │   ├── FilterBar                   Status-Auswahl, „Zurücksetzen“
+    │   └── FlightBoard                 Tabelle mit Kopfzeile und Anzahl
+    │       ├── FlightCard              eine Zeile: Zeit, Status ändern, Löschen
+    │       │   └── FlightStatusBadge   farbiges Status-Label
+    │       └── EmptyState              Hinweis, wenn keine Flüge passen
+    ├── ArrivalPage                     wie DeparturePage
+    ├── FlightDetailPage                lädt einen Flug per ID
+    │   └── FlightDetail                Detailansicht
+    └── NotFoundPage                    Hinweis bei unbekannter URL</code></pre>
+        </div>
+        <p><strong>Logik au&szlig;erhalb der Komponenten:</strong></p>
+        <ul>
+          <li><code>useFlights</code> &ndash; l&auml;dt die Fl&uuml;ge vom Backend, Polling, Anlegen/L&ouml;schen/Status &auml;ndern</li>
+          <li><code>useFlightFilters</code> &ndash; Suche und Filter, liefert die gefilterte und sortierte Liste</li>
+          <li><code>useLocalStorage</code> &ndash; merkt sich Einstellungen im Browser</li>
+          <li><code>ThemeContext</code> &ndash; Dark/Light-Theme f&uuml;r die ganze App</li>
+        </ul>
+      </section>
+
+      <section class="section">
+        <h2>6 &mdash; Backend</h2>
+        <p>Kleines REST-Backend (Deno + Hono), Daten in einer SQLite-Datenbank.</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Methode</th><th>Pfad</th><th>Zweck</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>GET</td><td><code>/api/flights</code></td><td>alle Fl&uuml;ge (optional <code>?type=</code>, <code>?status=</code>)</td></tr>
+              <tr><td>GET</td><td><code>/api/flights/:id</code></td><td>ein Flug</td></tr>
+              <tr><td>POST</td><td><code>/api/flights</code></td><td>Flug anlegen</td></tr>
+              <tr><td>PATCH</td><td><code>/api/flights/:id</code></td><td>Status &auml;ndern</td></tr>
+              <tr><td>DELETE</td><td><code>/api/flights/:id</code></td><td>Flug l&ouml;schen</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>7 &mdash; Umsetzungsschritte</h2>
+        <p>Jeder Schritt ergibt eine lauff&auml;hige App, die etwas mehr kann als vorher.</p>
+        <ol>
+          <li>Statische Tabelle mit festen Beispieldaten in einer Datei</li>
+          <li>In Komponenten zerlegen (<code>AirportHeader</code>, <code>FlightBoard</code>, <code>FlightCard</code>),
+            Daten als Array, Liste mit <code>.map()</code>, Status-Badges, Sortierung</li>
+          <li>Interaktion: Flug ausw&auml;hlen, Detailansicht, Abfl&uuml;ge/Ank&uuml;nfte umschalten</li>
+          <li>Suche, Filter und Formular zum Anlegen</li>
+          <li>Daten vom Backend laden, automatisch aktualisieren; Anlegen/L&ouml;schen/Status &uuml;ber die API</li>
+          <li>Aufr&auml;umen: Theme per Context, Logik in Custom Hooks</li>
+          <li>Tests f&uuml;r wichtige Komponenten</li>
+          <li>Mehrere Seiten mit React Router</li>
+          <li>Daten dauerhaft in einer Datenbank speichern</li>
+        </ol>
+      </section>
+
+      <section class="section section-aufgaben">
+        <h2>Checkliste f&uuml;r dein Konzept</h2>
+        <ul>
+          <li>Ist die Idee in zwei, drei S&auml;tzen verst&auml;ndlich?</li>
+          <li>Gibt es mindestens eine Liste, ein Formular und eine Detailansicht?</li>
+          <li>Sind alle Felder deines Datentyps mit Typ und Beispiel aufgef&uuml;hrt?</li>
+          <li>Hat jede Komponente im Baum genau eine Aufgabe?</li>
+          <li>Ist klar, welche Daten vom Backend kommen und welche Endpunkte du brauchst?</li>
+          <li>Kannst du die App in kleinen Schritten bauen, von denen jeder f&uuml;r sich l&auml;uft?</li>
+        </ul>
+      </section>
+
+    </div>
+
+    <nav class="lesson-nav">
+      <a class="nav-btn" href="1.3-komponenten-props-einfach.html">&larr; Zur&uuml;ck zu Lektion 1.3</a>
+      <span class="nav-center-info">Konzept-Vorlage</span>
+      <a class="nav-btn primary" href="1.4-komponenten-props-vertiefung.html">Lektion 1.4: Komponenten, Props &amp; Listen &rarr;</a>
+    </nav>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+  <script>
+    const ham = document.getElementById('hamburger');
+    const sb = document.getElementById('sidebar');
+    const ov = document.getElementById('overlay');
+    ham.addEventListener('click', () => { sb.classList.toggle('open'); ov.classList.toggle('visible'); });
+    ov.addEventListener('click', () => { sb.classList.remove('open'); ov.classList.remove('visible'); });
+    const cur = window.location.pathname.split('/').pop() || 'index.html';
+    document.querySelectorAll('.nav-link').forEach(l => {
+      if (l.getAttribute('href') === cur) l.classList.add('active');
+    });
+    const themeBtn = document.getElementById('theme-toggle');
+    const applyTheme = (t) => {
+      document.documentElement.setAttribute('data-theme', t);
+      if (themeBtn) themeBtn.innerHTML = t === 'dark' ? '&#9728;' : '&#9790;';
+    };
+    applyTheme(localStorage.getItem('kurs-theme') || 'dark');
+    setTimeout(() => document.documentElement.classList.add('theme-transitions'), 50);
+    if (themeBtn) themeBtn.addEventListener('click', () => {
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('kurs-theme', next);
+      applyTheme(next);
+    });
+    hljs.highlightAll();
+  </script>
+</body>
+
+</html>

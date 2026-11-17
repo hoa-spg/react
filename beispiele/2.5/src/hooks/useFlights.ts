@@ -12,7 +12,7 @@ interface UseFlightsReturn {
   refetch: () => void;
   addFlight: (flight: Omit<Flight, 'id'>) => Promise<void>;
   deleteFlight: (id: number) => Promise<void>;
-  updateStatus: (id: number, status: Flight['status']) => void;
+  updateStatus: (id: number, status: Flight['status']) => Promise<void>;
 }
 
 /**
@@ -73,12 +73,27 @@ const useFlights = (): UseFlightsReturn => {
 
   const deleteFlight = async (id: number) => {
     if (!window.confirm('Flug wirklich löschen?')) return;
-    await fetch(`${API_URL}/api/flights/${id}`, { method: 'DELETE' });
-    refetch();
+    try {
+      const res = await fetch(`${API_URL}/api/flights/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Fehler beim Löschen');
+      refetch();
+    } catch (err) {
+      console.error('Fehler beim Löschen:', err);
+    }
   };
 
-  const updateStatus = (id: number, status: Flight['status']) => {
-    setFlights((prev) => prev.map((f) => (f.id === id ? { ...f, status } : f)));
+  const updateStatus = async (id: number, status: Flight['status']) => {
+    try {
+      const res = await fetch(`${API_URL}/api/flights/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      });
+      if (!res.ok) throw new Error('Fehler beim Ändern des Status');
+      setFlights((prev) => prev.map((f) => (f.id === id ? { ...f, status } : f)));
+    } catch (err) {
+      console.error('Fehler beim Ändern des Status:', err);
+    }
   };
 
   return {

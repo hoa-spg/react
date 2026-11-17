@@ -1,14 +1,14 @@
 .add-form {
   margin-bottom: 1.5rem;
   padding: 1.5rem 2rem;
-  border: 1px solid #30363d;
+  border: 1px solid var(--app-border);
   border-radius: 12px;
-  background: #1c2128;
+  background: var(--app-card-bg);
 }
 
 .add-form-title {
   margin-bottom: 1.25rem;
-  color: #61dafb;
+  color: var(--app-accent);
   font-size: 1.1rem;
   font-weight: 600;
 }
@@ -27,7 +27,7 @@
 }
 
 .form-label {
-  color: #8b949e;
+  color: var(--app-muted);
   font-size: 0.8rem;
   font-weight: 600;
   letter-spacing: 0.04em;
@@ -37,10 +37,10 @@
 .form-input,
 .form-select {
   padding: 7px 10px;
-  border: 1px solid #30363d;
+  border: 1px solid var(--app-border);
   border-radius: 6px;
-  background: #21262d;
-  color: #e6edf3;
+  background: var(--app-sidebar-bg);
+  color: var(--app-text);
   font-size: 0.875rem;
 }
 
@@ -71,10 +71,10 @@
 
 .btn-cancel {
   padding: 8px 20px;
-  border: 1px solid #30363d;
+  border: 1px solid var(--app-border);
   border-radius: 6px;
-  background: #21262d;
-  color: #e6edf3;
+  background: var(--app-sidebar-bg);
+  color: var(--app-text);
   font-size: 0.875rem;
   cursor: pointer;
 }

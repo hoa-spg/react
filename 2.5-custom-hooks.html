@@ -29,9 +29,8 @@
       <a class="nav-link" href="1.1-einfuehrung-spa.html"><span class="ln">1.1</span>Motivation &amp; SPA</a>
       <a class="nav-link" href="1.2-einfuehrung.html"><span class="ln">1.2</span>Einführung &amp; Umgebung</a>
       <a class="nav-link" href="1.3-komponenten-props-einfach.html"><span class="ln">1.3</span>Komponenten &amp; Props (einfach)</a>
-      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten &amp; Props (Vertiefung)</a>
+      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten, Props &amp; Listen</a>
       <a class="nav-link" href="1.5-state-events.html"><span class="ln">1.5</span>State &amp; Events</a>
-      <a class="nav-link" href="1.6-listen-conditional.html"><span class="ln">1.6</span>Listen &amp; Conditional Rendering</a>
     </div>
     <div class="nav-group">
       <div class="nav-group-label react-label">Teil 2 &mdash; React Praxis</div>
@@ -224,9 +223,11 @@ const FlightBoard = ({ flights }: FlightBoardProps) =&gt; {
     <section class="section">
       <h2>3. useFlights &ndash; Datenabruf-Hook</h2>
       <p>
-        In Lektion 2.2 haben wir die Fetch-Logik direkt in <code>App.tsx</code> geschrieben. Mit
-        zunehmendem Umfang (Polling, AbortController, Fehlerbehandlung, manuelles Refetch) wird
-        diese Logik unhandlich. Wir extrahieren sie in einen dedizierten Hook.
+        In Lektion 2.2 und 2.3 haben wir die Fetch-Logik direkt in <code>App.tsx</code> geschrieben:
+        Laden mit Polling und <code>AbortController</code>, dazu Anlegen (<code>POST</code>), L&ouml;schen
+        (<code>DELETE</code>) und Status &auml;ndern (<code>PATCH</code>). Das sind rund 80 Zeilen, die mit der
+        Darstellung nichts zu tun haben. Wir extrahieren sie in einen dedizierten Hook &ndash; das Verhalten
+        bleibt genau gleich.
       </p>
 
       <div class="code-block">
@@ -234,86 +235,128 @@ const FlightBoard = ({ flights }: FlightBoardProps) =&gt; {
           <span class="code-filename">src/hooks/useFlights.ts</span>
           <span class="code-lang">TypeScript</span>
         </div>
-        <pre><code class="language-typescript">import { useState, useEffect } from 'react';
+        <pre><code class="language-typescript">import { useState, useEffect, useCallback } from 'react';
 import { Flight } from '../types/flight';
+
+const API_URL = 'http://localhost:8000';
 
 interface UseFlightsReturn {
   flights: Flight[];
   isLoading: boolean;
   error: string | null;
-  refetch: () =&gt; void;
   lastUpdated: Date | null;
+  isRefreshing: boolean;
+  refetch: () =&gt; void;
+  addFlight: (flight: Omit&lt;Flight, 'id'&gt;) =&gt; Promise&lt;void&gt;;
+  deleteFlight: (id: number) =&gt; Promise&lt;void&gt;;
+  updateStatus: (id: number, status: Flight['status']) =&gt; Promise&lt;void&gt;;
 }
 
-const API_URL = 'http://localhost:8000';
-
 /**
- * L&auml;dt alle Fl&uuml;ge vom Backend und aktualisiert sie alle 30 Sekunden.
- * Gibt Ladevorgangsstatus, Fehler und eine manuelle Aktualisierungsfunktion zur&uuml;ck.
+ * Custom hook that encapsulates all flight data fetching logic.
+ * Provides CRUD operations and polling every 30 seconds.
  */
 const useFlights = (): UseFlightsReturn =&gt; {
-  const [flights, setFlights]         = useState&lt;Flight[]&gt;([]);
-  const [isLoading, setIsLoading]     = useState&lt;boolean&gt;(true);
-  const [error, setError]             = useState&lt;string | null&gt;(null);
-  const [lastUpdated, setLastUpdated] = useState&lt;Date | null&gt;(null);
+  const [flights, setFlights]           = useState&lt;Flight[]&gt;([]);
+  const [isLoading, setIsLoading]       = useState(true);
+  const [error, setError]               = useState&lt;string | null&gt;(null);
+  const [lastUpdated, setLastUpdated]   = useState&lt;Date | null&gt;(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [refreshKey, setRefreshKey]     = useState(0);
 
-  // Trick f&uuml;r manuelles Refetch: refreshKey &auml;ndern triggert den Effekt erneut
-  const [refreshKey, setRefreshKey]   = useState(0);
+  const fetchData = useCallback(async (signal?: AbortSignal) =&gt; {
+    let isAborted = false;
+
+    try {
+      setIsRefreshing(true);
+      setError(null);
+      const res = await fetch(`${API_URL}/api/flights`, { signal });
+      if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+      const data: Flight[] = await res.json();
+      setFlights(data);
+      setLastUpdated(new Date());
+    } catch (err) {
+      if (err instanceof Error &amp;&amp; err.name === 'AbortError') {
+        isAborted = true;
+        return;
+      }
+      setError(err instanceof Error ? err.message : 'Unbekannter Fehler');
+    } finally {
+      if (!isAborted) {
+        setIsLoading(false);
+        setIsRefreshing(false);
+      }
+    }
+  }, []);
 
   useEffect(() =&gt; {
-    // AbortController: bricht den laufenden Fetch beim Cleanup ab
     const controller = new AbortController();
+    fetchData(controller.signal);
+    const id = setInterval(() =&gt; fetchData(controller.signal), 30_000);
+    return () =&gt; { clearInterval(id); controller.abort(); };
+  }, [fetchData, refreshKey]);
 
-    const fetchData = async () =&gt; {
-      try {
-        setIsLoading(true);
-        setError(null);
+  const refetch = () =&gt; setRefreshKey((k) =&gt; k + 1);
 
-        const response = await fetch(`${API_URL}/api/flights`, {
-          signal: controller.signal,
-        });
+  const addFlight = async (flightData: Omit&lt;Flight, 'id'&gt;) =&gt; {
+    const res = await fetch(`${API_URL}/api/flights`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(flightData),
+    });
+    if (!res.ok) throw new Error('Fehler beim Hinzufügen');
+    refetch();
+  };
 
-        if (!response.ok) {
-          throw new Error(`HTTP-Fehler: ${response.status} ${response.statusText}`);
-        }
+  const deleteFlight = async (id: number) =&gt; {
+    if (!window.confirm('Flug wirklich löschen?')) return;
+    try {
+      const res = await fetch(`${API_URL}/api/flights/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Fehler beim Löschen');
+      refetch();
+    } catch (err) {
+      console.error('Fehler beim Löschen:', err);
+    }
+  };
 
-        const data: Flight[] = await response.json();
-        setFlights(data);
-        setLastUpdated(new Date());
-      } catch (err) {
-        // AbortError ignorieren: Das ist kein echter Fehler, sondern unser Cleanup
-        if (err instanceof Error &amp;&amp; err.name === 'AbortError') return;
-        setError(err instanceof Error ? err.message : 'Unbekannter Fehler');
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const updateStatus = async (id: number, status: Flight['status']) =&gt; {
+    try {
+      const res = await fetch(`${API_URL}/api/flights/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      });
+      if (!res.ok) throw new Error('Fehler beim Ändern des Status');
+      setFlights((prev) =&gt; prev.map((f) =&gt; (f.id === id ? { ...f, status } : f)));
+    } catch (err) {
+      console.error('Fehler beim Ändern des Status:', err);
+    }
+  };
 
-    // Sofortiger erster Fetch
-    fetchData();
-
-    // Automatische Aktualisierung alle 30 Sekunden
-    const intervalId = setInterval(fetchData, 30_000);
-
-    return () =&gt; {
-      controller.abort();        // Laufenden Fetch abbrechen
-      clearInterval(intervalId); // Polling stoppen
-    };
-  }, [refreshKey]); // refreshKey als Abh&auml;ngigkeit: &Auml;nderung triggert Effekt
-
-  const refetch = () =&gt; setRefreshKey(k =&gt; k + 1);
-
-  return { flights, isLoading, error, refetch, lastUpdated };
+  return {
+    flights,
+    isLoading,
+    error,
+    lastUpdated,
+    isRefreshing,
+    refetch,
+    addFlight,
+    deleteFlight,
+    updateStatus,
+  };
 };
 
 export default useFlights;</code></pre>
       </div>
 
-      <p>Das Ergebnis in <code>App.tsx</code> spricht f&uuml;r sich:</p>
+      <p>
+        Das Ergebnis in <code>App.tsx</code> spricht f&uuml;r sich. Die folgende Skizze l&auml;sst Props und
+        Komponenten weg; die vollst&auml;ndige Fassung zeigt der Projektschritt:
+      </p>
 
       <div class="code-block">
         <div class="code-header">
-          <span class="code-filename">src/App.tsx (nach Extraktion)</span>
+          <span class="code-filename">Skizze (vereinfacht): App.tsx nach der Extraktion</span>
           <span class="code-lang">TypeScript</span>
         </div>
         <pre><code class="language-typescript">import useFlights from './hooks/useFlights';
@@ -326,8 +369,12 @@ function App() {
   if (error)     return &lt;ErrorMessage message={error} onRetry={refetch} /&gt;;
 
   return (
-    &lt;div className="app"&gt;
-      &lt;AirportHeader lastUpdated={lastUpdated} onRefresh={refetch} /&gt;
+    &lt;div className="app-page"&gt;
+      &lt;AirportHeader
+        airportName="Flughafen Wien-Schwechat"
+        lastUpdated={lastUpdated}
+        onRefresh={refetch}
+      /&gt;
       {isLoading ? (
         &lt;BoardLoading /&gt;
       ) : (
@@ -350,7 +397,22 @@ function App() {
             <code>useEffect</code>-Abh&auml;ngigkeitsliste. Da React &auml;nderungen in der
             Abh&auml;ngigkeitsliste erkennt, wird der Effekt neu ausgef&uuml;hrt.
             Der Trick funktioniert immer, wenn man einen Effekt manuell neu triggern m&ouml;chte,
-            ohne dessen eigentliche Abh&auml;ngigkeiten zu ver&auml;ndern.
+            ohne dessen eigentliche Abh&auml;ngigkeiten zu ver&auml;ndern. Nach <code>addFlight</code> und
+            <code>deleteFlight</code> l&auml;dt der Hook so die Liste neu.
+          </p>
+        </div>
+      </div>
+
+      <div class="callout callout-tip">
+        <div class="callout-icon">&#128161;</div>
+        <div class="callout-body">
+          <div class="callout-title">isLoading vs. isRefreshing</div>
+          <p>
+            <code>isLoading</code> ist nur beim allerersten Laden <code>true</code> &ndash; dann zeigt die App die
+            Ladeanzeige statt der Tafel. Beim Polling und beim manuellen Aktualisieren wird nur
+            <code>isRefreshing</code> gesetzt: Die Tafel bleibt sichtbar, der Header zeigt
+            &bdquo;(wird aktualisiert...)&ldquo;. W&uuml;rde man bei jedem Polling <code>isLoading</code> setzen,
+            verschw&auml;nde die Tafel alle 30 Sekunden kurz.
           </p>
         </div>
       </div>
@@ -434,18 +496,15 @@ const [theme, setTheme] = useLocalStorage&lt;'dark' | 'light'&gt;('theme', 'dark
 // Sprache persistieren
 const [lang, setLang] = useLocalStorage&lt;'de' | 'en'&gt;('language', 'de');
 
-// Filter-Einstellungen persistieren (komplexes Objekt)
-const [filters, setFilters] = useLocalStorage&lt;FilterState&gt;(
-  'flugboard-filters',
-  DEFAULT_FILTERS
-);
+// Filter-Einstellungen persistieren &ndash; wie im Projekt einzeln pro Filter
+const [searchQuery, setSearchQuery] = useLocalStorage('fb-search', '');
+const [statusFilter, setStatusFilter] =
+  useLocalStorage&lt;'all' | FlightStatus&gt;('fb-status', 'all');
 
 // Identischer Verwendungsstil wie useState:
-setTheme('light');            // einfacher Wert
-setFilters(prev =&gt; ({        // ABER: Vorsicht! Kein Setter-Callback wie bei useState
-  ...prev,
-  searchQuery: 'LH',
-}));</code></pre>
+setTheme('light');
+setSearchQuery('LH');
+setStatusFilter('delayed');</code></pre>
       </div>
 
       <div class="callout callout-warning">
@@ -454,9 +513,10 @@ setFilters(prev =&gt; ({        // ABER: Vorsicht! Kein Setter-Callback wie bei 
           <div class="callout-title">Kein Setter-Callback!</div>
           <p>
             Unser <code>useLocalStorage</code>-Hook akzeptiert im Setter keinen Callback wie
-            <code>setCount(prev =&gt; prev + 1)</code>. Um ein Objekt zu aktualisieren, muss der
-            aktuelle Wert zuerst gelesen werden:
-            <code>setFilters({ ...filters, searchQuery: 'LH' })</code>.
+            <code>setCount(prev =&gt; prev + 1)</code>. Speichert man ein Objekt, muss der
+            aktuelle Wert zuerst gelesen werden, z.B.
+            <code>setSettings({ ...settings, lang: 'en' })</code>. Deshalb speichern wir die
+            Filter im Projekt als einzelne Werte.
             F&uuml;r eine robuste Implementierung k&ouml;nnte der Setter auf Callbacks erweitert werden
             (<code>value: T | ((prev: T) =&gt; T)</code>).
           </p>
@@ -554,8 +614,9 @@ const useFlightFilters = () =&gt; {
         </div>
 
         <p>
-          Wir refaktorieren <code>App.tsx</code> grundlegend. Die gesamte Fetch-Logik wandert in
-          <code>useFlights</code>, die Filter-Logik in <code>useFlightFilters</code>.
+          Wir refaktorieren <code>App.tsx</code> grundlegend. Die gesamte Fetch-Logik (inklusive Anlegen,
+          L&ouml;schen und Status&auml;ndern) wandert in <code>useFlights</code>, die Filter-Logik in
+          <code>useFlightFilters</code>. Funktional &auml;ndert sich nichts gegen&uuml;ber Lektion 2.4.
           Das Ergebnis: Eine sehr schlanke <code>App.tsx</code>, die nur noch die Hooks aufruft
           und die Ergebnisse an Komponenten verteilt.
         </p>
@@ -573,69 +634,76 @@ const useFlightFilters = () =&gt; {
 import { Flight, FlightStatus } from '../types/flight';
 import useLocalStorage from './useLocalStorage';
 
-interface UseFlightFiltersReturn {
+interface FlightFilters {
   searchQuery: string;
-  setSearchQuery: (q: string) =&gt; void;
-  statusFilter: FlightStatus | 'all';
-  setStatusFilter: (s: FlightStatus | 'all') =&gt; void;
   typeFilter: 'all' | 'departure' | 'arrival';
-  setTypeFilter: (t: 'all' | 'departure' | 'arrival') =&gt; void;
+  statusFilter: 'all' | FlightStatus;
+}
+
+interface UseFlightFiltersReturn extends FlightFilters {
+  setSearchQuery: (q: string) =&gt; void;
+  setTypeFilter: (t: FlightFilters['typeFilter']) =&gt; void;
+  setStatusFilter: (s: FlightFilters['statusFilter']) =&gt; void;
+  resetFilters: () =&gt; void;
+  hasActiveFilters: boolean;
   filteredDepartures: Flight[];
   filteredArrivals: Flight[];
 }
 
 /**
- * Verwaltet alle Filter-Einstellungen f&uuml;r die Flugsuche.
- * Filterzustand wird in localStorage persistiert.
- *
- * @param flights - Das ungefilterte Flug-Array
+ * Custom hook that manages flight filtering state via localStorage.
+ * Returns filtered and sorted departure/arrival lists.
  */
 const useFlightFilters = (flights: Flight[]): UseFlightFiltersReturn =&gt; {
-  // Filter-State mit localStorage-Persistenz
-  const [searchQuery, setSearchQuery] =
-    useLocalStorage&lt;string&gt;('fb-search', '');
+  const [searchQuery, setSearchQuery]   = useLocalStorage('fb-search', '');
+  const [typeFilter, setTypeFilter]     = useLocalStorage&lt;FlightFilters['typeFilter']&gt;('fb-type', 'all');
+  const [statusFilter, setStatusFilter] = useLocalStorage&lt;FlightFilters['statusFilter']&gt;('fb-status', 'all');
 
-  const [statusFilter, setStatusFilter] =
-    useLocalStorage&lt;FlightStatus | 'all'&gt;('fb-status', 'all');
+  const hasActiveFilters =
+    searchQuery !== '' || typeFilter !== 'all' || statusFilter !== 'all';
 
-  const [typeFilter, setTypeFilter] =
-    useLocalStorage&lt;'all' | 'departure' | 'arrival'&gt;('fb-type', 'all');
+  const resetFilters = () =&gt; {
+    setSearchQuery('');
+    setTypeFilter('all');
+    setStatusFilter('all');
+  };
 
-  // useMemo: Gefilterte Listen nur neu berechnen, wenn sich
-  // flights oder Filter-Werte &auml;ndern
-  const filteredFlights = useMemo(() =&gt; {
-    return flights.filter(flight =&gt; {
-      const q = searchQuery.toLowerCase();
-      const matchesSearch =
-        !q ||
-        flight.flightNumber.toLowerCase().includes(q) ||
-        flight.airline.toLowerCase().includes(q) ||
-        flight.airport.toLowerCase().includes(q);
-
-      const matchesStatus =
-        statusFilter === 'all' || flight.status === statusFilter;
-
-      const matchesType =
-        typeFilter === 'all' || flight.type === typeFilter;
-
-      return matchesSearch &amp;&amp; matchesStatus &amp;&amp; matchesType;
-    });
-  }, [flights, searchQuery, statusFilter, typeFilter]);
+  const filtered = useMemo(() =&gt; {
+    const q = searchQuery.toLowerCase();
+    return [...flights]
+      .filter((f) =&gt; {
+        if (statusFilter !== 'all' &amp;&amp; f.status !== statusFilter) return false;
+        if (
+          q &amp;&amp;
+          !f.flightNumber.toLowerCase().includes(q) &amp;&amp;
+          !f.airline.toLowerCase().includes(q) &amp;&amp;
+          !f.airport.toLowerCase().includes(q)
+        )
+          return false;
+        return true;
+      })
+      .sort((a, b) =&gt; a.scheduledTime.localeCompare(b.scheduledTime));
+  }, [flights, searchQuery, statusFilter]);
 
   const filteredDepartures = useMemo(
-    () =&gt; filteredFlights.filter(f =&gt; f.type === 'departure'),
-    [filteredFlights]
+    () =&gt; filtered.filter((f) =&gt; f.type === 'departure'),
+    [filtered],
   );
 
   const filteredArrivals = useMemo(
-    () =&gt; filteredFlights.filter(f =&gt; f.type === 'arrival'),
-    [filteredFlights]
+    () =&gt; filtered.filter((f) =&gt; f.type === 'arrival'),
+    [filtered],
   );
 
   return {
-    searchQuery,    setSearchQuery,
-    statusFilter,   setStatusFilter,
-    typeFilter,     setTypeFilter,
+    searchQuery,
+    setSearchQuery,
+    typeFilter,
+    setTypeFilter,
+    statusFilter,
+    setStatusFilter,
+    resetFilters,
+    hasActiveFilters,
     filteredDepartures,
     filteredArrivals,
   };
@@ -644,85 +712,227 @@ const useFlightFilters = (flights: Flight[]): UseFlightFiltersReturn =&gt; {
 export default useFlightFilters;</code></pre>
         </div>
 
-        <h4>Schritt 3: App.tsx &ndash; Vorher / Nachher</h4>
+        <p>
+          Wie in 2.1 sortiert der Hook die gefilterten Fl&uuml;ge nach <code>scheduledTime</code>. Der
+          Typ-Filter blendet weiterhin ganze Boards aus (in <code>App</code>), deshalb filtert der Hook nur
+          nach Suche und Status.
+        </p>
+
+        <h4>Schritt 3: App.tsx nach dem Refactoring</h4>
         <div class="code-block">
           <div class="code-header">
             <span class="code-filename">src/App.tsx (nach Refactoring)</span>
             <span class="code-lang">TypeScript</span>
           </div>
-          <pre><code class="language-typescript">import { useState } from 'react';
-import { Flight, FlightStatus } from './types/flight';
+          <pre><code class="language-typescript">import { useState, type CSSProperties } from 'react';
+import { Flight } from './types/flight';
+import { useTheme } from './context/ThemeContext';
 import useFlights from './hooks/useFlights';
 import useFlightFilters from './hooks/useFlightFilters';
-import { useTheme } from './context/ThemeContext';
-
 import AirportHeader from './components/AirportHeader';
 import FlightBoard from './components/FlightBoard';
 import FlightDetail from './components/FlightDetail';
 import SearchBar from './components/SearchBar';
 import FilterBar from './components/FilterBar';
+import AddFlightForm from './components/AddFlightForm';
+import './App.css';
 
-// App.tsx ist jetzt deutlich &uuml;bersichtlicher:
-// Keine direkte useState/useEffect-Logik mehr f&uuml;r Daten &amp; Filter.
-function App() {
-  const { theme } = useTheme();
-
-  // Datenabruf-Logik komplett im Hook
-  const { flights, isLoading, error, refetch, lastUpdated } = useFlights();
-
-  // Filter-Logik komplett im Hook (inkl. localStorage-Persistenz)
-  const {
-    searchQuery, setSearchQuery,
-    statusFilter, setStatusFilter,
-    filteredDepartures, filteredArrivals,
-  } = useFlightFilters(flights);
-
-  // Nur App-spezifischer State bleibt hier
-  const [selectedFlight, setSelectedFlight] = useState&lt;Flight | null&gt;(null);
-
-  const handleStatusChange = (id: number, status: FlightStatus) =&gt; {
-    // Direkte Mutation nicht m&ouml;glich, da flights aus dem Hook kommt.
-    // In der Praxis: API-Call + refetch(). F&uuml;r lokale Demo: eigener State.
-    console.log(`Status &auml;ndern: Flug ${id} -&gt; ${status}`);
-    refetch();
-  };
-
-  if (error)     return &lt;div className="error"&gt;Fehler: {error}&lt;/div&gt;;
+interface ErrorScreenProps { error: string; onRetry: () =&gt; void; }
+const ErrorScreen = ({ error, onRetry }: ErrorScreenProps) =&gt; {
+  const { colors } = useTheme();
+  const themeVars: CSSProperties = {
+    '--app-bg': colors.bg,
+    '--app-text': colors.text,
+    '--app-muted': colors.textMuted,
+    '--app-card-bg': colors.bgCard,
+    '--app-sidebar-bg': colors.bgSidebar,
+    '--app-border': colors.border,
+    '--app-accent': colors.accent,
+  } as CSSProperties;
 
   return (
-    &lt;div style={{ minHeight: '100vh', background: theme === 'dark' ? '#0d1117' : '#f6f8fa' }}&gt;
-      &lt;AirportHeader lastUpdated={lastUpdated} onRefresh={refetch} /&gt;
-      &lt;main style={{ padding: '1.5rem' }}&gt;
-        &lt;SearchBar value={searchQuery} onChange={setSearchQuery} /&gt;
-        &lt;FilterBar currentStatus={statusFilter} onStatusChange={setStatusFilter} /&gt;
-        {isLoading ? (
-          &lt;div className="board-loading"&gt;Fl&uuml;ge werden geladen...&lt;/div&gt;
-        ) : (
-          &lt;&gt;
-            &lt;FlightBoard
-              title="Abfl&uuml;ge"
-              flights={filteredDepartures}
-              onFlightSelect={setSelectedFlight}
-              selectedFlightId={selectedFlight?.id}
-            /&gt;
-            &lt;FlightBoard
-              title="Ank&uuml;nfte"
-              flights={filteredArrivals}
-              onFlightSelect={setSelectedFlight}
-              selectedFlightId={selectedFlight?.id}
-            /&gt;
-          &lt;/&gt;
-        )}
-        {selectedFlight &amp;&amp; (
-          &lt;FlightDetail
-            flight={selectedFlight}
-            onClose={() =&gt; setSelectedFlight(null)}
-          /&gt;
-        )}
-      &lt;/main&gt;
+    // Inline style is required to inject live theme variables from context.
+    &lt;div className="status-screen status-screen-error" style={themeVars}&gt;
+      &lt;p className="error-title"&gt;Fehler: {error}&lt;/p&gt;
+      &lt;p className="error-help"&gt;
+        Ist das Backend gestartet?{' '}
+        &lt;code className="backend-command"&gt;
+          deno task dev
+        &lt;/code&gt;{' '}
+        im backend/-Ordner ausführen.
+      &lt;/p&gt;
+      &lt;button onClick={onRetry} className="retry-btn"&gt;
+        Neu laden
+      &lt;/button&gt;
     &lt;/div&gt;
   );
-}</code></pre>
+};
+
+// ── Main App ──────────────────────────────────────────────────────────────────
+
+/**
+ * Root component for lesson 2.5 — very slim thanks to custom hooks.
+ * All fetch logic lives in useFlights; all filter logic in useFlightFilters.
+ */
+const App = () =&gt; {
+  const { colors } = useTheme();
+  const themeVars: CSSProperties = {
+    '--app-bg': colors.bg,
+    '--app-text': colors.text,
+    '--app-muted': colors.textMuted,
+    '--app-card-bg': colors.bgCard,
+    '--app-sidebar-bg': colors.bgSidebar,
+    '--app-border': colors.border,
+    '--app-accent': colors.accent,
+  } as CSSProperties;
+
+  const {
+    flights,
+    isLoading,
+    error,
+    lastUpdated,
+    isRefreshing,
+    refetch,
+    addFlight,
+    deleteFlight,
+    updateStatus,
+  } = useFlights();
+
+  const {
+    searchQuery,
+    setSearchQuery,
+    typeFilter,
+    setTypeFilter,
+    statusFilter,
+    setStatusFilter,
+    resetFilters,
+    hasActiveFilters,
+    filteredDepartures,
+    filteredArrivals,
+  } = useFlightFilters(flights);
+
+  // Nur die ID merken und den Flug aus der aktuellen Liste ableiten:
+  // So zeigt das Detail-Panel immer den aktuellen Status und schließt sich,
+  // sobald der Flug gelöscht wurde.
+  const [selectedFlightId, setSelectedFlightId] = useState&lt;number | null&gt;(null);
+  const selectedFlight = flights.find((f) =&gt; f.id === selectedFlightId) ?? null;
+  const [showAddForm, setShowAddForm]       = useState(false);
+
+  const handleAddFlight = async (flight: Flight) =&gt; {
+    try {
+      await addFlight(flight);
+      setShowAddForm(false);
+    } catch (err) {
+      console.error('Fehler beim Hinzufügen:', err);
+    }
+  };
+
+  const showDepartures = typeFilter === 'all' || typeFilter === 'departure';
+  const showArrivals   = typeFilter === 'all' || typeFilter === 'arrival';
+
+  if (error)     return &lt;ErrorScreen error={error} onRetry={refetch} /&gt;;
+
+  return (
+    // Inline style is required to inject live theme variables from context.
+    &lt;div className="app-page" style={themeVars}&gt;
+      &lt;AirportHeader
+        airportName="Flughafen Wien-Schwechat"
+        lastUpdated={lastUpdated}
+        isRefreshing={isRefreshing}
+        onRefresh={refetch}
+      &gt;
+        &lt;button
+          className="add-btn"
+          onClick={() =&gt; setShowAddForm((v) =&gt; !v)}
+        &gt;
+          {showAddForm ? 'Abbrechen' : '+ Flug hinzufügen'}
+        &lt;/button&gt;
+      &lt;/AirportHeader&gt;
+
+      {showAddForm &amp;&amp; (
+        &lt;AddFlightForm
+          onAdd={handleAddFlight}
+          onCancel={() =&gt; setShowAddForm(false)}
+        /&gt;
+      )}
+
+      &lt;p className="summary-line"&gt;
+        {flights.length} Flüge gesamt &amp;nbsp;|&amp;nbsp;
+        {flights.filter((f) =&gt; f.type === 'departure').length} Abflüge &amp;nbsp;|&amp;nbsp;
+        {flights.filter((f) =&gt; f.type === 'arrival').length} Ankünfte
+      &lt;/p&gt;
+
+      &lt;div className="toolbar"&gt;
+        &lt;SearchBar value={searchQuery} onChange={setSearchQuery} placeholder="Suche nach Flug, Airline, Ziel…" /&gt;
+        &lt;FilterBar
+          typeFilter={typeFilter}
+          statusFilter={statusFilter}
+          onTypeChange={setTypeFilter}
+          onStatusChange={setStatusFilter}
+          onReset={resetFilters}
+          hasActiveFilters={hasActiveFilters}
+        /&gt;
+      &lt;/div&gt;
+
+      {isLoading ? (
+        &lt;div className="board-loading board-loading--muted"&gt;
+          &lt;div className="loading-spinner" aria-hidden="true"&gt;&lt;/div&gt;
+          &lt;p&gt;Flugdaten werden geladen...&lt;/p&gt;
+        &lt;/div&gt;
+      ) : (
+        &lt;&gt;
+          {showDepartures &amp;&amp; (
+            &lt;FlightBoard
+              flights={filteredDepartures}
+              title="Abflüge"
+              count={filteredDepartures.length}
+              selectedFlightId={selectedFlight?.id}
+              onFlightSelect={(flight) =&gt; setSelectedFlightId(flight.id)}
+              onFlightDelete={deleteFlight}
+              onStatusChange={updateStatus}
+              onResetFilters={hasActiveFilters ? resetFilters : undefined}
+            /&gt;
+          )}
+          {showArrivals &amp;&amp; (
+            &lt;FlightBoard
+              flights={filteredArrivals}
+              title="Ankünfte"
+              count={filteredArrivals.length}
+              selectedFlightId={selectedFlight?.id}
+              onFlightSelect={(flight) =&gt; setSelectedFlightId(flight.id)}
+              onFlightDelete={deleteFlight}
+              onStatusChange={updateStatus}
+              onResetFilters={hasActiveFilters ? resetFilters : undefined}
+            /&gt;
+          )}
+        &lt;/&gt;
+      )}
+
+      {selectedFlight &amp;&amp; (
+        &lt;FlightDetail flight={selectedFlight} onClose={() =&gt; setSelectedFlightId(null)} /&gt;
+      )}
+    &lt;/div&gt;
+  );
+};
+
+export default App;</code></pre>
+        </div>
+
+        <div class="callout callout-tip">
+          <div class="callout-icon">&#128161;</div>
+          <div class="callout-body">
+            <div class="callout-title">Abgeleiteter State statt Kopie: selectedFlightId</div>
+            <p>
+              Bisher hat <code>App</code> eine <em>Kopie</em> des ausgew&auml;hlten Flugs gespeichert und musste sie
+              bei jeder Status&auml;nderung und beim L&ouml;schen selbst nachziehen. Jetzt &auml;ndert
+              <code>useFlights</code> die Liste &ndash; von <code>selectedFlight</code> wei&szlig; der Hook nichts.
+              Deshalb merkt sich <code>App</code> nur noch die ID und leitet den Flug bei jedem Render aus der
+              aktuellen Liste ab: <code>flights.find((f) =&gt; f.id === selectedFlightId) ?? null</code>.
+              So zeigt das Detail-Panel immer den aktuellen Status und verschwindet automatisch, sobald der
+              Flug gel&ouml;scht wurde. Faustregel: Was sich aus vorhandenem State berechnen l&auml;sst, nicht
+              zus&auml;tzlich speichern.
+            </p>
+          </div>
         </div>
       </div>
     </section>
@@ -802,11 +1012,14 @@ function App() {
           <li>Erstelle <code>src/hooks/useFlights.ts</code> wie im Theorieteil gezeigt</li>
           <li>
             Der Hook soll zur&uuml;ckgeben:
-            <code>flights</code>, <code>isLoading</code>, <code>error</code>,
-            <code>refetch()</code>, <code>lastUpdated</code>
+            <code>flights</code>, <code>isLoading</code>, <code>error</code>, <code>lastUpdated</code>,
+            <code>isRefreshing</code>, <code>refetch()</code> sowie <code>addFlight()</code>,
+            <code>deleteFlight()</code> und <code>updateStatus()</code>
           </li>
           <li>Verwende einen <code>AbortController</code> im Cleanup, um laufende Requests abzubrechen</li>
           <li>Implementiere automatisches Polling alle 30 Sekunden mit <code>setInterval</code></li>
+          <li>Teste danach, dass Anlegen, L&ouml;schen und Status&auml;ndern weiterhin funktionieren und das
+            Detail-Panel den aktuellen Status zeigt</li>
           <li>
             Z&auml;hle die Zeilen von <code>App.tsx</code> vorher und nachher &ndash;
             die Reduktion sollte sp&uuml;rbar sein

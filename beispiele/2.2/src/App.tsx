@@ -15,7 +15,7 @@ const sortByTime = (flights: Flight[]): Flight[] =>
   [...flights].sort((a, b) => a.scheduledTime.localeCompare(b.scheduledTime));
 
 /**
- * Root application component for L06.
+ * Root application component for lesson 2.2.
  * Fetches flights from the Deno backend via useEffect.
  * Supports AbortController cleanup and 30-second polling.
  */
@@ -91,7 +91,8 @@ const App = () => {
   const handleDeleteFlight = async (id: number) => {
     if (!window.confirm('Flug wirklich löschen?')) return;
     try {
-      await fetch(`${API_URL}/api/flights/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${API_URL}/api/flights/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Fehler beim Löschen des Flugs');
       setFlights((prev) => prev.filter((f) => f.id !== id));
       setSelectedFlight((prev) => (prev?.id === id ? null : prev));
     } catch (err) {
@@ -203,7 +204,8 @@ const App = () => {
               count={filteredDepartures.length}
               selectedFlightId={selectedFlight?.id}
               onFlightSelect={setSelectedFlight}
-              onDeleteFlight={handleDeleteFlight}
+              onFlightDelete={handleDeleteFlight}
+              onResetFilters={hasActiveFilters ? handleReset : undefined}
             />
           )}
           {showArrivals && (
@@ -213,7 +215,8 @@ const App = () => {
               count={filteredArrivals.length}
               selectedFlightId={selectedFlight?.id}
               onFlightSelect={setSelectedFlight}
-              onDeleteFlight={handleDeleteFlight}
+              onFlightDelete={handleDeleteFlight}
+              onResetFilters={hasActiveFilters ? handleReset : undefined}
             />
           )}
         </>

@@ -5,12 +5,12 @@
 }
 
 .flight-row:hover {
-  background: var(--bg-sidebar);
+  background: var(--app-sidebar-bg);
 }
 
 .flight-row.is-selected {
-  border-left-color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  border-left-color: var(--app-accent);
+  background: color-mix(in srgb, var(--app-accent) 14%, transparent);
 }
 
 .flight-row.is-cancelled {
@@ -19,44 +19,44 @@
 
 .flight-cell {
   padding: 0.7rem 1rem;
-  border-bottom: 1px solid var(--border);
-  color: var(--text);
+  border-bottom: 1px solid var(--app-border);
+  color: var(--app-text);
 }
 
 .flight-num.is-cancelled {
-  color: var(--text-muted);
+  color: var(--app-muted);
   text-decoration: line-through;
 }
 
 .time-old {
   margin-right: 4px;
-  color: var(--text-muted);
+  color: var(--app-muted);
   text-decoration: line-through;
 }
 
 .time-delayed {
-  color: var(--warning);
+  color: var(--app-warning);
 }
 
 .time-boarding {
-  color: var(--accent);
+  color: var(--app-accent);
 }
 
 .mini-select {
   padding: 3px 6px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--app-border);
   border-radius: 4px;
-  background: var(--bg-sidebar);
-  color: var(--text);
+  background: var(--app-sidebar-bg);
+  color: var(--app-text);
   font-size: 0.75rem;
 }
 
 .delete-btn {
   padding: 2px 7px;
-  border: 1px solid var(--danger);
+  border: 1px solid var(--app-danger);
   border-radius: 4px;
   background: none;
-  color: var(--danger);
+  color: var(--app-danger);
   font-size: 0.75rem;
   line-height: 1.4;
 }

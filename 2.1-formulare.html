@@ -29,9 +29,8 @@
       <a class="nav-link" href="1.1-einfuehrung-spa.html"><span class="ln">1.1</span>Motivation &amp; SPA</a>
       <a class="nav-link" href="1.2-einfuehrung.html"><span class="ln">1.2</span>Einführung &amp; Umgebung</a>
       <a class="nav-link" href="1.3-komponenten-props-einfach.html"><span class="ln">1.3</span>Komponenten &amp; Props (einfach)</a>
-      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten &amp; Props (Vertiefung)</a>
+      <a class="nav-link" href="1.4-komponenten-props-vertiefung.html"><span class="ln">1.4</span>Komponenten, Props &amp; Listen</a>
       <a class="nav-link" href="1.5-state-events.html"><span class="ln">1.5</span>State &amp; Events</a>
-      <a class="nav-link" href="1.6-listen-conditional.html"><span class="ln">1.6</span>Listen &amp; Conditional Rendering</a>
     </div>
     <div class="nav-group">
       <div class="nav-group-label react-label">Teil 2 &mdash; React Praxis</div>
@@ -208,41 +207,36 @@ const handleTextareaChange = (e: React.ChangeEvent&lt;HTMLTextAreaElement&gt;) =
           <span class="code-filename">src/components/SearchBar.tsx</span>
           <span class="code-lang">TypeScript</span>
         </div>
-        <pre><code class="language-typescript">interface SearchBarProps {
+        <pre><code class="language-typescript">import './SearchBar.css';
+
+interface SearchBarProps {
   value: string;
-  onChange: (value: string) => void;
+  onChange: (value: string) =&gt; void;
   placeholder?: string;
 }
 
 /**
  * Wiederverwendbares Suchfeld.
- * Der Elternteil kontrolliert den Wert &uuml;ber den onChange-Callback.
+ * Der Elternteil kontrolliert den Wert über den onChange-Callback.
  */
 const SearchBar = ({
   value,
   onChange,
-  placeholder = 'Flugnummer oder Ziel suchen...',
-}: SearchBarProps) => {
+  placeholder = 'Suchen…',
+}: SearchBarProps) =&gt; {
   return (
-    &lt;div className="search-bar"&gt;
-      {/* Such-Icon als dekoratives Element */}
-      &lt;span className="search-icon"&gt;
-        &#128269;
-      &lt;/span&gt;
+    &lt;div className="search-wrap"&gt;
       &lt;input
         type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
         className="search-input"
+        value={value}
+        placeholder={placeholder}
+        onChange={(e) =&gt; onChange(e.target.value)}
       /&gt;
-      {/* L&ouml;schen-Button nur anzeigen wenn Eingabe vorhanden */}
+      {/* Löschen-Button nur anzeigen, wenn Eingabe vorhanden */}
       {value &amp;&amp; (
-        &lt;button
-          onClick={() => onChange('')}
-          className="search-clear-btn"
-        &gt;
-          &times;
+        &lt;button className="search-clear" onClick={() =&gt; onChange('')} title="Löschen"&gt;
+          ✕
         &lt;/button&gt;
       )}
     &lt;/div&gt;
@@ -282,71 +276,74 @@ const filteredFlights = sampleFlights.filter(f => {
         <code>value</code> an State und aktualisieren ihn per <code>onChange</code>. Da <code>e.target.value</code>
         immer den Typ <code>string</code> hat, ist eine Type Assertion notwendig.
       </p>
+      <p>
+        In Lektion 1.5 haben wir die Ansicht noch mit Buttons umgeschaltet. Jetzt fassen wir Typ- und
+        Status-Filter in einer <code>FilterBar</code> mit zwei Selects zusammen. Der State
+        (<code>typeFilter</code>, <code>statusFilter</code>) bleibt wie bisher in <code>App.tsx</code>.
+      </p>
       <div class="code-block">
         <div class="code-header">
           <span class="code-filename">src/components/FilterBar.tsx</span>
           <span class="code-lang">TypeScript</span>
         </div>
         <pre><code class="language-typescript">import { FlightType, FlightStatus } from '../types/flight';
+import './FilterBar.css';
 
-type FilterType   = 'all' | FlightType;
+type TypeFilter   = 'all' | FlightType;
 type StatusFilter = 'all' | FlightStatus;
 
 interface FilterBarProps {
-  typeFilter:     FilterType;
-  statusFilter:   StatusFilter;
-  onTypeChange:   (value: FilterType) => void;
-  onStatusChange: (value: StatusFilter) => void;
+  typeFilter:       TypeFilter;
+  statusFilter:     StatusFilter;
+  onTypeChange:     (value: TypeFilter) =&gt; void;
+  onStatusChange:   (value: StatusFilter) =&gt; void;
+  onReset:          () =&gt; void;
+  hasActiveFilters: boolean;
 }
 
 /**
- * Filterleiste mit Typ- und Status-Filter.
+ * Filterleiste mit Typ- und Status-Filter sowie optionalem Zurücksetzen-Button.
  */
 const FilterBar = ({
   typeFilter,
   statusFilter,
   onTypeChange,
   onStatusChange,
-}: FilterBarProps) => {
+  onReset,
+  hasActiveFilters,
+}: FilterBarProps) =&gt; {
   return (
     &lt;div className="filter-bar"&gt;
-      &lt;span className="filter-label"&gt;
-        Filter:
-      &lt;/span&gt;
-
       {/* Typ-Filter */}
       &lt;select
-        value={typeFilter}
-        onChange={(e) =&gt; onTypeChange(e.target.value as FilterType)}
         className="filter-select"
+        value={typeFilter}
+        onChange={(e) =&gt; onTypeChange(e.target.value as TypeFilter)}
       &gt;
-        &lt;option value="all"&gt;Alle Fl&uuml;ge&lt;/option&gt;
-        &lt;option value="departure"&gt;Nur Abfl&uuml;ge&lt;/option&gt;
-        &lt;option value="arrival"&gt;Nur Ank&uuml;nfte&lt;/option&gt;
+        &lt;option value="all"&gt;Alle Typen&lt;/option&gt;
+        &lt;option value="departure"&gt;Abflüge&lt;/option&gt;
+        &lt;option value="arrival"&gt;Ankünfte&lt;/option&gt;
       &lt;/select&gt;
 
       {/* Status-Filter */}
       &lt;select
+        className="filter-select"
         value={statusFilter}
         onChange={(e) =&gt; onStatusChange(e.target.value as StatusFilter)}
-        className="filter-select"
       &gt;
         &lt;option value="all"&gt;Alle Flüge&lt;/option&gt;
-        &lt;option value="on-time"&gt;P&uuml;nktlich&lt;/option&gt;
-        &lt;option value="delayed"&gt;Versp&auml;tet&lt;/option&gt;
+        &lt;option value="on-time"&gt;Pünktlich&lt;/option&gt;
+        &lt;option value="delayed"&gt;Verspätet&lt;/option&gt;
         &lt;option value="boarding"&gt;Boarding&lt;/option&gt;
-        &lt;option value="departed"&gt;Abgeflogen&lt;/option&gt;
+        &lt;option value="departed"&gt;Gestartet&lt;/option&gt;
         &lt;option value="landed"&gt;Gelandet&lt;/option&gt;
-        &lt;option value="cancelled"&gt;Annulliert&lt;/option&gt;
+        &lt;option value="cancelled"&gt;Gestrichen&lt;/option&gt;
       &lt;/select&gt;
 
-      {/* Aktive Filter anzeigen / zur&uuml;cksetzen */}
-      {(typeFilter !== 'all' || statusFilter !== 'all') &amp;&amp; (
-        &lt;button
-          onClick={() => { onTypeChange('all'); onStatusChange('all'); }}
-          style={{ ...selectStyle, background: 'transparent', color: '#f85149', border: '1px solid #f8514944' }}
-        &gt;
-          &times; Zur&uuml;cksetzen
+      {/* Zurücksetzen nur anzeigen, wenn ein Filter aktiv ist */}
+      {hasActiveFilters &amp;&amp; (
+        &lt;button className="filter-reset" onClick={onReset}&gt;
+          Zurücksetzen
         &lt;/button&gt;
       )}
     &lt;/div&gt;
@@ -372,145 +369,118 @@ export default FilterBar;</code></pre>
         </div>
         <pre><code class="language-typescript">import { useState } from 'react';
 import { Flight, FlightType } from '../types/flight';
+import './AddFlightForm.css';
 
 interface AddFlightFormProps {
-  onAdd:    (flight: Flight) => void;
-  onCancel: () => void;
+  onAdd:    (flight: Flight) =&gt; void;
+  onCancel: () =&gt; void;
 }
 
+type FormErrors = Record&lt;string, string&gt;;
+
+const FLIGHT_NUMBER_PATTERN = /^[A-Z]{2}\d{3,4}$/;
+
 /**
- * Formular zum Hinzuf&uuml;gen eines neuen Fluges.
+ * Formular zum Hinzufügen eines neuen Fluges.
  * Pflichtfelder: Flugnummer, Airline, Zeit, Flughafen.
  */
-const AddFlightForm = ({ onAdd, onCancel }: AddFlightFormProps) => {
+const AddFlightForm = ({ onAdd, onCancel }: AddFlightFormProps) =&gt; {
   // Ein State pro Formularfeld
-  const [flightNumber,   setFlightNumber]   = useState('');
-  const [airline,        setAirline]        = useState('');
-  const [type,           setType]           = useState&lt;FlightType&gt;('departure');
-  const [scheduledTime,  setScheduledTime]  = useState('');
-  const [airport,        setAirport]        = useState('');
-  const [terminal,       setTerminal]       = useState('T1');
-  const [gate,           setGate]           = useState('');
-  const [errors,         setErrors]         = useState&lt;Record&lt;string, string&gt;&gt;({});
+  const [flightNumber,  setFlightNumber]  = useState('');
+  const [airline,       setAirline]       = useState('');
+  const [type,          setType]          = useState&lt;FlightType&gt;('departure');
+  const [scheduledTime, setScheduledTime] = useState('');
+  const [airport,       setAirport]       = useState('');
+  const [terminal,      setTerminal]      = useState('T1');
+  const [gate,          setGate]          = useState('');
+  const [errors,        setErrors]        = useState&lt;FormErrors&gt;({});
 
-  const FLIGHT_NUMBER_PATTERN = /^[A-Z]{2}\d{3,4}$/;
-
-  // Validierungsfunktion &ndash; gibt Fehler-Objekt zur&uuml;ck
-  const validate = (): Record&lt;string, string&gt; =&gt; {
-    const errs: Record&lt;string, string&gt; = {};
+  // Validierungsfunktion – gibt Fehler-Objekt zurück
+  const validate = (): FormErrors =&gt; {
+    const errs: FormErrors = {};
     const normalizedFlightNumber = flightNumber.trim().toUpperCase();
+
     if (!normalizedFlightNumber) {
-      errs.flightNumber = 'Flugnummer ist erforderlich';
+      errs.flightNumber = 'Flugnummer ist erforderlich.';
     } else if (!FLIGHT_NUMBER_PATTERN.test(normalizedFlightNumber)) {
-      errs.flightNumber = 'Flugnummer muss genau 2 Buchstaben und 3 oder 4 Ziffern enthalten (z.B. OS123).';
+      errs.flightNumber =
+        'Flugnummer muss genau 2 Buchstaben und 3 oder 4 Ziffern enthalten (z.B. OS123).';
     }
-    if (!airline.trim())       errs.airline       = 'Airline ist erforderlich';
-    if (!scheduledTime)        errs.scheduledTime = 'Abflugzeit ist erforderlich';
-    if (!airport.trim())       errs.airport       = 'Flughafen ist erforderlich';
-    // Zeitformat pr&uuml;fen: HH:MM
-    if (scheduledTime &amp;&amp; !/^\d{2}:\d{2}$/.test(scheduledTime)) {
-      errs.scheduledTime = 'Format: HH:MM (z.B. 14:30)';
-    }
+
+    if (!airline.trim()) errs.airline = 'Airline ist erforderlich.';
+    if (!scheduledTime) errs.scheduledTime = 'Zeit ist erforderlich.';
+    if (!airport.trim()) errs.airport = 'Ziel/Herkunft ist erforderlich.';
     return errs;
   };
 
-  const handleSubmit = (e: React.FormEvent&lt;HTMLFormElement&gt;) => {
+  const handleSubmit = (e: React.FormEvent) =&gt; {
     e.preventDefault();  // Kein Seiten-Reload!
-
-    const validationErrors = validate();
-    if (Object.keys(validationErrors).length &gt; 0) {
-      setErrors(validationErrors);
+    const errs = validate();
+    if (Object.keys(errs).length &gt; 0) {
+      setErrors(errs);
       return;
     }
-
     // Neues Flight-Objekt erstellen
     const newFlight: Flight = {
-      id:            Date.now(),          // Einfache tempor&auml;re ID
-      flightNumber:  flightNumber.trim().toUpperCase(),
-      airline:       airline.trim(),
+      id: Date.now(),                 // Einfache temporäre ID
+      flightNumber: flightNumber.trim().toUpperCase(),
+      airline: airline.trim(),
       type,
       scheduledTime,
-      status:        'on-time',           // Neuer Flug startet als p&uuml;nktlich
-      airport:       airport.trim(),
-      terminal:      terminal || 'T1',
-      gate:          gate.trim() || undefined,
+      airport: airport.trim(),
+      terminal,
+      gate: gate.trim() || undefined,
+      status: 'on-time',              // Neuer Flug startet als pünktlich
     };
-
     onAdd(newFlight);
   };
 
-  // Wiederverwendbarer Style f&uuml;r alle Inputs
-  const inputStyle: React.CSSProperties = {
-    width: '100%',
-    padding: '0.5rem 0.75rem',
-    background: '#1c2128',
-    border: '1px solid #30363d',
-    borderRadius: '6px',
-    color: '#e6edf3',
-    fontSize: '0.875rem',
-    boxSizing: 'border-box',
-  };
-
-  const errorStyle: React.CSSProperties = {
-    color: '#f85149',
-    fontSize: '0.75rem',
-    marginTop: '0.2rem',
-  };
-
-  const labelStyle: React.CSSProperties = {
-    display: 'block',
-    marginBottom: '0.25rem',
-    fontSize: '0.8rem',
-    color: '#8b949e',
+  // CSS-Klasse für Inputs: bei Fehler zusätzlich form-input--error (roter Rahmen)
+  const inputClass = (field: string) =&gt; {
+    return `form-input${errors[field] ? ' form-input--error' : ''}`;
   };
 
   return (
-    &lt;form
-      onSubmit={handleSubmit}
-      style={{
-        background: '#161b22',
-        border: '1px solid #30363d',
-        borderRadius: '8px',
-        padding: '1.5rem',
-        marginBottom: '1.5rem',
-      }}
-    &gt;
-      &lt;h3 style={{ color: '#3fb950', marginBottom: '1.25rem', fontSize: '1rem' }}&gt;
-        Neuen Flug hinzuf&uuml;gen
-      &lt;/h3&gt;
+    // noValidate: Browser-Validierung aus, wir validieren selbst
+    &lt;form className="add-form" onSubmit={handleSubmit} noValidate&gt;
+      &lt;h3 className="add-form-title"&gt;Flug hinzufügen&lt;/h3&gt;
 
-      &lt;div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 1rem' }}&gt;
+      &lt;div className="add-form-grid"&gt;
         {/* Flugnummer */}
-        &lt;div style={{ marginBottom: '0.75rem' }}&gt;
-          &lt;label style={labelStyle}&gt;Flugnummer *&lt;/label&gt;
+        &lt;div className="form-field"&gt;
+          &lt;label className="form-label"&gt;Flugnummer *&lt;/label&gt;
           &lt;input
-            style={{ ...inputStyle, borderColor: errors.flightNumber ? '#f85149' : '#30363d' }}
+            className={inputClass('flightNumber')}
             value={flightNumber}
-            onChange={e =&gt; setFlightNumber(e.target.value)}
-            placeholder="OS123"
+            onChange={(e) =&gt; setFlightNumber(e.target.value)}
+            placeholder="z.B. OS123"
           /&gt;
-          {errors.flightNumber &amp;&amp; &lt;p style={errorStyle}&gt;{errors.flightNumber}&lt;/p&gt;}
+          {errors.flightNumber &amp;&amp; (
+            &lt;span className="form-error"&gt;{errors.flightNumber}&lt;/span&gt;
+          )}
         &lt;/div&gt;
 
         {/* Airline */}
-        &lt;div style={{ marginBottom: '0.75rem' }}&gt;
-          &lt;label style={labelStyle}&gt;Airline *&lt;/label&gt;
+        &lt;div className="form-field"&gt;
+          &lt;label className="form-label"&gt;Airline *&lt;/label&gt;
           &lt;input
-            style={{ ...inputStyle, borderColor: errors.airline ? '#f85149' : '#30363d' }}
+            className={inputClass('airline')}
             value={airline}
-            onChange={e =&gt; setAirline(e.target.value)}
-            placeholder="Austrian Airlines"
+            onChange={(e) =&gt; setAirline(e.target.value)}
+            placeholder="z.B. Austrian Airlines"
           /&gt;
-          {errors.airline &amp;&amp; &lt;p style={errorStyle}&gt;{errors.airline}&lt;/p&gt;}
+          {errors.airline &amp;&amp; (
+            &lt;span className="form-error"&gt;{errors.airline}&lt;/span&gt;
+          )}
         &lt;/div&gt;
 
         {/* Typ */}
-        &lt;div style={{ marginBottom: '0.75rem' }}&gt;
-          &lt;label style={labelStyle}&gt;Typ *&lt;/label&gt;
+        &lt;div className="form-field"&gt;
+          &lt;label className="form-label"&gt;Typ&lt;/label&gt;
           &lt;select
-            style={inputStyle}
+            className="form-select"
             value={type}
-            onChange={e =&gt; setType(e.target.value as FlightType)}
+            onChange={(e) =&gt; setType(e.target.value as FlightType)}
           &gt;
             &lt;option value="departure"&gt;Abflug&lt;/option&gt;
             &lt;option value="arrival"&gt;Ankunft&lt;/option&gt;
@@ -518,81 +488,65 @@ const AddFlightForm = ({ onAdd, onCancel }: AddFlightFormProps) => {
         &lt;/div&gt;
 
         {/* Zeit */}
-        &lt;div style={{ marginBottom: '0.75rem' }}&gt;
-          &lt;label style={labelStyle}&gt;{type === 'departure' ? 'Abflugzeit' : 'Ankunftszeit'} *&lt;/label&gt;
+        &lt;div className="form-field"&gt;
+          &lt;label className="form-label"&gt;Abflugzeit *&lt;/label&gt;
           &lt;input
-            style={{ ...inputStyle, borderColor: errors.scheduledTime ? '#f85149' : '#30363d' }}
             type="time"
+            className={inputClass('scheduledTime')}
             value={scheduledTime}
-            onChange={e =&gt; setScheduledTime(e.target.value)}
+            onChange={(e) =&gt; setScheduledTime(e.target.value)}
           /&gt;
-          {errors.scheduledTime &amp;&amp; &lt;p style={errorStyle}&gt;{errors.scheduledTime}&lt;/p&gt;}
+          {errors.scheduledTime &amp;&amp; (
+            &lt;span className="form-error"&gt;{errors.scheduledTime}&lt;/span&gt;
+          )}
         &lt;/div&gt;
 
         {/* Flughafen */}
-        &lt;div style={{ marginBottom: '0.75rem' }}&gt;
-          &lt;label style={labelStyle}&gt;{type === 'departure' ? 'Zielflughafen' : 'Herkunftsflughafen'} *&lt;/label&gt;
+        &lt;div className="form-field"&gt;
+          &lt;label className="form-label"&gt;Ziel / Herkunft *&lt;/label&gt;
           &lt;input
-            style={{ ...inputStyle, borderColor: errors.airport ? '#f85149' : '#30363d' }}
+            className={inputClass('airport')}
             value={airport}
-            onChange={e =&gt; setAirport(e.target.value)}
-            placeholder="London Heathrow (LHR)"
+            onChange={(e) =&gt; setAirport(e.target.value)}
+            placeholder="z.B. London Heathrow (LHR)"
           /&gt;
-          {errors.airport &amp;&amp; &lt;p style={errorStyle}&gt;{errors.airport}&lt;/p&gt;}
+          {errors.airport &amp;&amp; (
+            &lt;span className="form-error"&gt;{errors.airport}&lt;/span&gt;
+          )}
         &lt;/div&gt;
 
         {/* Terminal */}
-        &lt;div style={{ marginBottom: '0.75rem' }}&gt;
-          &lt;label style={labelStyle}&gt;Terminal&lt;/label&gt;
-          &lt;select style={inputStyle} value={terminal} onChange={e =&gt; setTerminal(e.target.value)}&gt;
-            &lt;option&gt;T1&lt;/option&gt;
-            &lt;option&gt;T2&lt;/option&gt;
-            &lt;option&gt;T3&lt;/option&gt;
+        &lt;div className="form-field"&gt;
+          &lt;label className="form-label"&gt;Terminal&lt;/label&gt;
+          &lt;select
+            className="form-select"
+            value={terminal}
+            onChange={(e) =&gt; setTerminal(e.target.value)}
+          &gt;
+            &lt;option value="T1"&gt;T1&lt;/option&gt;
+            &lt;option value="T2"&gt;T2&lt;/option&gt;
+            &lt;option value="T3"&gt;T3&lt;/option&gt;
           &lt;/select&gt;
         &lt;/div&gt;
 
         {/* Gate (optional) */}
-        &lt;div style={{ marginBottom: '0.75rem' }}&gt;
-          &lt;label style={labelStyle}&gt;Gate (optional)&lt;/label&gt;
+        &lt;div className="form-field"&gt;
+          &lt;label className="form-label"&gt;Gate (optional)&lt;/label&gt;
           &lt;input
-            style={inputStyle}
+            className="form-input"
             value={gate}
-            onChange={e =&gt; setGate(e.target.value)}
-            placeholder="B12"
+            onChange={(e) =&gt; setGate(e.target.value)}
+            placeholder="z.B. B12"
           /&gt;
         &lt;/div&gt;
       &lt;/div&gt;
 
-      {/* Schaltfl&auml;chen */}
-      &lt;div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}&gt;
-        &lt;button
-          type="submit"
-          style={{
-            padding: '0.5rem 1.25rem',
-            background: '#3fb950',
-            border: 'none',
-            borderRadius: '6px',
-            color: '#000',
-            fontWeight: 600,
-            cursor: 'pointer',
-            fontSize: '0.875rem',
-          }}
-        &gt;
-          Hinzuf&uuml;gen
+      {/* Schaltflächen */}
+      &lt;div className="form-actions"&gt;
+        &lt;button type="submit" className="btn-submit"&gt;
+          Hinzufügen
         &lt;/button&gt;
-        &lt;button
-          type="button"
-          onClick={onCancel}
-          style={{
-            padding: '0.5rem 1.25rem',
-            background: 'transparent',
-            border: '1px solid #30363d',
-            borderRadius: '6px',
-            color: '#8b949e',
-            cursor: 'pointer',
-            fontSize: '0.875rem',
-          }}
-        &gt;
+        &lt;button type="button" className="btn-cancel" onClick={onCancel}&gt;
           Abbrechen
         &lt;/button&gt;
       &lt;/div&gt;
@@ -613,7 +567,9 @@ export default AddFlightForm;</code></pre>
         </div>
         <p>
           Das FlugBoard wird vollst&auml;ndig interaktiv: Suche, Filterung und das Hinzuf&uuml;gen neuer
-          Fl&uuml;ge sind m&ouml;glich. <code>App.tsx</code> wird zum zentralen State-Manager.
+          Fl&uuml;ge sind m&ouml;glich. <code>App.tsx</code> wird zum zentralen State-Manager. Alles aus den
+          bisherigen Lektionen bleibt erhalten: die Sortierung (<code>sortByTime</code> aus 1.4), die Auswahl
+          mit Detail-Panel (1.5) und das Ausblenden der Boards &uuml;ber den Typ-Filter (1.5).
         </p>
         <div class="code-block">
           <div class="code-header">
@@ -623,75 +579,143 @@ export default AddFlightForm;</code></pre>
           <pre><code class="language-typescript">import { useState } from 'react';
 import { Flight, FlightType, FlightStatus } from './types/flight';
 import { sampleFlights } from './data/flights';
+import AirportHeader from './components/AirportHeader';
 import SearchBar from './components/SearchBar';
 import FilterBar from './components/FilterBar';
 import FlightBoard from './components/FlightBoard';
+import FlightDetail from './components/FlightDetail';
 import AddFlightForm from './components/AddFlightForm';
+import './App.css';
 
 type TypeFilter   = 'all' | FlightType;
 type StatusFilter = 'all' | FlightStatus;
 
+// Wie in Lektion 1.4: Kopie sortieren, Original bleibt unver&auml;ndert
+const sortByTime = (flights: Flight[]): Flight[] =&gt;
+  [...flights].sort((a, b) =&gt; a.scheduledTime.localeCompare(b.scheduledTime));
+
 function App() {
-  const [flights, setFlights]           = useState&lt;Flight[]&gt;(sampleFlights);
-  const [searchQuery, setSearchQuery]   = useState('');
-  const [typeFilter, setTypeFilter]     = useState&lt;TypeFilter&gt;('all');
-  const [statusFilter, setStatusFilter] = useState&lt;StatusFilter&gt;('all');
-  const [showAddForm, setShowAddForm]   = useState(false);
+  const [flights, setFlights]               = useState&lt;Flight[]&gt;(sampleFlights);
+  const [searchQuery, setSearchQuery]       = useState('');
+  const [typeFilter, setTypeFilter]         = useState&lt;TypeFilter&gt;('all');
+  const [statusFilter, setStatusFilter]     = useState&lt;StatusFilter&gt;('all');
+  const [showAddForm, setShowAddForm]       = useState(false);
+  const [selectedFlight, setSelectedFlight] = useState&lt;Flight | null&gt;(null);  // aus 1.5
 
   // Fl&uuml;ge hinzuf&uuml;gen
-  const handleAddFlight = (flight: Flight) => {
+  const handleAddFlight = (flight: Flight) =&gt; {
     setFlights(prev =&gt; [...prev, flight]);
     setShowAddForm(false);  // Formular nach Einreichen schlie&szlig;en
   };
 
-  // Alle aktiven Filter anwenden
-  const filteredFlights = flights
-    .filter(f =&gt; typeFilter === 'all' || f.type === typeFilter)
-    .filter(f =&gt; statusFilter === 'all' || f.status === statusFilter)
-    .filter(f =&gt; {
-      if (!searchQuery) return true;
-      const q = searchQuery.toLowerCase();
-      return (
+  // Alle Filter zur&uuml;cksetzen
+  const handleReset = () =&gt; {
+    setSearchQuery('');
+    setTypeFilter('all');
+    setStatusFilter('all');
+  };
+
+  // Alle aktiven Filter anwenden, dann sortieren
+  const q = searchQuery.toLowerCase();
+  const filteredFlights = sortByTime(
+    flights
+      .filter(f =&gt; statusFilter === 'all' || f.status === statusFilter)
+      .filter(f =&gt;
+        !q ||
         f.flightNumber.toLowerCase().includes(q) ||
         f.airport.toLowerCase().includes(q) ||
         f.airline.toLowerCase().includes(q)
-      );
-    });
+      )
+  );
+
+  const hasActiveFilters =
+    searchQuery !== '' || typeFilter !== 'all' || statusFilter !== 'all';
+
+  // Typ-Filter blendet ganze Boards aus (wie die Buttons in 1.5)
+  const showDepartures = typeFilter === 'all' || typeFilter === 'departure';
+  const showArrivals   = typeFilter === 'all' || typeFilter === 'arrival';
 
   return (
     &lt;div className="app-page"&gt;
-      &lt;header className="app-header"&gt;
-        &lt;h1 className="app-title"&gt;&#9992; FlugBoard&lt;/h1&gt;
-        &lt;button onClick={() =&gt; setShowAddForm(v =&gt; !v)} style={{ /* ... */ }}&gt;
+      {/* Button als children im AirportHeader (siehe Lektion 1.4) */}
+      &lt;AirportHeader airportName="Flughafen Wien-Schwechat"&gt;
+        &lt;button className="add-btn" onClick={() =&gt; setShowAddForm(v =&gt; !v)}&gt;
           {showAddForm ? 'Abbrechen' : '+ Flug hinzuf&uuml;gen'}
         &lt;/button&gt;
-      &lt;/header&gt;
+      &lt;/AirportHeader&gt;
 
       {showAddForm &amp;&amp; (
         &lt;AddFlightForm onAdd={handleAddFlight} onCancel={() =&gt; setShowAddForm(false)} /&gt;
       )}
 
-      &lt;SearchBar value={searchQuery} onChange={setSearchQuery} /&gt;
-      &lt;FilterBar
-        typeFilter={typeFilter}
-        statusFilter={statusFilter}
-        onTypeChange={setTypeFilter}
-        onStatusChange={setStatusFilter}
-      /&gt;
+      {/* Such- und Filterleiste */}
+      &lt;div className="toolbar"&gt;
+        &lt;SearchBar
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Suche nach Flug, Airline, Ziel&hellip;"
+        /&gt;
+        &lt;FilterBar
+          typeFilter={typeFilter}
+          statusFilter={statusFilter}
+          onTypeChange={setTypeFilter}
+          onStatusChange={setStatusFilter}
+          onReset={handleReset}
+          hasActiveFilters={hasActiveFilters}
+        /&gt;
+      &lt;/div&gt;
 
-      &lt;FlightBoard
-        flights={filteredFlights.filter(f =&gt; f.type === 'departure')}
-        title={`Abfl&uuml;ge (${filteredFlights.filter(f =&gt; f.type === 'departure').length})`}
-      /&gt;
-      &lt;FlightBoard
-        flights={filteredFlights.filter(f =&gt; f.type === 'arrival')}
-        title={`Ank&uuml;nfte (${filteredFlights.filter(f =&gt; f.type === 'arrival').length})`}
-      /&gt;
+      {showDepartures &amp;&amp; (
+        &lt;FlightBoard
+          flights={filteredFlights.filter(f =&gt; f.type === 'departure')}
+          title="Abfl&uuml;ge"
+          selectedFlightId={selectedFlight?.id}
+          onFlightSelect={setSelectedFlight}
+          onResetFilters={hasActiveFilters ? handleReset : undefined}
+        /&gt;
+      )}
+      {showArrivals &amp;&amp; (
+        &lt;FlightBoard
+          flights={filteredFlights.filter(f =&gt; f.type === 'arrival')}
+          title="Ank&uuml;nfte"
+          selectedFlightId={selectedFlight?.id}
+          onFlightSelect={setSelectedFlight}
+          onResetFilters={hasActiveFilters ? handleReset : undefined}
+        /&gt;
+      )}
+
+      {selectedFlight &amp;&amp; (
+        &lt;FlightDetail flight={selectedFlight} onClose={() =&gt; setSelectedFlight(null)} /&gt;
+      )}
     &lt;/div&gt;
   );
 }
 
 export default App;</code></pre>
+        </div>
+        <p>
+          Jetzt kommt auch das optionale <code>onReset</code>-Prop von <code>EmptyState</code> zum Einsatz:
+          Findet ein Board wegen der Filter keinen Flug, zeigt der Empty State einen Button
+          &bdquo;Filter zur&uuml;cksetzen&ldquo;. <code>FlightBoard</code> reicht den Callback nur durch:
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">src/components/FlightBoard.tsx (Ausschnitt)</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">interface FlightBoardProps {
+  // ... flights, title, selectedFlightId, onFlightSelect wie bisher
+  onResetFilters?: () =&gt; void;   // optional: nur wenn Filter aktiv sind
+}
+
+// ...
+      {flights.length === 0 ? (
+        &lt;EmptyState onReset={onResetFilters} /&gt;
+      ) : (
+        &lt;table className="flight-table"&gt;
+          {/* ... wie bisher ... */}
+        &lt;/table&gt;
+      )}</code></pre>
         </div>
       </div>
     </section>
@@ -813,7 +837,7 @@ export default App;</code></pre>
   </div><!-- /content-area -->
 
         <nav class="lesson-nav">
-    <a class="nav-btn" href="1.6-listen-conditional.html">&larr; Lektion 1.6: Listen &amp; Conditional Rendering</a>
+    <a class="nav-btn" href="1.5-state-events.html">&larr; Lektion 1.5: State &amp; Events</a>
     <span class="nav-center-info">Lektion 2.1</span>
     <a class="nav-btn primary" href="2.2-useeffect-api.html">Lektion 2.2: useEffect &amp; API &rarr;</a>
   </nav>
