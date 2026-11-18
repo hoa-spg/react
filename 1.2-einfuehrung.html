@@ -388,6 +388,11 @@ return (
           Ersetze den Inhalt von <code>src/App.tsx</code> und <code>src/App.css</code>
           mit folgendem Code:
         </p>
+        <p>
+          Vite legt au&szlig;erdem eine <code>src/index.css</code> mit eigenen Standard-Styles an
+          (u.&nbsp;a. ein zentriertes <code>body</code>-Layout). Entferne in <code>src/main.tsx</code> die Zeile
+          <code>import './index.css';</code> und l&ouml;sche die Datei &ndash; so wie im Beispielprojekt.
+        </p>
         <div class="code-block">
           <div class="code-header">
             <span class="code-filename">src/App.tsx</span>
@@ -395,14 +400,14 @@ return (
           </div>
           <pre><code class="language-typescript">import './App.css';
 
-const App = () => {
+const App = () =&gt; {
   return (
     &lt;div className="app-page"&gt;
-      &lt;h1 className="app-heading"&gt;&amp;#9992; FlugBoard L01&lt;/h1&gt;
+      &lt;h1 className="app-heading"&gt;✈ FlugBoard 1.2&lt;/h1&gt;
       &lt;p className="app-subheading"&gt;Flughafen Wien-Schwechat&lt;/p&gt;
 
       &lt;section&gt;
-        &lt;h2 className="section-heading"&gt;Abfl&uuml;ge&lt;/h2&gt;
+        &lt;h2 className="section-heading"&gt;Abflüge&lt;/h2&gt;
         &lt;table className="flight-table"&gt;
           &lt;thead&gt;
             &lt;tr&gt;
@@ -414,6 +419,7 @@ const App = () => {
             &lt;/tr&gt;
           &lt;/thead&gt;
           &lt;tbody&gt;
+            {/* Flight 1 — Boarding */}
             &lt;tr&gt;
               &lt;td&gt;OS123&lt;/td&gt;
               &lt;td&gt;Austrian Airlines&lt;/td&gt;
@@ -426,6 +432,7 @@ const App = () => {
               &lt;/td&gt;
             &lt;/tr&gt;
 
+            {/* Flight 2 — Delayed */}
             &lt;tr&gt;
               &lt;td&gt;LH456&lt;/td&gt;
               &lt;td&gt;Lufthansa&lt;/td&gt;
@@ -433,11 +440,12 @@ const App = () => {
               &lt;td&gt;11:15&lt;/td&gt;
               &lt;td&gt;
                 &lt;span className="status-badge status-delayed"&gt;
-                  Versp&auml;tet
+                  Verspätet
                 &lt;/span&gt;
               &lt;/td&gt;
             &lt;/tr&gt;
 
+            {/* Flight 3 — On time */}
             &lt;tr&gt;
               &lt;td&gt;BA234&lt;/td&gt;
               &lt;td&gt;British Airways&lt;/td&gt;
@@ -445,7 +453,7 @@ const App = () => {
               &lt;td&gt;12:00&lt;/td&gt;
               &lt;td&gt;
                 &lt;span className="status-badge status-on-time"&gt;
-                  P&uuml;nktlich
+                  Pünktlich
                 &lt;/span&gt;
               &lt;/td&gt;
             &lt;/tr&gt;

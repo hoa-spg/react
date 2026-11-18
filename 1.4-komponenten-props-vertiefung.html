@@ -84,13 +84,13 @@
           <li>Eigene Funktionskomponenten erstellen</li>
           <li>Props definieren mit TypeScript-Interfaces</li>
           <li>Komponenten zusammensetzen (Komposition)</li>
-          <li>Children Props verstehen</li>
           <li>Default Props und optionale Props mit <code>?</code> nutzen</li>
           <li>Komponenten in eigene Dateien auslagern</li>
           <li>Listen mit <code>.map()</code> rendern und den <code>key</code>-Prop richtig einsetzen</li>
           <li>Elemente bedingt rendern mit <code>&amp;&amp;</code>, Ternary und fr&uuml;hem Return</li>
           <li>Listen sortieren, ohne das Original-Array zu ver&auml;ndern</li>
           <li>Leere Listen mit einem Empty State abfangen</li>
+          <li>Children Props verstehen</li>
         </ul>
       </section>
 
@@ -470,8 +470,9 @@ const FlightBoard = ({ flights, title }: FlightBoardProps) => {
 export default FlightBoard;</code></pre>
         </div>
         <p>In <code>App.tsx</code> werden die Fl&uuml;ge nach Typ aufgeteilt und an zwei
-          <code>FlightBoard</code>-Instanzen &uuml;bergeben. Der <code>AirportHeader</code> aus Lektion 1.3
-          bleibt als Seitenkopf erhalten:</p>
+          <code>FlightBoard</code>-Instanzen &uuml;bergeben. Der <code>AirportHeader</code> bleibt als
+          Seitenkopf erhalten (seine &uuml;berarbeitete Fassung sehen wir im Abschnitt
+          <a href="#children-props">Children Props</a>):</p>
         <div class="code-block">
           <div class="code-header">
             <span class="code-filename">src/App.tsx</span>
@@ -499,42 +500,6 @@ function App() {
 }
 
 export default App;</code></pre>
-        </div>
-      </section>
-
-      <section class="section">
-        <h2>Children Props</h2>
-        <p>
-          Jede Komponente hat automatisch Zugriff auf ein spezielles Prop namens <code>children</code>. Es
-          enth&auml;lt alles, was zwischen dem &ouml;ffnenden und schlie&szlig;enden Tag der Komponente steht &ndash;
-          &auml;hnlich wie der Inhalt eines HTML-Elements. Der Typ f&uuml;r children ist <code>React.ReactNode</code>.
-        </p>
-        <div class="code-block">
-          <div class="code-header">
-            <span class="code-filename">Children Props Beispiel</span>
-            <span class="code-lang">TypeScript</span>
-          </div>
-          <pre><code class="language-typescript">import { ReactNode } from 'react';
-
-// Props-Interface mit children
-interface SectionProps {
-  title: string;
-  children: ReactNode;   // Alles was zwischen die Tags kommt
-}
-
-// Layout-Komponente, die Kinder-Elemente einbettet
-const BoardSection = ({ title, children }: SectionProps) => (
-  &lt;section&gt;
-    &lt;h2&gt;{title}&lt;/h2&gt;
-    {children}
-  &lt;/section&gt;
-);
-
-// Verwendung: Alles zwischen den Tags wird als children &uuml;bergeben
-&lt;BoardSection title="Abfl&uuml;ge"&gt;
-  &lt;FlightBoard flights={departures} title="Abfl&uuml;ge" /&gt;
-  &lt;p&gt;{departures.length} Fl&uuml;ge angezeigt&lt;/p&gt;
-&lt;/BoardSection&gt;</code></pre>
         </div>
       </section>
 
@@ -807,6 +772,117 @@ export default EmptyState;</code></pre>
         </div>
       </section>
 
+      <section class="section" id="children-props">
+        <h2>Children Props</h2>
+        <p>
+          Jede Komponente hat automatisch Zugriff auf ein spezielles Prop namens <code>children</code>. Es
+          enth&auml;lt alles, was zwischen dem &ouml;ffnenden und schlie&szlig;enden Tag der Komponente steht &ndash;
+          &auml;hnlich wie der Inhalt eines HTML-Elements. Der Typ f&uuml;r children ist <code>React.ReactNode</code>.
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">Children Props Beispiel</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">import { ReactNode } from 'react';
+
+// Props-Interface mit children
+interface SectionProps {
+  title: string;
+  children: ReactNode;   // Alles was zwischen die Tags kommt
+}
+
+// Layout-Komponente, die Kinder-Elemente einbettet
+const BoardSection = ({ title, children }: SectionProps) => (
+  &lt;section&gt;
+    &lt;h2&gt;{title}&lt;/h2&gt;
+    {children}
+  &lt;/section&gt;
+);
+
+// Verwendung: Alles zwischen den Tags wird als children &uuml;bergeben
+&lt;BoardSection title="Abfl&uuml;ge"&gt;
+  &lt;FlightBoard flights={departures} title="Abfl&uuml;ge" /&gt;
+  &lt;p&gt;{departures.length} Fl&uuml;ge angezeigt&lt;/p&gt;
+&lt;/BoardSection&gt;</code></pre>
+        </div>
+        <p>
+          Im Projekt bekommt der <code>AirportHeader</code> aus Lektion 1.3 auf diese Weise Platz f&uuml;r
+          Aktionen: Links stehen Titel und Flughafenname, rechts erscheint alles, was als
+          <code>children</code> &uuml;bergeben wird. Weil <code>children</code> optional ist
+          (<code>children?</code>), funktioniert <code>&lt;AirportHeader airportName="..." /&gt;</code> in
+          <code>App.tsx</code> unver&auml;ndert weiter. Genutzt wird der Platz ab Lektion 2.1 f&uuml;r den
+          Button &bdquo;+ Flug hinzuf&uuml;gen&ldquo;. Gleichzeitig bekommt die Komponente ein eigenes
+          Props-Interface und neue CSS-Klassen:
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">src/components/AirportHeader.tsx</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">import { ReactNode } from 'react';
+import './AirportHeader.css';
+
+interface AirportHeaderProps {
+  airportName: string;
+  children?: ReactNode;
+}
+
+/**
+ * Page-level header showing the airport name and optional action children.
+ * @param airportName - The name of the airport to display.
+ * @param children    - Optional elements rendered on the right side of the header.
+ */
+const AirportHeader = ({ airportName, children }: AirportHeaderProps) =&gt; {
+  return (
+    &lt;header className="airport-header"&gt;
+      &lt;div className="airport-header-title-group"&gt;
+        &lt;h1 className="airport-header-title"&gt;✈ FlugBoard 1.4&lt;/h1&gt;
+        &lt;span className="airport-header-subtitle"&gt;{airportName}&lt;/span&gt;
+      &lt;/div&gt;
+      {children &amp;&amp; &lt;div className="airport-header-actions"&gt;{children}&lt;/div&gt;}
+    &lt;/header&gt;
+  );
+};
+
+export default AirportHeader;</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">src/components/AirportHeader.css</span>
+            <span class="code-lang">CSS</span>
+          </div>
+          <pre><code class="language-css">.airport-header {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
+.airport-header-title-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.airport-header-title {
+  color: #61dafb;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.airport-header-subtitle {
+  color: #8b949e;
+  font-size: 1rem;
+}</code></pre>
+        </div>
+        <p>
+          <code>{children &amp;&amp; ...}</code> sorgt daf&uuml;r, dass der Aktionsbereich nur gerendert wird,
+          wenn tats&auml;chlich etwas &uuml;bergeben wurde.
+        </p>
+      </section>
+
       <section class="section section-projekt">
         <h2>Projektschritt</h2>
         <div class="projekt-box">
@@ -826,7 +902,7 @@ export default EmptyState;</code></pre>
             <pre><code class="language-bash">src/
 ├── App.tsx                     &larr; Sortiert die Fl&uuml;ge, nutzt AirportHeader und FlightBoard
 ├── components/
-│   ├── AirportHeader.tsx       &larr; Seitenkopf (aus Lektion 1.3)
+│   ├── AirportHeader.tsx       &larr; Seitenkopf (&uuml;berarbeitet: children, eigene CSS-Klassen)
 │   ├── EmptyState.tsx          &larr; Hinweis bei leerer Liste
 │   ├── FlightCard.tsx          &larr; Einzelne Tabellenzeile
 │   ├── FlightBoard.tsx         &larr; Tabelle + Header (oder EmptyState)
@@ -1057,15 +1133,15 @@ export default EmptyState;</code></pre>
               <span class="aufgabe-title">AirportHeader mit children</span>
             </div>
             <p>
-              Erweitere die Komponente <code>AirportHeader</code> aus Lektion 1.3
-              (<code>src/components/AirportHeader.tsx</code>) um ein optionales <code>children</code>-Prop.
+              Nutze das optionale <code>children</code>-Prop des &uuml;berarbeiteten <code>AirportHeader</code>
+              (Abschnitt <a href="#children-props">Children Props</a>).
             </p>
             <ul>
-              <li>Props: <code>airportName: string</code>, <code>children?: React.ReactNode</code></li>
-              <li>Die Komponente zeigt einen Seitentitel mit dem Flugzeug-Symbol (&#9992;) und optional Kinder-Elemente
-                darunter</li>
-              <li>Verwende die Komponente in <code>App.tsx</code> und platziere darin einen kurzen Info-Text als
-                children</li>
+              <li>&Uuml;bergib in <code>App.tsx</code> einen kurzen Info-Text als children, z.&nbsp;B.
+                <code>&lt;span&gt;Stand: 10:00 Uhr&lt;/span&gt;</code></li>
+              <li>Pr&uuml;fe, dass der Text rechts im Header erscheint und links Titel und Flughafenname bleiben</li>
+              <li>Entferne den Text wieder: Der Aktionsbereich (<code>airport-header-actions</code>) darf dann im
+                DOM nicht mehr auftauchen (DevTools)</li>
             </ul>
           </div>
 

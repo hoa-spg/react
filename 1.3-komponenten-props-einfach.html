@@ -162,20 +162,22 @@ function App() {
             <span class="code-filename">src/components/FlightRow.tsx</span>
             <span class="code-lang">TypeScript</span>
           </div>
-<pre><code class="language-typescript">type FlightRowProps = {
+<pre><code class="language-typescript">import './FlightRow.css';
+
+type FlightRowProps = {
   flightNumber: string;
   airline: string;
   destination: string;
   time: string;
 };
 
-const FlightRow = (props: FlightRowProps) => {
+const FlightRow = (props: FlightRowProps) =&gt; {
   return (
     &lt;tr&gt;
-      &lt;td&gt;{props.flightNumber}&lt;/td&gt;
-      &lt;td&gt;{props.airline}&lt;/td&gt;
-      &lt;td&gt;{props.destination}&lt;/td&gt;
-      &lt;td&gt;{props.time}&lt;/td&gt;
+      &lt;td className="flight-row-cell"&gt;{props.flightNumber}&lt;/td&gt;
+      &lt;td className="flight-row-cell"&gt;{props.airline}&lt;/td&gt;
+      &lt;td className="flight-row-cell"&gt;{props.destination}&lt;/td&gt;
+      &lt;td className="flight-row-cell"&gt;{props.time}&lt;/td&gt;
     &lt;/tr&gt;
   );
 };
@@ -204,8 +206,9 @@ export default FlightRow;</code></pre>
           </div>
 
           <p>
-            Wir zerlegen die statische Tabelle aus L01 in zwei einfache Komponenten:
-            <code>AirportHeader</code> und <code>FlightRow</code>. Styling bleibt wie im Projekt
+            Wir zerlegen die statische Tabelle aus Lektion 1.2 in einfache Komponenten:
+            <code>AirportHeader</code> f&uuml;r den Seitenkopf, <code>FlightRow</code> (siehe oben) f&uuml;r eine
+            Tabellenzeile und <code>Welcome</code> aus dem Mini-Beispiel. Styling bleibt wie im Projekt
             standardm&auml;&szlig;ig in CSS-Dateien pro Komponente.
           </p>
 
@@ -217,12 +220,15 @@ export default FlightRow;</code></pre>
             <pre><code class="language-typescript">import './App.css';
 import AirportHeader from './components/AirportHeader';
 import FlightRow from './components/FlightRow';
+import Welcome from './components/Welcome';
 
-function App() {
+const App = () =&gt; {
   return (
     &lt;div className="app-page"&gt;
       &lt;AirportHeader airportName="Flughafen Wien-Schwechat" /&gt;
+      &lt;Welcome name="Max" /&gt;
 
+      &lt;h2 className="section-heading"&gt;Abflüge&lt;/h2&gt;
       &lt;table className="flight-table"&gt;
         &lt;thead&gt;
           &lt;tr&gt;
@@ -245,13 +251,61 @@ function App() {
             destination="Frankfurt (FRA)"
             time="11:15"
           /&gt;
+          &lt;FlightRow
+            flightNumber="BA234"
+            airline="British Airways"
+            destination="London Heathrow (LHR)"
+            time="12:00"
+          /&gt;
         &lt;/tbody&gt;
       &lt;/table&gt;
     &lt;/div&gt;
   );
-}
+};
 
 export default App;</code></pre>
+          </div>
+
+          <p>
+            Die Styles f&uuml;r &Uuml;berschrift und Tabellenzellen wandern aus <code>App.css</code> in die
+            CSS-Dateien der Komponenten. In <code>App.css</code> bleibt nur das Seitenlayout und die Tabelle:
+          </p>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-filename">src/App.css</span>
+              <span class="code-lang">CSS</span>
+            </div>
+            <pre><code class="language-css">.app-page {
+  background: #0d1117;
+  color: #e6edf3;
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.section-heading {
+  font-size: 1.2rem;
+  margin-bottom: 0.75rem;
+}
+
+.flight-table {
+  background: #1c2128;
+  border-collapse: collapse;
+  border-radius: 8px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.flight-table th {
+  background: #161b22;
+  border-bottom: 1px solid #30363d;
+  color: #8b949e;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  padding: 0.6rem 1rem;
+  text-align: left;
+  text-transform: uppercase;
+}</code></pre>
           </div>
 
           <div class="code-block">
@@ -261,16 +315,68 @@ export default App;</code></pre>
             </div>
             <pre><code class="language-typescript">import './AirportHeader.css';
 
-const AirportHeader = ({ airportName }: { airportName: string }) => {
+const AirportHeader = ({ airportName }: { airportName: string }) =&gt; {
   return (
-    &lt;header className="airport-header"&gt;
-      &lt;h1 className="airport-header__title"&gt;&#9992; FlugBoard&lt;/h1&gt;
-      &lt;p className="airport-header__subtitle"&gt;{airportName}&lt;/p&gt;
+    &lt;header&gt;
+      &lt;h1 className="airport-title"&gt;✈ FlugBoard 1.3&lt;/h1&gt;
+      &lt;p className="airport-subtitle"&gt;{airportName}&lt;/p&gt;
     &lt;/header&gt;
   );
 };
 
 export default AirportHeader;</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-filename">src/components/AirportHeader.css</span>
+              <span class="code-lang">CSS</span>
+            </div>
+            <pre><code class="language-css">.airport-title {
+  color: #61dafb;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.airport-subtitle {
+  color: #8b949e;
+  margin-bottom: 2rem;
+}</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-filename">src/components/FlightRow.css</span>
+              <span class="code-lang">CSS</span>
+            </div>
+            <pre><code class="language-css">.flight-row-cell {
+  border-bottom: 1px solid #30363d;
+  padding: 0.7rem 1rem;
+}</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-filename">src/components/Welcome.tsx</span>
+              <span class="code-lang">TypeScript</span>
+            </div>
+            <pre><code class="language-typescript">import './Welcome.css';
+
+const Welcome = (props: { name: string }) =&gt; {
+  return &lt;p className="welcome-message"&gt;Hallo {props.name}!&lt;/p&gt;;
+};
+
+export default Welcome;</code></pre>
+          </div>
+
+          <div class="code-block">
+            <div class="code-header">
+              <span class="code-filename">src/components/Welcome.css</span>
+              <span class="code-lang">CSS</span>
+            </div>
+            <pre><code class="language-css">.welcome-message {
+  margin: 1em 0;
+}</code></pre>
           </div>
         </div>
       </section>
@@ -309,9 +415,10 @@ export default AirportHeader;</code></pre>
           <div class="aufgabe">
             <div class="aufgabe-header">
               <span class="aufgabe-num">Aufgabe 1</span>
-              <span class="aufgabe-title">Dritte Zeile als Komponente</span>
+              <span class="aufgabe-title">Vierte Zeile als Komponente</span>
             </div>
-            <p>F&uuml;ge eine dritte <code>FlightRow</code>-Instanz f&uuml;r BA234 hinzu.</p>
+            <p>F&uuml;ge eine vierte <code>FlightRow</code>-Instanz f&uuml;r FR890 hinzu (Ryanair, Dublin (DUB),
+              14:50).</p>
           </div>
 
           <div class="aufgabe">
