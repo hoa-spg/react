@@ -1,11 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  SafeAreaView,
-  StyleSheet,
-} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { sampleFlights } from './src/data/flights';
 import { Flight } from './src/types/flight';
@@ -21,6 +16,7 @@ export default function App() {
   const [refreshing, setRefreshing]   = useState(false);
   const [isLoading, setIsLoading]     = useState(true);
 
+  // Ladezeit simulieren: erst nach 1 Sekunde gelten die Daten als geladen
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       setIsLoading(false);
@@ -44,6 +40,7 @@ export default function App() {
       .sort((a, b) => a.scheduledTime.localeCompare(b.scheduledTime));
   }, [searchQuery, typeFilter]);
 
+  // Pull-to-Refresh: Spinner für 1 Sekunde anzeigen
   const handleRefresh = () => {
     setRefreshing(true);
     setTimeout(() => setRefreshing(false), 1000);
@@ -63,44 +60,46 @@ export default function App() {
       : 'Ankünfte';
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar style="light" />
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.safeArea}>
+        <StatusBar style="light" />
 
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>✈ FlugBoard 4.2</Text>
-        <Text style={styles.headerSubtitle}>Flughafen Wien-Schwechat</Text>
-      </View>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>✈ FlugBoard 4.2</Text>
+          <Text style={styles.headerSubtitle}>Flughafen Wien-Schwechat</Text>
+        </View>
 
-      {/* Search */}
-      <SearchBar value={searchQuery} onChangeText={setSearchQuery} />
+        {/* Search */}
+        <SearchBar value={searchQuery} onChangeText={setSearchQuery} />
 
-      {/* Type filter tabs */}
-      <View style={styles.tabs}>
-        {TAB_FILTERS.map(tab => (
-          <TouchableOpacity
-            key={tab.key}
-            style={[styles.tab, typeFilter === tab.key && styles.tabActive]}
-            onPress={() => setTypeFilter(tab.key)}
-          >
-            <Text style={[styles.tabText, typeFilter === tab.key && styles.tabTextActive]}>
-              {tab.label}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+        {/* Type filter tabs */}
+        <View style={styles.tabs}>
+          {TAB_FILTERS.map(tab => (
+            <TouchableOpacity
+              key={tab.key}
+              style={[styles.tab, typeFilter === tab.key && styles.tabActive]}
+              onPress={() => setTypeFilter(tab.key)}
+            >
+              <Text style={[styles.tabText, typeFilter === tab.key && styles.tabTextActive]}>
+                {tab.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
 
-      {/* Flight list */}
-      <FlightList
-        flights={filteredFlights}
-        title={listTitle}
-        onFlightPress={setSelectedFlight}
-        selectedFlightId={selectedFlight?.id}
-        isLoading={isLoading}
-        onRefresh={handleRefresh}
-        refreshing={refreshing}
-      />
-    </SafeAreaView>
+        {/* Flight list */}
+        <FlightList
+          flights={filteredFlights}
+          title={listTitle}
+          onFlightPress={setSelectedFlight}
+          selectedFlightId={selectedFlight?.id}
+          isLoading={isLoading}
+          onRefresh={handleRefresh}
+          refreshing={refreshing}
+        />
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 

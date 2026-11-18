@@ -1,22 +1,28 @@
-import { Flight } from '@/types/flight';
+import type { Metadata } from 'next';
+import { listFlights } from '@/lib/flights-db';
 import SearchWrapper from '@/components/SearchWrapper';
 
-async function getArrivals(): Promise<Flight[]> {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000';
-  const res = await fetch(`${baseUrl}/api/flights?type=arrival`, {
-    next: { revalidate: 30 },
-  });
-  if (!res.ok) throw new Error('Fehler beim Laden der Ankünfte');
-  return res.json();
-}
+export const metadata: Metadata = {
+  title: 'Ankünfte',
+};
 
-export default async function ArrivalPage() {
-  const arrivals = await getArrivals();
+// Seite höchstens alle 30 Sekunden neu erzeugen (ISR).
+// Ohne diese Zeile würde Next.js sie nur einmal beim Build rendern.
+export const revalidate = 30;
+
+export default function ArrivalPage() {
+  // Server Component: liest direkt aus der Datenbank – kein fetch, kein useEffect
+  const arrivals = [...listFlights('arrival')].sort((a, b) =>
+    a.scheduledTime.localeCompare(b.scheduledTime),
+  );
+
   return (
     <div>
+      {/* Überschrift wird auf dem Server gerendert */}
       <h1 className="board-page-title">
         Ankünfte ({arrivals.length})
       </h1>
+      {/* Server Component übergibt serialisierbare Daten an die Client Component */}
       <SearchWrapper flights={arrivals} />
     </div>
   );

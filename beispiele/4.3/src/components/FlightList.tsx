@@ -22,7 +22,8 @@ const FlightList = ({
   refreshing = false,
 }: FlightListProps) => (
   <FlatList
-    data={flights}
+    // Während des Ladens eine leere Liste – dann zeigt ListEmptyComponent den Spinner
+    data={isLoading ? [] : flights}
     keyExtractor={item => item.id.toString()}
     renderItem={({ item }) => (
       <FlightCard

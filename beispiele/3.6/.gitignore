@@ -1,0 +1,10 @@
+# Entstehen beim Starten bzw. Bauen automatisch
+flugboard.sqlite
+next-env.d.ts
+
+# Ergebnisse von Playwright
+test-results/
+playwright-report/
+
+# Lokale Umgebungsvariablen (können Geheimnisse enthalten)
+.env*.local

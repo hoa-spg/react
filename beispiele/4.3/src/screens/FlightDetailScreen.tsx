@@ -1,10 +1,9 @@
-import { useRoute } from '@react-navigation/native';
-import { NativeStackRouteProp } from '@react-navigation/native-stack';
+import { RouteProp, useRoute } from '@react-navigation/native';
 import { ScrollView, View, Text, StyleSheet } from 'react-native';
 import { DepartureStackParamList } from '../navigation/types';
 import StatusBadge from '../components/StatusBadge';
 
-type Route = NativeStackRouteProp<DepartureStackParamList, 'FlightDetail'>;
+type Route = RouteProp<DepartureStackParamList, 'FlightDetail'>;
 
 const DetailRow = ({ label, value }: { label: string; value: string }) => (
   <View style={styles.row}>

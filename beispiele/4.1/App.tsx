@@ -1,5 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView, Platform } from 'react-native';
+import { Alert, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { sampleFlights } from './src/data/flights';
 
 export default function App() {
@@ -8,47 +9,48 @@ export default function App() {
   };
 
   return (
-    <View style={styles.container}>
-      <StatusBar style="light" />
+    <SafeAreaProvider>
+      {/* SafeAreaView hält Abstand zu Notch, Statusleiste und Home-Balken */}
+      <SafeAreaView style={styles.container}>
+        <StatusBar style="light" />
 
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>✈ FlugBoard 4.1</Text>
-        <Text style={styles.headerSubtitle}>Flughafen Wien-Schwechat</Text>
-      </View>
+        {/* Kopfzeile */}
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>✈ FlugBoard 4.1</Text>
+          <Text style={styles.headerSubtitle}>Flughafen Wien-Schwechat</Text>
+        </View>
 
-      {/* Content */}
-      <ScrollView style={styles.content}>
-        <Text style={styles.sectionTitle}>Abflüge &amp; Ankünfte ({sampleFlights.length})</Text>
+        {/* ScrollView: Inhalt lässt sich scrollen, wenn er nicht auf den Bildschirm passt */}
+        <ScrollView style={styles.content}>
+          <Text style={styles.sectionTitle}>Abflüge & Ankünfte ({sampleFlights.length})</Text>
 
-        {sampleFlights.map(flight => (
-          <View key={flight.id} style={styles.card}>
-            <View style={styles.cardRow}>
-              <Text style={styles.flightNumber}>{flight.flightNumber}</Text>
-              <Text style={styles.flightType}>
-                {flight.type === 'departure' ? '↑ Abflug' : '↓ Ankunft'}
-              </Text>
+          {sampleFlights.map((flight) => (
+            <View key={flight.id} style={styles.card}>
+              <View style={styles.cardRow}>
+                <Text style={styles.flightNumber}>{flight.flightNumber}</Text>
+                <Text style={styles.flightType}>
+                  {flight.type === 'departure' ? '↑ Abflug' : '↓ Ankunft'}
+                </Text>
+              </View>
+              <Text style={styles.airline}>{flight.airline}</Text>
+              <View style={styles.cardRow}>
+                <Text style={styles.airport}>{flight.airport}</Text>
+                <Text style={styles.time}>{flight.scheduledTime}</Text>
+              </View>
             </View>
-            <Text style={styles.airline}>{flight.airline}</Text>
-            <View style={styles.cardRow}>
-              <Text style={styles.airport}>{flight.airport}</Text>
-              <Text style={styles.time}>{flight.scheduledTime}</Text>
-            </View>
-            <Text style={styles.terminal}>
-              {flight.terminal}{flight.gate ? ` · Gate ${flight.gate}` : ''}
-            </Text>
-          </View>
-        ))}
-      </ScrollView>
+          ))}
+        </ScrollView>
 
-      {/* Refresh Button */}
-      <TouchableOpacity style={styles.refreshButton} onPress={handleRefresh} activeOpacity={0.8}>
-        <Text style={styles.refreshButtonText}>Aktualisieren</Text>
-      </TouchableOpacity>
-    </View>
+        {/* Button: TouchableOpacity wird beim Drücken durchsichtiger */}
+        <TouchableOpacity style={styles.refreshButton} onPress={handleRefresh} activeOpacity={0.7}>
+          <Text style={styles.refreshButtonText}>Aktualisieren</Text>
+        </TouchableOpacity>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 
+// Schatten: iOS kennt shadow*-Eigenschaften, Android nur elevation
 const shadowStyle = Platform.select({
   ios: { shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.3, shadowRadius: 4 },
   android: { elevation: 4 },
@@ -62,8 +64,7 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: '#161b22',
-    paddingTop: Platform.OS === 'ios' ? 54 : 32,
-    paddingBottom: 16,
+    paddingVertical: 16,
     paddingHorizontal: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#30363d',
@@ -101,7 +102,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 4,
   },
   flightNumber: {
     fontSize: 16,
@@ -126,14 +126,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#e6edf3',
-  },
-  terminal: {
-    fontSize: 11,
-    color: '#8b949e',
-    marginTop: 6,
-    paddingTop: 6,
-    borderTopWidth: 1,
-    borderTopColor: '#30363d',
   },
   refreshButton: {
     backgroundColor: '#1c2128',

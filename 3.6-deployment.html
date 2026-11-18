@@ -80,224 +80,132 @@
     <h2>Lernziele</h2>
     <p>Nach dieser Lektion kannst du folgendes:</p>
     <ul>
-      <li>Eine Next.js-Anwendung auf Vercel deployen</li>
-      <li>Umgebungsvariablen mit <code>.env.local</code> verwalten und sicher einsetzen</li>
-      <li>Den Unterschied zwischen <code>NEXT_PUBLIC_</code>-Variablen und Server-only-Variablen erkl&auml;ren</li>
-      <li>Die Build-Ausgabe von <code>npm run build</code> lesen und interpretieren</li>
-      <li>CI/CD mit Vercel und GitHub verstehen und einrichten</li>
+      <li>Entwicklungs- und Produktionsbetrieb unterscheiden und eine passende Hosting-Art w&auml;hlen</li>
+      <li>Einen Produktions-Build erstellen und die Build-Ausgabe lesen</li>
+      <li>Umgebungsvariablen verwenden und <code>NEXT_PUBLIC_</code>- von Server-Variablen unterscheiden</li>
+      <li>FlugBoard auf einem eigenen Linux-Server mit Node.js betreiben</li>
       <li>Eine Produktionscheckliste vor dem Go-Live durcharbeiten</li>
     </ul>
   </section>
 
   <!-- SECTION 1 -->
   <section class="section">
-    <h2>1 &mdash; Was ist Vercel?</h2>
+    <h2>1 &mdash; Von der Entwicklung in den Betrieb</h2>
     <p>
-      Vercel ist das Unternehmen hinter Next.js und bietet gleichzeitig die optimale
-      Hosting-Plattform daf&uuml;r. W&auml;hrend du Next.js theoretisch &uuml;berall hosten kannst
-      (Node-Server, Docker, statisch), ist Vercel so tief in den Framework-Entwicklungsprozess
-      integriert, dass es das einfachste und leistungsf&auml;higste Deployment bietet.
+      Bisher lief FlugBoard mit <code>npm run dev</code>. Der Entwicklungsserver &uuml;bersetzt jede Seite erst
+      beim Aufruf, zeigt Fehler im Browser an und l&auml;dt bei jeder &Auml;nderung neu &mdash; praktisch zum
+      Entwickeln, aber langsam. F&uuml;r den Betrieb gibt es zwei andere Befehle:
     </p>
+    <ul>
+      <li><code>npm run build</code> (<code>next build</code>) &uuml;bersetzt und optimiert die ganze App einmal und rendert statische Seiten vor. Das Ergebnis liegt im Ordner <code>.next/</code>.</li>
+      <li><code>npm start</code> (<code>next start</code>) startet einen schnellen Produktionsserver, der dieses Ergebnis ausliefert.</li>
+    </ul>
 
-    <h3>Vercel-Features im &Uuml;berblick</h3>
+    <h3>Wo l&auml;uft FlugBoard?</h3>
+    <p>
+      Unsere App braucht einen laufenden Node.js-Server (Server Components, Route Handlers, Server Actions)
+      und speichert seit Lektion&nbsp;2.8 in einer <strong>SQLite-Datei</strong>. Das entscheidet &uuml;ber die
+      Hosting-Art:
+    </p>
     <div style="overflow-x:auto;">
       <table class="compare-table">
         <thead>
           <tr>
-            <th>Feature</th>
-            <th>Beschreibung</th>
-            <th>Relevanz f&uuml;r FlugBoard</th>
+            <th>Hosting-Art</th>
+            <th>Beispiele</th>
+            <th>Passt f&uuml;r FlugBoard?</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td><strong>Auto-Deployments</strong></td>
-            <td>Jeder Git-Push auf <code>main</code> triggert automatisch einen Build</td>
-            <td>Kein manuelles Deployment n&ouml;tig</td>
+            <td><strong>Eigener Node-Server</strong></td>
+            <td>Linux-VM, Schulserver, Raspberry Pi</td>
+            <td>Ja &mdash; die SQLite-Datei bleibt auf der Festplatte des Servers erhalten</td>
           </tr>
           <tr>
-            <td><strong>Edge CDN</strong></td>
-            <td>Statische Seiten weltweit verteilt ausgeliefert</td>
-            <td>Schnelle Ladezeiten f&uuml;r alle Nutzer</td>
+            <td><strong>Serverless-Plattform</strong></td>
+            <td>Vercel, Netlify</td>
+            <td>Nur mit gehosteter Datenbank &mdash; das Dateisystem ist nicht dauerhaft, eine SQLite-Datei w&uuml;rde verloren gehen</td>
           </tr>
           <tr>
-            <td><strong>Serverless Functions</strong></td>
-            <td>API Routes laufen als isolierte Funktionen</td>
-            <td>Unsere <code>route.ts</code>-Handler</td>
+            <td><strong>Statisches Hosting</strong></td>
+            <td>GitHub Pages</td>
+            <td>Nein &mdash; dort l&auml;uft kein Server-Code</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Wir betreiben FlugBoard deshalb auf einem eigenen Linux-Server.</p>
+  </section>
+
+  <!-- SECTION 2 -->
+  <section class="section">
+    <h2>2 &mdash; Der Produktions-Build</h2>
+    <p>
+      Vor jedem Deployment l&auml;uft der Build zuerst lokal. Next.js pr&uuml;ft dabei auch die TypeScript-Typen
+      und bricht bei Fehlern ab &mdash; so kommt fehlerhafter Code gar nicht erst auf den Server.
+    </p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">Terminal &mdash; Build von FlugBoard (gek&uuml;rzt)</span>
+        <span class="code-lang">Text</span>
+      </div>
+      <pre><code class="language-text">npm run build
+
+Route (app)                                 Size  First Load JS  Revalidate  Expire
+┌ ○ /                                      171 B         106 kB         30s      1y
+├ ○ /_not-found                            136 B         103 kB
+├ ƒ /api/flights                           136 B         103 kB
+├ ƒ /api/flights/[id]                      136 B         103 kB
+├ ○ /arrivals                              983 B         107 kB         30s      1y
+├ ○ /departures                            983 B         107 kB         30s      1y
+└ ƒ /flight/[id]                           171 B         106 kB
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand</code></pre>
+    </div>
+
+    <div style="overflow-x:auto;">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Symbol</th>
+            <th>Bedeutung</th>
+            <th>Im FlugBoard</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>○</code> Static</td>
+            <td>Beim Build vorgerendert. Mit Wert in der Spalte <em>Revalidate</em> wird die Seite danach h&ouml;chstens so oft neu erzeugt (Lektion&nbsp;3.3).</td>
+            <td>Startseite, Abfl&uuml;ge, Ank&uuml;nfte (30&nbsp;s)</td>
           </tr>
           <tr>
-            <td><strong>Preview Deployments</strong></td>
-            <td>Jeder Pull Request bekommt eine eigene URL</td>
-            <td>Testen vor dem Merge</td>
-          </tr>
-          <tr>
-            <td><strong>Analytik</strong></td>
-            <td>Performance-Metriken direkt im Dashboard</td>
-            <td>Core Web Vitals &uuml;berwachen</td>
-          </tr>
-          <tr>
-            <td><strong>Free Tier</strong></td>
-            <td>Kostenlos f&uuml;r private Projekte</td>
-            <td>Ideal f&uuml;r Kurs und Demos</td>
+            <td><code>ƒ</code> Dynamic</td>
+            <td>Wird bei jedem Request auf dem Server gerendert.</td>
+            <td>Detailseite (eigene ID pro Aufruf), Route Handlers</td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <h3>Der Deployment-Ablauf</h3>
+    <p>Danach l&auml;sst sich der Produktionsbetrieb lokal ausprobieren:</p>
     <div class="code-block">
       <div class="code-header">
-        <span class="code-filename">CI/CD Pipeline mit Vercel</span>
+        <span class="code-filename">Terminal</span>
         <span class="code-lang">Bash</span>
       </div>
-      <pre><code class="language-bash"># 1. Du pushst Code auf GitHub
-git add .
-git commit -m "feat: Suchfilter implementiert"
-git push origin main
-
-# 2. Vercel erkennt den Push automatisch
-# 3. Build startet (npm run build)
-# 4. TypeScript wird gepr&uuml;ft
-# 5. Statische Seiten werden vorgerendert
-# 6. Deployment auf das CDN
-# 7. Neue Version ist live unter https://flugboard.vercel.app</code></pre>
+      <pre><code class="language-bash">npm start             # Produktionsserver auf http://localhost:3000
+PORT=8080 npm start   # anderer Port</code></pre>
     </div>
-
-    <div class="callout callout-info">
-      <div class="callout-icon">&#8505;</div>
+    <div class="callout callout-tip">
+      <div class="callout-icon">&#10003;</div>
       <div class="callout-body">
-        <div class="callout-title">Preview Deployments</div>
+        <div class="callout-title">Build-Fehler lokal finden</div>
         <p>
-          Wenn du einen Pull Request auf GitHub er&ouml;ffnest, erstellt Vercel automatisch
-          eine tempor&auml;re URL f&uuml;r diesen Branch &mdash; z.&nbsp;B.
-          <code>https://flugboard-git-feature-xyz-yourname.vercel.app</code>.
-          So kannst du &Auml;nderungen testen und reviewen, bevor sie auf <code>main</code> landen.
-          Das ist einer der gr&ouml;&szlig;ten Produktivit&auml;tsgewinne im Team-Workflow.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <!-- SECTION 2 -->
-  <section class="section">
-    <h2>2 &mdash; Umgebungsvariablen sicher verwalten</h2>
-    <p>
-      Umgebungsvariablen speichern Konfigurationswerte, die sich zwischen Entwicklung
-      und Produktion unterscheiden &mdash; API-Keys, Datenbank-Verbindungsstrings,
-      externe Service-URLs. In Next.js gibt es verschiedene Dateien f&uuml;r
-      verschiedene Umgebungen.
-    </p>
-
-    <h3>Datei-Hierarchie</h3>
-    <div class="code-block">
-      <div class="code-header">
-        <span class="code-filename">Env-Dateien und ihre Priorit&auml;t (h&ouml;chste zuerst)</span>
-        <span class="code-lang">Bash</span>
-      </div>
-      <pre><code class="language-bash">.env.local          # H&ouml;chste Priorit&auml;t – NIE in Git! Lokale Overrides
-.env.development    # Nur im Development-Modus (npm run dev)
-.env.production     # Nur im Production-Modus (npm run build)
-.env                # Alle Umgebungen, kann in Git eingecheckt werden</code></pre>
-    </div>
-
-    <div class="code-block">
-      <div class="code-header">
-        <span class="code-filename">.env.local &mdash; Lokale Entwicklungsvariablen</span>
-        <span class="code-lang">Bash</span>
-      </div>
-      <pre><code class="language-bash"># ACHTUNG: Diese Datei NIEMALS in Git commiten!
-# Sie enth&auml;lt Secrets und pers&ouml;nliche Konfiguration.
-
-# Datenbankzugriff (nur Server-seitig)
-# Lokal (Kapitel 12-17): SQLite-Datei
-SQLITE_DB_PATH=./flugboard.sqlite
-
-# Optional für Production mit Turso/libSQL
-TURSO_DATABASE_URL=libsql://dein-projekt.turso.io
-TURSO_AUTH_TOKEN=dein-token
-
-# Externer API-Schl&uuml;ssel (nur Server-seitig)
-FLIGHT_DATA_API_KEY=sk_live_abc123xyz
-
-# Interne API-URL (Server-seitig)
-API_BASE_URL=http://localhost:3000/api</code></pre>
-    </div>
-
-    <div class="code-block">
-      <div class="code-header">
-        <span class="code-filename">.env &mdash; &Ouml;ffentliche Variablen (kann in Git)</span>
-        <span class="code-lang">Bash</span>
-      </div>
-      <pre><code class="language-bash"># NEXT_PUBLIC_ Prefix = wird an den Browser gesendet
-# Nur nicht-sensitive Konfiguration hier!
-
-NEXT_PUBLIC_APP_NAME=FlugBoard
-NEXT_PUBLIC_APP_VERSION=1.0.0
-NEXT_PUBLIC_API_URL=http://localhost:3000
-
-# In Produktion &uuml;berschreiben:
-# NEXT_PUBLIC_API_URL=https://flugboard.vercel.app</code></pre>
-    </div>
-
-    <h3><code>NEXT_PUBLIC_</code> vs. Server-only</h3>
-    <div class="code-block">
-      <div class="code-header">
-        <span class="code-filename">Zugriff auf Env-Variablen</span>
-        <span class="code-lang">TypeScript</span>
-      </div>
-      <pre><code class="language-typescript">// ✅ Server Component: kann ALLE Variablen nutzen
-export default async function ServerComponent() {
-  const sqliteDb = process.env.SQLITE_DB_PATH;      // ✅ Server only
-  const tursoUrl = process.env.TURSO_DATABASE_URL;  // ✅ Server only
-  const apiKey   = process.env.FLIGHT_DATA_API_KEY; // ✅ Server only
-  const appName  = process.env.NEXT_PUBLIC_APP_NAME; // ✅ auch Server
-  // ...
-}
-
-// ⚠️ Client Component: nur NEXT_PUBLIC_ Variablen!
-'use client';
-export default function ClientComponent() {
-  const appName = process.env.NEXT_PUBLIC_APP_NAME; // ✅ ok
-  const sqliteDb = process.env.SQLITE_DB_PATH;      // ❌ undefined!
-  // Server-only Variablen werden aus dem Client-Bundle entfernt.
-}</code></pre>
-    </div>
-
-    <h3><code>.gitignore</code> korrekt konfigurieren</h3>
-    <div class="code-block">
-      <div class="code-header">
-        <span class="code-filename">.gitignore</span>
-        <span class="code-lang">Bash</span>
-      </div>
-      <pre><code class="language-bash"># Dependencies
-node_modules/
-
-# Build-Ausgabe
-.next/
-out/
-
-# Umgebungsvariablen – KRITISCH!
-.env.local
-.env.*.local
-
-# Debug-Logs
-npm-debug.log*
-
-# Betriebssystem
-.DS_Store
-Thumbs.db</code></pre>
-    </div>
-
-    <div class="callout callout-warning">
-      <div class="callout-icon">&#9888;</div>
-      <div class="callout-body">
-        <div class="callout-title">Secrets nie in Git committen</div>
-        <p>
-          Wenn du versehentlich <code>.env.local</code> in Git eingecheckt hast,
-          reicht ein <code>git rm --cached .env.local</code> nicht aus &mdash;
-          die Datei bleibt in der Git-Historie. Alle betroffenen Secrets m&uuml;ssen
-          sofort rotiert (ge&auml;ndert) werden. Tools wie <code>git-secrets</code> oder
-          GitHub's Secret Scanning k&ouml;nnen dabei helfen, solche Fehler fr&uuml;h zu erkennen.
+          Manche Fehler zeigt <code>npm run dev</code> nicht, weil der Entwicklungsserver nur die aufgerufenen
+          Seiten &uuml;bersetzt. F&uuml;hre deshalb vor jedem Push einmal <code>npm run build</code> aus &mdash; und
+          die E2E-Tests aus Lektion&nbsp;3.5.
         </p>
       </div>
     </div>
@@ -305,103 +213,97 @@ Thumbs.db</code></pre>
 
   <!-- SECTION 3 -->
   <section class="section">
-    <h2>3 &mdash; Build-Ausgabe analysieren</h2>
+    <h2>3 &mdash; Umgebungsvariablen</h2>
     <p>
-      Bevor du deployest, solltest du immer <code>npm run build</code> lokal ausf&uuml;hren.
-      Next.js bricht den Build ab, wenn es TypeScript-Fehler oder ESLint-Verstö&szlig;e gibt &mdash;
-      das schützt dich vor fehlerhaften Deployments.
+      Manche Einstellungen unterscheiden sich zwischen deinem Rechner und dem Server &mdash; Pfade,
+      Passw&ouml;rter, API-Schl&uuml;ssel. Sie geh&ouml;ren nicht in den Code, sondern in
+      <strong>Umgebungsvariablen</strong>. Im Code liest man sie mit <code>process.env.NAME</code>; fehlt die
+      Variable, ist der Wert <code>undefined</code>.
     </p>
 
+    <h3>Beispiel: Pfad zur Datenbank</h3>
+    <p>
+      Bisher legt FlugBoard <code>flugboard.sqlite</code> im Projektordner an. Auf dem Server soll die Datei
+      in einem eigenen Ordner liegen, damit sie bei einem Update des Codes nicht verloren geht. Daf&uuml;r
+      reichen zwei Zeilen in der DB-Schicht:
+    </p>
     <div class="code-block">
       <div class="code-header">
-        <span class="code-filename">Terminal &mdash; Build ausf&uuml;hren</span>
-        <span class="code-lang">Bash</span>
+        <span class="code-filename">src/lib/flights-db.ts</span>
+        <span class="code-lang">TypeScript</span>
       </div>
-      <pre><code class="language-bash">npm run build
+      <pre><code class="language-typescript">// ... (Imports, Tabelle, Seed-Daten wie bisher)
 
-# Beispiel-Ausgabe:
-  ▲ Next.js 15.0.0
+declare global {
+  // eslint-disable-next-line no-var
+  var __flugboardDb: Database.Database | undefined;
+}
 
-   Creating an optimized production build ...
- ✓ Compiled successfully
- ✓ Linting and checking validity of types
- ✓ Collecting page data
- ✓ Generating static pages (8/8)
- ✓ Finalizing page optimization
+// Pfad zur Datenbankdatei: auf dem Server per Umgebungsvariable einstellbar
+const dbPath = process.env.DATABASE_PATH ?? 'flugboard.sqlite';
+const sqlite = global.__flugboardDb ?? new Database(dbPath);
+if (!global.__flugboardDb) {
+  global.__flugboardDb = sqlite;
+}
 
-Route (app)                          Size     First Load JS
-┌ ○ /                              1.2 kB         88.2 kB
-├ ○ /departures                    3.4 kB         90.4 kB
-├ ○ /arrivals                      3.4 kB         90.4 kB
-├ ƒ /flight/[id]                   2.1 kB         89.1 kB
-├ ○ /api/flights                      0 B              0 B
-└ ○ /api/flights/[id]                 0 B              0 B
-+ First Load JS shared by all        87 kB
-  ├ chunks/framework-xxx.js         44.8 kB
-  └ chunks/main-xxx.js              42.2 kB</code></pre>
+// ... (Rest unverändert)</code></pre>
     </div>
+    <p>
+      Ohne Variable bleibt alles wie bisher. Mit <code>DATABASE_PATH=/var/lib/flugboard/flugboard.sqlite</code>
+      verwendet die App die Datei in diesem Ordner.
+    </p>
 
-    <h3>Bedeutung der Symbole</h3>
-    <div style="overflow-x:auto;">
-      <table class="compare-table">
-        <thead>
-          <tr>
-            <th>Symbol</th>
-            <th>Name</th>
-            <th>Bedeutung</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>○</code></td>
-            <td>Static</td>
-            <td>Statisch vorgerendert beim Build &mdash; schnellstm&ouml;glich</td>
-          </tr>
-          <tr>
-            <td><code>●</code></td>
-            <td>SSG mit Data</td>
-            <td>Statisch, aber mit Datenabruf beim Build (<code>generateStaticParams</code>)</td>
-          </tr>
-          <tr>
-            <td><code>ƒ</code></td>
-            <td>Dynamic</td>
-            <td>Dynamisch gerendert pro Request (SSR) oder hat dynamische Segmente</td>
-          </tr>
-          <tr>
-            <td><code>ISR</code></td>
-            <td>Incremental</td>
-            <td>Statisch, aber mit automatischer Revalidierung nach X Sekunden</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <h3>TypeScript separat pr&uuml;fen</h3>
+    <h3>Variablen setzen</h3>
     <div class="code-block">
       <div class="code-header">
-        <span class="code-filename">Terminal &mdash; TypeScript ohne Build pr&uuml;fen</span>
+        <span class="code-filename">Terminal &mdash; Variable f&uuml;r einen Befehl setzen</span>
         <span class="code-lang">Bash</span>
       </div>
-      <pre><code class="language-bash"># Nur TypeScript-Fehler pr&uuml;fen, kein Build
-npx tsc --noEmit
-
-# ESLint separat ausf&uuml;hren
-npx next lint
-
-# Beides zusammen (empfohlen vor jedem Commit)
-npx tsc --noEmit &amp;&amp; npx next lint</code></pre>
+      <pre><code class="language-bash">DATABASE_PATH=./test.sqlite npm run dev</code></pre>
+    </div>
+    <p>
+      Bequemer sind Dateien im Projektordner, die Next.js beim Start automatisch einliest:
+    </p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">Env-Dateien (wichtigste zuerst)</span>
+        <span class="code-lang">Text</span>
+      </div>
+      <pre><code class="language-text">.env.local          # lokale Einstellungen und Geheimnisse – nie in Git!
+.env.development    # nur bei npm run dev
+.env.production     # nur bei npm run build / npm start
+.env                # für alle Umgebungen, darf in Git</code></pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">.env.local</span>
+        <span class="code-lang">Text</span>
+      </div>
+      <pre><code class="language-text">DATABASE_PATH=./flugboard-lokal.sqlite</code></pre>
+    </div>
+    <p>Damit <code>.env.local</code> nie im Repository landet, kommt sie in die <code>.gitignore</code>:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">.gitignore (Erg&auml;nzung)</span>
+        <span class="code-lang">Text</span>
+      </div>
+      <pre><code class="language-text"># Lokale Umgebungsvariablen (können Geheimnisse enthalten)
+.env*.local</code></pre>
     </div>
 
-    <div class="callout callout-tip">
-      <div class="callout-icon">&#10003;</div>
+    <h3><code>NEXT_PUBLIC_</code> vs. Server-only</h3>
+    <ul>
+      <li>Normale Variablen wie <code>DATABASE_PATH</code> gibt es nur auf dem Server: in Server Components, Route Handlers, Server Actions und der DB-Schicht.</li>
+      <li>Variablen mit dem Pr&auml;fix <code>NEXT_PUBLIC_</code> (z.&nbsp;B. <code>NEXT_PUBLIC_APP_NAME</code>) baut Next.js beim Build in den JavaScript-Code f&uuml;r den Browser ein. Nur sie sind auch in Client Components verf&uuml;gbar &mdash; und damit f&uuml;r jeden Besucher sichtbar.</li>
+    </ul>
+    <div class="callout callout-warning">
+      <div class="callout-icon">&#9888;</div>
       <div class="callout-body">
-        <div class="callout-title">Build-Fehler lokal finden</div>
+        <div class="callout-title">Geheimnisse nie in Git und nie mit NEXT_PUBLIC_</div>
         <p>
-          Der lokale Dev-Server (<code>npm run dev</code>) zeigt viele Fehler nicht an,
-          die erst beim Build auftauchen &mdash; zum Beispiel fehlende
-          <code>generateStaticParams</code>-R&uuml;ckgaben oder falsch konfiguriertes Caching.
-          F&uuml;hre daher immer einmal <code>npm run build</code> durch, bevor du
-          deinen Code pusht.
+          Passw&ouml;rter und API-Schl&uuml;ssel geh&ouml;ren in <code>.env.local</code> bzw. auf den Server, nie in den
+          Code und nie in eine <code>NEXT_PUBLIC_</code>-Variable. Wurde eine solche Datei doch committet, bleibt
+          sie in der Git-Historie &mdash; dann m&uuml;ssen die Geheimnisse sofort ge&auml;ndert werden.
         </p>
       </div>
     </div>
@@ -409,109 +311,97 @@ npx tsc --noEmit &amp;&amp; npx next lint</code></pre>
 
   <!-- SECTION 4 -->
   <section class="section">
-    <h2>4 &mdash; Deployment Schritt f&uuml;r Schritt</h2>
+    <h2>4 &mdash; Deployment auf einem Linux-Server</h2>
+    <p>
+      Voraussetzung ist ein Linux-Server mit SSH-Zugang, auf dem Node.js (LTS) und Git installiert sind. Der
+      Code kommt &uuml;ber ein Git-Repository auf den Server &mdash; deshalb zuerst lokal committen und auf
+      GitHub pushen, inklusive <code>package-lock.json</code>.
+    </p>
 
-    <h3>Option A: Vercel CLI (schnell f&uuml;r Tests)</h3>
+    <h3>Erstes Deployment</h3>
     <div class="code-block">
       <div class="code-header">
-        <span class="code-filename">Terminal &mdash; Vercel CLI Deployment</span>
+        <span class="code-filename">Terminal &mdash; auf dem Server</span>
         <span class="code-lang">Bash</span>
       </div>
-      <pre><code class="language-bash"># 1. Vercel CLI installieren
-npm install -g vercel
+      <pre><code class="language-bash"># Code holen
+git clone https://github.com/DEIN-NAME/flugboard.git
+cd flugboard
 
-# 2. Einloggen (Browser &ouml;ffnet sich)
-vercel login
+# Abhängigkeiten exakt nach package-lock.json installieren
+npm ci
 
-# 3. Deployment starten (im Projektordner)
-vercel
+# Ordner für die Datenbank anlegen und Variable setzen
+mkdir -p /var/lib/flugboard
+export DATABASE_PATH=/var/lib/flugboard/flugboard.sqlite
 
-# Fragen des Wizards:
-# ? Set up and deploy "flugboard-next"? › Yes
-# ? Which scope? › dein-username
-# ? Link to existing project? › No
-# ? What's your project's name? › flugboard-next
-# ? In which directory is your code located? › ./
-
-# 4. Live-URL wird angezeigt:
-# ✓ Production: https://flugboard-next-xxx.vercel.app</code></pre>
+# Bauen und starten
+npm run build
+npm start</code></pre>
     </div>
+    <ul>
+      <li><code>npm ci</code> installiert genau die Versionen aus <code>package-lock.json</code> &mdash; anders als <code>npm install</code> &auml;ndert es die Datei nie. So l&auml;uft auf dem Server derselbe Stand wie lokal.</li>
+      <li><code>export</code> setzt die Variable f&uuml;r alle folgenden Befehle im Terminal. Auch der Build braucht sie, weil er die statischen Seiten mit Daten aus der Datenbank vorrendert.</li>
+      <li>Der Ordner <code>/var/lib/flugboard</code> muss f&uuml;r den Benutzer beschreibbar sein, unter dem die App l&auml;uft.</li>
+    </ul>
 
-    <h3>Option B: GitHub + Vercel Dashboard (empfohlen)</h3>
-    <p>Dies ist der empfohlene Workflow f&uuml;r echte Projekte. Einmal eingerichtet,
-    l&auml;uft jedes Deployment automatisch.</p>
-
+    <h3>Dauerbetrieb mit systemd</h3>
+    <p>
+      Mit <code>npm start</code> im Terminal endet der Server, sobald du dich abmeldest. Auf Linux &uuml;bernimmt
+      <strong>systemd</strong> den Dauerbetrieb: Es startet die App beim Hochfahren und nach einem Absturz neu.
+      Daf&uuml;r legt man eine Dienst-Datei an:
+    </p>
     <div class="code-block">
       <div class="code-header">
-        <span class="code-filename">Schritt 1: GitHub Repository erstellen und pushen</span>
-        <span class="code-lang">Bash</span>
+        <span class="code-filename">/etc/systemd/system/flugboard.service</span>
+        <span class="code-lang">INI</span>
       </div>
-      <pre><code class="language-bash"># Im Projektordner
-git init
-git add .
-git commit -m "Initial commit: FlugBoard Next.js"
+      <pre><code class="language-ini">[Unit]
+Description=FlugBoard (Next.js)
+After=network.target
 
-# Repository auf GitHub erstellen (ohne README)
-# Dann:
-git remote add origin https://github.com/dein-name/flugboard-next.git
-git branch -M main
-git push -u origin main</code></pre>
+[Service]
+User=flugboard
+WorkingDirectory=/home/flugboard/flugboard
+Environment=DATABASE_PATH=/var/lib/flugboard/flugboard.sqlite
+Environment=PORT=3000
+ExecStart=/usr/bin/npm start
+Restart=always
+
+[Install]
+WantedBy=multi-user.target</code></pre>
     </div>
-
     <div class="code-block">
       <div class="code-header">
-        <span class="code-filename">Schritt 2: Vercel mit GitHub verbinden</span>
+        <span class="code-filename">Terminal &mdash; Dienst aktivieren</span>
         <span class="code-lang">Bash</span>
       </div>
-      <pre><code class="language-bash"># Anleitung (Browser-schritte):
-# 1. Gehe zu https://vercel.com/new
-# 2. Klicke "Import Git Repository"
-# 3. W&auml;hle dein GitHub-Konto
-# 4. W&auml;hle das "flugboard-next"-Repository
-# 5. Framework: "Next.js" wird automatisch erkannt
-# 6. Root Directory: "./" (leer lassen)
-# 7. Build Command: npm run build (auto)
-# 8. Env Variables hinzuf&uuml;gen (n&auml;chster Schritt)
-# 9. Klicke "Deploy"</code></pre>
+      <pre><code class="language-bash">sudo systemctl daemon-reload            # neue Dienst-Datei einlesen
+sudo systemctl enable --now flugboard   # jetzt und bei jedem Hochfahren starten
+sudo systemctl status flugboard         # läuft der Dienst?
+journalctl -u flugboard -f              # Ausgaben (Logs) live ansehen</code></pre>
     </div>
 
+    <h3>Updates einspielen</h3>
     <div class="code-block">
       <div class="code-header">
-        <span class="code-filename">Schritt 3: Umgebungsvariablen in Vercel setzen</span>
+        <span class="code-filename">Terminal &mdash; auf dem Server</span>
         <span class="code-lang">Bash</span>
       </div>
-      <pre><code class="language-bash"># Im Vercel Dashboard:
-# Project → Settings → Environment Variables
-
-# Beispiel-Variablen f&uuml;r Produktion:
-Name:  TURSO_DATABASE_URL
-Value: libsql://dein-projekt.turso.io
-Env:   Production, Preview
-
-Name:  TURSO_AUTH_TOKEN
-Value: dein-token
-Env:   Production, Preview
-
-Name:  NEXT_PUBLIC_API_URL
-Value: https://flugboard.vercel.app
-Env:   Production
-
-Name:  NEXT_PUBLIC_API_URL
-Value: http://localhost:3000
-Env:   Development</code></pre>
+      <pre><code class="language-bash">cd ~/flugboard
+git pull
+npm ci
+DATABASE_PATH=/var/lib/flugboard/flugboard.sqlite npm run build
+sudo systemctl restart flugboard</code></pre>
     </div>
-
     <div class="callout callout-info">
       <div class="callout-icon">&#8505;</div>
       <div class="callout-body">
-        <div class="callout-title">Preview vs. Production Umgebung</div>
+        <div class="callout-title">Ausblick: Reverse Proxy und HTTPS</div>
         <p>
-          In Vercel gibt es drei Umgebungen: <strong>Production</strong> (Branch <code>main</code>),
-          <strong>Preview</strong> (alle anderen Branches / Pull Requests) und
-          <strong>Development</strong> (lokal mit <code>vercel env pull</code>).
-          Du kannst f&uuml;r jede Umgebung eigene Werte setzen &mdash; z.&nbsp;B. eine
-          Test-Datenbank f&uuml;r Previews und die echte Datenbank nur f&uuml;r Production.
-          Wichtig: Eine lokale SQLite-Datei ist auf Vercel nicht dauerhaft persistent.
+          Im echten Betrieb l&auml;uft die App nicht direkt auf Port&nbsp;80/443, sondern hinter einem
+          <strong>Reverse Proxy</strong> wie Caddy oder nginx. Er nimmt die Anfragen aus dem Internet an,
+          k&uuml;mmert sich um HTTPS-Zertifikate und leitet an <code>localhost:3000</code> weiter.
         </p>
       </div>
     </div>
@@ -520,69 +410,20 @@ Env:   Development</code></pre>
   <!-- SECTION 5 -->
   <section class="section">
     <h2>5 &mdash; Produktionscheckliste</h2>
-    <p>
-      Bevor du FlugBoard &ouml;ffentlich erreichbar machst, arbeite diese Checkliste
-      Punkt f&uuml;r Punkt durch. Ein einziger &uuml;bersehener Punkt kann zu Sicherheitsl&uuml;cken
-      oder schlechter Performance f&uuml;hren.
-    </p>
-
     <div class="callout callout-tip">
       <div class="callout-icon">&#10003;</div>
       <div class="callout-body">
-        <div class="callout-title">Produktionscheckliste</div>
+        <div class="callout-title">Vor dem Go-Live</div>
         <ul style="margin:0; padding-left: 1.2rem;">
-          <li>&#9744; <code>.env.local</code> ist in <code>.gitignore</code> eingetragen</li>
-          <li>&#9744; Keine Secrets oder API-Keys direkt im Quellcode</li>
-          <li>&#9744; Alle <code>NEXT_PUBLIC_</code>-Variablen enthalten keine sensitiven Daten</li>
-          <li>&#9744; <code>npm run build</code> schlie&szlig;t ohne Fehler ab</li>
-          <li>&#9744; <code>npx tsc --noEmit</code> meldet keine TypeScript-Fehler</li>
-          <li>&#9744; <code>npx next lint</code> zeigt keine Fehler</li>
-          <li>&#9744; Alle Umgebungsvariablen sind im Vercel Dashboard konfiguriert</li>
-          <li>&#9744; <code>NEXT_PUBLIC_API_URL</code> zeigt auf die Produktions-URL, nicht auf <code>localhost</code></li>
-          <li>&#9744; Keine <code>console.log</code>-Statements mit sensitiven Daten im Code</li>
-          <li>&#9744; <code>not-found.tsx</code> f&uuml;r 404-Seiten vorhanden</li>
-          <li>&#9744; <code>error.tsx</code> f&uuml;r Fehlerbehandlung vorhanden</li>
-          <li>&#9744; Metadaten (<code>title</code>, <code>description</code>) f&uuml;r alle Seiten gesetzt</li>
+          <li>&#9744; <code>npm run build</code> l&auml;uft lokal ohne Fehler</li>
+          <li>&#9744; <code>npm run test:e2e</code> meldet nur bestandene Tests</li>
+          <li>&#9744; Keine Passw&ouml;rter oder API-Schl&uuml;ssel im Code, <code>.env*.local</code> steht in <code>.gitignore</code></li>
+          <li>&#9744; <code>NEXT_PUBLIC_</code>-Variablen enthalten nichts Geheimes</li>
+          <li>&#9744; <code>package-lock.json</code> ist committet</li>
+          <li>&#9744; <code>DATABASE_PATH</code> zeigt auf einen Ordner au&szlig;erhalb des Projekts; von der Datei gibt es eine Sicherung</li>
+          <li>&#9744; <code>not-found.tsx</code> und <code>error.tsx</code> sind vorhanden</li>
         </ul>
       </div>
-    </div>
-
-    <h3>Localhost aus dem Code entfernen</h3>
-    <div class="code-block">
-      <div class="code-header">
-        <span class="code-filename">Vorher: Hardcodierte localhost-URL</span>
-        <span class="code-lang">TypeScript</span>
-      </div>
-      <pre><code class="language-typescript">// ❌ FALSCH: Funktioniert nicht in Produktion!
-const res = await fetch('http://localhost:3000/api/flights');</code></pre>
-    </div>
-
-    <div class="code-block">
-      <div class="code-header">
-        <span class="code-filename">Nachher: Umgebungsvariable verwenden</span>
-        <span class="code-lang">TypeScript</span>
-      </div>
-      <pre><code class="language-typescript">// ✅ RICHTIG: Funktioniert in Entwicklung und Produktion
-const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000';
-const res = await fetch(`${baseUrl}/api/flights`);
-
-// Noch besser f&uuml;r Server Components: direkt importieren!
-import { listFlights } from '@/lib/flights-db';
-// Kein fetch n&ouml;tig, kein URL-Problem.</code></pre>
-    </div>
-
-    <h3>Laufzeit-Logs bereinigen</h3>
-    <div class="code-block">
-      <div class="code-header">
-        <span class="code-filename">Alle console.log-Statements finden</span>
-        <span class="code-lang">Bash</span>
-      </div>
-      <pre><code class="language-bash"># Alle console.log-Stellen im Quellcode finden
-grep -r "console.log" src/ --include="*.ts" --include="*.tsx"
-
-# Optional: ESLint-Regel aktivieren (no-console)
-# In .eslintrc.json:
-# { "rules": { "no-console": "warn" } }</code></pre>
     </div>
   </section>
 
@@ -592,123 +433,45 @@ grep -r "console.log" src/ --include="*.ts" --include="*.tsx"
     <div class="projekt-box">
       <div class="projekt-box-header">
         <span class="projekt-step">Projektschritt 3.6</span>
-        <h3>FlugBoard auf Vercel deployen</h3>
+        <h3>FlugBoard in Betrieb nehmen</h3>
       </div>
       <p>
-        In diesem finalen Projektschritt f&uuml;r Teil&nbsp;3 deployen wir FlugBoard auf Vercel
-        und machen es &ouml;ffentlich erreichbar. Gl&uuml;ckwunsch &mdash; du hast eine vollst&auml;ndige
-        Next.js-Anwendung gebaut!
+        Im letzten Projektschritt von Teil&nbsp;3 &auml;ndern sich am Code nur zwei Zeilen. Der Rest ist Betrieb:
+        bauen, auf den Server bringen, dauerhaft starten.
       </p>
       <ol>
-        <li>
-          <strong><code>.env.local</code> erstellen:</strong> Lege alle ben&ouml;tigten
-          Variablen an und stelle sicher, dass <code>.gitignore</code> diese Datei ausschlie&szlig;t.
-        </li>
-        <li>
-          <strong>URLs ersetzen:</strong> Ersetze alle <code>http://localhost:3000</code>-Vorkommen
-          im Code durch <code>process.env.NEXT_PUBLIC_API_URL</code>.
-        </li>
-        <li>
-          <strong>Lokaler Build:</strong> F&uuml;hre <code>npm run build</code> aus und
-          behebe alle auftretenden Fehler.
-        </li>
-        <li>
-          <strong>GitHub Repository:</strong> Erstelle ein neues Repository auf GitHub
-          und push den Code.
-        </li>
-        <li>
-          <strong>Vercel verbinden:</strong> Gehe zu <code>vercel.com/new</code>,
-          importiere das GitHub-Repository und konfiguriere die Umgebungsvariablen.
-        </li>
-        <li>
-          <strong>Live-URL testen:</strong> &Ouml;ffne die von Vercel bereitgestellte URL
-          und teste alle Seiten: Startseite, Abfl&uuml;ge, Ank&uuml;nfte, Flugdetail.
-        </li>
+        <li><strong>Umgebungsvariable:</strong> In <code>src/lib/flights-db.ts</code> den Pfad aus <code>DATABASE_PATH</code> lesen (Abschnitt&nbsp;3) und <code>.env*.local</code> in <code>.gitignore</code> eintragen.</li>
+        <li><strong>Lokal pr&uuml;fen:</strong> <code>npm run build</code> und <code>npm start</code> ausf&uuml;hren, die Build-Ausgabe lesen und die E2E-Tests laufen lassen.</li>
+        <li><strong>Repository:</strong> Projekt mit <code>package-lock.json</code> auf GitHub pushen.</li>
+        <li><strong>Server:</strong> Klonen, <code>npm ci</code>, mit <code>DATABASE_PATH</code> bauen und starten (Abschnitt&nbsp;4).</li>
+        <li><strong>Dauerbetrieb:</strong> systemd-Dienst einrichten. Test: einen Flug anlegen, den Dienst neu starten &mdash; der Flug ist noch da.</li>
       </ol>
-
-      <div class="code-block">
-        <div class="code-header">
-          <span class="code-filename">Vercel Env Vars f&uuml;r FlugBoard</span>
-          <span class="code-lang">Bash</span>
-        </div>
-        <pre><code class="language-bash"># Im Vercel Dashboard → Project Settings → Environment Variables
-
-# Pflicht:
-NEXT_PUBLIC_APP_NAME   = FlugBoard
-NEXT_PUBLIC_API_URL    = https://dein-projekt.vercel.app   # Production
-NEXT_PUBLIC_API_URL    = http://localhost:3000              # Development
-
-# Für persistente DB in Production (Beispiel Turso):
-TURSO_DATABASE_URL     = libsql://dein-projekt.turso.io
-TURSO_AUTH_TOKEN       = &lt;dein Token&gt;
-
-# Optional (wenn externe API verwendet):
-FLIGHT_DATA_API_KEY    = &lt;deinen Key hier&gt;</code></pre>
-      </div>
+      <p class="mb-0">Steht kein Server zur Verf&uuml;gung, lassen sich die Schritte&nbsp;4 und&nbsp;5 auch auf dem eigenen Rechner oder in einer virtuellen Maschine nachvollziehen.</p>
     </div>
   </section>
 
   <!-- FEHLER -->
   <section class="section section-fehler">
     <h2>H&auml;ufige Fehler</h2>
-
     <div class="fehler-item">
-      <div class="fehler-title">Fehler: <code>.env.local</code> versehentlich in Git commitet</div>
-      <p>
-        Du hast <code>.env.local</code> zum Repository hinzugef&uuml;gt. Die Datei ist jetzt
-        in der Git-Historie und alle Secrets sind f&uuml;r jeden sichtbar, der Zugriff
-        auf das Repository hat &mdash; auch nach dem L&ouml;schen.
-      </p>
-      <p class="fehler-fix">
-        <strong>Fix:</strong> Sofort alle betroffenen Secrets rotieren (neue API-Keys generieren,
-        Passw&ouml;rter &auml;ndern). Die Datei aus der Git-Historie entfernen:
-        <code>git rm --cached .env.local</code>, dann <code>.gitignore</code> pr&uuml;fen
-        und <code>git push</code>. F&uuml;r vollst&auml;ndiges Entfernen aus der Historie:
-        <code>git filter-branch</code> oder das <code>BFG Repo-Cleaner</code>-Tool verwenden.
-      </p>
+      <div class="fehler-title">Fehler: <code>Could not find a production build</code></div>
+      <p><code>npm start</code> bricht sofort ab, weil im Ordner <code>.next/</code> noch kein Build liegt.</p>
+      <p class="fehler-fix"><strong>Fix:</strong> Zuerst <code>npm run build</code>, dann <code>npm start</code> &mdash; auch nach jedem <code>git pull</code>.</p>
     </div>
-
     <div class="fehler-item">
-      <div class="fehler-title">Fehler: <code>NEXT_PUBLIC_</code>-Prefix vergessen</div>
-      <p>
-        Du definierst <code>API_URL=https://...</code> in <code>.env</code> und versuchst
-        in einer Client Component mit <code>process.env.API_URL</code> darauf zuzugreifen.
-        Der Wert ist <code>undefined</code>, weil Server-only-Variablen aus dem
-        Client-Bundle entfernt werden.
-      </p>
-      <p class="fehler-fix">
-        <strong>Fix:</strong> Benenne die Variable in <code>NEXT_PUBLIC_API_URL</code> um.
-        Alternativ: Wenn die Variable sensitiv ist, verwende sie nur in Server Components
-        oder Route Handlers.
-      </p>
+      <div class="fehler-title">Fehler: Neue Fl&uuml;ge nach einem Update verschwunden</div>
+      <p>Die Datenbank lag im Projektordner. Beim neuen Klonen oder Aufr&auml;umen des Ordners wurde sie gel&ouml;scht.</p>
+      <p class="fehler-fix"><strong>Fix:</strong> <code>DATABASE_PATH</code> auf einen Ordner au&szlig;erhalb des Projekts setzen und die Datei regelm&auml;&szlig;ig sichern.</p>
     </div>
-
     <div class="fehler-item">
-      <div class="fehler-title">Fehler: Build-Fehler ignoriert und direkt gepusht</div>
-      <p>
-        Du pushst Code auf <code>main</code>, ohne vorher <code>npm run build</code>
-        lokal ausgef&uuml;hrt zu haben. Vercel versucht den Build, scheitert an
-        TypeScript-Fehlern, und die &Auml;nderungen sind nicht live.
-      </p>
-      <p class="fehler-fix">
-        <strong>Fix:</strong> Gew&ouml;hne dir an, vor jedem Push einmalig
-        <code>npm run build</code> auszuf&uuml;hren. Noch besser: Richte einen
-        Git Pre-Push-Hook ein: <code>echo "npm run build" &gt; .git/hooks/pre-push &amp;&amp; chmod +x .git/hooks/pre-push</code>.
-      </p>
+      <div class="fehler-title">Fehler: App l&auml;uft nur, solange das Terminal offen ist</div>
+      <p>Nach dem Abmelden von der SSH-Verbindung ist die Seite nicht mehr erreichbar.</p>
+      <p class="fehler-fix"><strong>Fix:</strong> Die App als systemd-Dienst betreiben (Abschnitt&nbsp;4).</p>
     </div>
-
     <div class="fehler-item">
-      <div class="fehler-title">Fehler: <code>localhost</code> in Produktions-Umgebungsvariable</div>
-      <p>
-        Du setzt <code>NEXT_PUBLIC_API_URL=http://localhost:3000</code> in den Vercel-Produktions-Einstellungen.
-        Alle API-Aufrufe von der Live-Seite zeigen auf <code>localhost</code>, das im
-        Browser des Besuchers nicht existiert.
-      </p>
-      <p class="fehler-fix">
-        <strong>Fix:</strong> Setze in Vercel f&uuml;r die Production-Umgebung die vollst&auml;ndige
-        Live-URL: <code>NEXT_PUBLIC_API_URL=https://flugboard.vercel.app</code>.
-        <code>localhost</code> nur in der Development-Umgebung verwenden.
-      </p>
+      <div class="fehler-title">Fehler: <code>NEXT_PUBLIC_</code>-Pr&auml;fix vergessen</div>
+      <p>Eine Client Component liest <code>process.env.APP_NAME</code> und bekommt <code>undefined</code>.</p>
+      <p class="fehler-fix"><strong>Fix:</strong> Werte f&uuml;r den Browser hei&szlig;en <code>NEXT_PUBLIC_APP_NAME</code> &mdash; aber nur, wenn sie nicht geheim sind. Nach einer &Auml;nderung neu bauen, weil sie beim Build eingesetzt werden.</p>
     </div>
   </section>
 
@@ -720,85 +483,68 @@ FLIGHT_DATA_API_KEY    = &lt;deinen Key hier&gt;</code></pre>
       <div class="aufgabe">
         <div class="aufgabe-header">
           <span class="aufgabe-num">Aufgabe 1</span>
-          <span class="aufgabe-title"><code>.env.local</code> einrichten und URLs ersetzen</span>
+          <span class="aufgabe-title">Build-Ausgabe verstehen</span>
         </div>
-        <p>
-          Bereite das Projekt f&uuml;r verschiedene Umgebungen vor.
-        </p>
         <ul>
-          <li>Erstelle <code>.env.local</code> mit <code>NEXT_PUBLIC_API_URL</code> und <code>NEXT_PUBLIC_APP_NAME</code></li>
-          <li>Pr&uuml;fe, dass <code>.env.local</code> in <code>.gitignore</code> steht</li>
-          <li>Ersetze alle hardcodierten <code>localhost:3000</code>-URLs durch die Umgebungsvariable</li>
-          <li>Starte den Dev-Server neu und pr&uuml;fe, ob alles noch funktioniert</li>
+          <li>F&uuml;hre <code>npm run build</code> aus und notiere, welche Routen <code>○</code> und welche <code>ƒ</code> sind.</li>
+          <li>Begr&uuml;nde: Warum ist <code>/flight/[id]</code> dynamisch, <code>/departures</code> aber statisch mit Revalidate?</li>
+          <li>Entferne testweise <code>export const revalidate = 30</code> aus der Abflugseite. Was &auml;ndert sich in der Ausgabe?</li>
         </ul>
       </div>
 
       <div class="aufgabe">
         <div class="aufgabe-header">
           <span class="aufgabe-num">Aufgabe 2</span>
-          <span class="aufgabe-title"><code>npm run build</code> durchf&uuml;hren und analysieren</span>
+          <span class="aufgabe-title">Zwei Datenbanken</span>
         </div>
-        <p>
-          F&uuml;hre einen vollst&auml;ndigen Produktions-Build durch und verstehe die Ausgabe.
-        </p>
         <ul>
-          <li>F&uuml;hre <code>npm run build</code> aus und behebe alle auftretenden Fehler</li>
-          <li>Notiere dir, welche Seiten als <code>○ Static</code> und welche als <code>ƒ Dynamic</code> markiert sind</li>
-          <li>F&uuml;hre <code>npx tsc --noEmit</code> aus und pr&uuml;fe auf TypeScript-Fehler</li>
-          <li>Diskutiere: Warum ist <code>/flight/[id]</code> dynamisch, aber <code>/departures</code> statisch?</li>
+          <li>Starte die App einmal normal und einmal mit <code>DATABASE_PATH=./test.sqlite npm run dev</code>.</li>
+          <li>Lege in der Test-Datenbank einen Flug an. Ist er auch in der normalen Datenbank zu sehen?</li>
+          <li>Setze die Variable stattdessen in <code>.env.local</code> und pr&uuml;fe mit <code>git status</code>, dass die Datei nicht erfasst wird.</li>
         </ul>
       </div>
 
       <div class="aufgabe">
         <div class="aufgabe-header">
           <span class="aufgabe-num">Aufgabe 3</span>
-          <span class="aufgabe-title">GitHub Repository erstellen und Code pushen</span>
+          <span class="aufgabe-title">E2E-Tests gegen den Produktions-Build</span>
         </div>
-        <p>
-          Bereite das Repository f&uuml;r das Deployment vor.
-        </p>
         <ul>
-          <li>Erstelle ein neues <em>public</em> Repository auf GitHub.com</li>
-          <li>Initialisiere Git lokal und erstelle einen ersten Commit</li>
-          <li>Push den Code auf GitHub (<code>main</code>-Branch)</li>
-          <li>Pr&uuml;fe auf GitHub, dass <code>.env.local</code> <em>nicht</em> im Repository enthalten ist</li>
+          <li>&Auml;ndere in <code>playwright.config.ts</code> den <code>webServer</code>-Befehl auf <code>npm run build &amp;&amp; npm start</code>.</li>
+          <li>Laufen alle Tests aus Lektion&nbsp;3.5 auch gegen den Produktionsserver?</li>
+          <li>Vergleiche die Laufzeit mit <code>npm run dev</code>.</li>
         </ul>
       </div>
 
       <div class="aufgabe aufgabe-bonus">
         <div class="aufgabe-header">
           <span class="aufgabe-num">Aufgabe 4 &mdash; Bonus</span>
-          <span class="aufgabe-title">FlugBoard auf Vercel deployen und Live-URL teilen</span>
+          <span class="aufgabe-title">Echter Server mit HTTPS</span>
         </div>
-        <p>
-          Bringe FlugBoard ans Netz und teile die Live-URL mit der Klasse.
-        </p>
         <ul>
-          <li>Verbinde das GitHub-Repository mit einem Vercel-Account</li>
-          <li>Konfiguriere alle Umgebungsvariablen f&uuml;r die Production-Umgebung</li>
-          <li>Warte, bis der Build erfolgreich ist und &ouml;ffne die Live-URL</li>
-          <li>Teste alle Seiten auf der Live-URL: Startseite, Abfl&uuml;ge, Ank&uuml;nfte, Detailseite</li>
-          <li>Erstelle einen Pull Request mit einer Verbesserung &mdash; beobachte das Preview Deployment</li>
+          <li>Bringe FlugBoard auf einen Server (Schulserver oder VM) und richte den systemd-Dienst ein.</li>
+          <li>Installiere Caddy als Reverse Proxy, sodass die App unter Port&nbsp;80 erreichbar ist.</li>
+          <li>Spiele eine kleine &Auml;nderung als Update ein (Abschnitt&nbsp;4) und pr&uuml;fe, dass die Daten erhalten bleiben.</li>
         </ul>
       </div>
 
     </div>
   </section>
 
-  <!-- ABSCHLUSS TEIL 2 -->
+  <!-- ABSCHLUSS TEIL 3 -->
   <section class="section">
     <h2>&#127881; Teil 3 abgeschlossen!</h2>
     <p>
-      Du hast den zweiten Teil des FlugBoard-Kurses erfolgreich abgeschlossen.
+      Du hast den dritten Teil des FlugBoard-Kurses erfolgreich abgeschlossen.
       Hier ist eine kurze Zusammenfassung dessen, was du gelernt hast:
     </p>
     <ul>
       <li><strong>Lektion 3.1:</strong> Next.js-Projekt erstellen, App Router, <code>page.tsx</code> und <code>layout.tsx</code></li>
       <li><strong>Lektion 3.2:</strong> Dateibasiertes Routing, verschachtelte Layouts, Route Groups, <code>loading.tsx</code>, <code>error.tsx</code></li>
       <li><strong>Lektion 3.3:</strong> Server vs. Client Components, Kompositionsregel, Caching-Strategien, URL-basierte Filter</li>
-      <li><strong>Lektion 3.4:</strong> Route Handlers (GET, POST, DELETE), Server Actions, <code>revalidatePath</code></li>
-      <li><strong>Lektion 3.5:</strong> End-to-End-Tests mit Playwright in CI und lokal ausführen</li>
-      <li><strong>Lektion 3.6:</strong> Umgebungsvariablen, Build-Analyse, Vercel Deployment, Produktionscheckliste</li>
+      <li><strong>Lektion 3.4:</strong> Route Handlers (GET, POST, PATCH, DELETE), Server Actions, <code>revalidatePath</code></li>
+      <li><strong>Lektion 3.5:</strong> End-to-End-Tests mit Playwright</li>
+      <li><strong>Lektion 3.6:</strong> Produktions-Build, Umgebungsvariablen, Betrieb auf einem eigenen Linux-Server</li>
     </ul>
 
     <div class="callout callout-info">

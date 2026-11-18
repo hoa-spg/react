@@ -11,7 +11,7 @@ export default function FlightTable({ flights }: { flights: Flight[] }) {
     <table className="table-base">
       <thead>
         <tr>
-          {['Flug', 'Airline', 'Ziel', 'Zeit', 'Status', 'Gate'].map((h) => (
+          {['Flug', 'Airline', 'Ziel / Herkunft', 'Zeit', 'Status', 'Gate'].map((h) => (
             <th key={h}>
               {h}
             </th>

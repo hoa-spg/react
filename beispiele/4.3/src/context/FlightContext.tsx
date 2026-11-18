@@ -1,23 +1,13 @@
-import {
-  createContext,
-  useContext,
-  useState,
-  useMemo,
-  useEffect,
-  useRef,
-  ReactNode,
-} from 'react';
-import { Flight, FlightStatus } from '../types/flight';
+import { createContext, useContext, useState, useMemo, useEffect, ReactNode } from 'react';
+import { Flight } from '../types/flight';
 import { sampleFlights } from '../data/flights';
 
 interface FlightContextType {
-  flights: Flight[];
   isLoading: boolean;
   isRefreshing: boolean;
   refetch: () => void;
   searchQuery: string;
   setSearchQuery: (q: string) => void;
-  updateStatus: (id: number, status: FlightStatus) => void;
   departures: Flight[];
   arrivals: Flight[];
 }
@@ -29,8 +19,8 @@ export const FlightProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading]         = useState(true);
   const [isRefreshing, setIsRefreshing]   = useState(false);
   const [searchQuery, setSearchQuery]     = useState('');
-  const refreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Ladezeit simulieren wie in Lektion 4.2
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       setFlights(sampleFlights);
@@ -39,29 +29,10 @@ export const FlightProvider = ({ children }: { children: ReactNode }) => {
     return () => clearTimeout(timeoutId);
   }, []);
 
+  // Pull-to-Refresh: Spinner für 1 Sekunde anzeigen
   const refetch = () => {
     setIsRefreshing(true);
-    if (refreshTimerRef.current) {
-      clearTimeout(refreshTimerRef.current);
-    }
-    refreshTimerRef.current = setTimeout(() => {
-      setFlights(sampleFlights);
-      setIsRefreshing(false);
-      refreshTimerRef.current = null;
-    }, 1000);
-  };
-
-  useEffect(
-    () => () => {
-      if (refreshTimerRef.current) {
-        clearTimeout(refreshTimerRef.current);
-      }
-    },
-    [],
-  );
-
-  const updateStatus = (id: number, status: FlightStatus) => {
-    setFlights(prev => prev.map(f => f.id === id ? { ...f, status } : f));
+    setTimeout(() => setIsRefreshing(false), 1000);
   };
 
   const filtered = useMemo(() => {
@@ -91,13 +62,11 @@ export const FlightProvider = ({ children }: { children: ReactNode }) => {
   return (
     <FlightContext.Provider
       value={{
-        flights,
         isLoading,
         isRefreshing,
         refetch,
         searchQuery,
         setSearchQuery,
-        updateStatus,
         departures,
         arrivals,
       }}

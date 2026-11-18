@@ -1,0 +1,29 @@
+import type { Metadata } from 'next';
+import { listFlights } from '@/lib/flights-db';
+import SearchWrapper from '@/components/SearchWrapper';
+
+export const metadata: Metadata = {
+  title: 'Ankünfte',
+};
+
+// Seite höchstens alle 30 Sekunden neu erzeugen (ISR).
+// Ohne diese Zeile würde Next.js sie nur einmal beim Build rendern.
+export const revalidate = 30;
+
+export default function ArrivalPage() {
+  // Server Component: liest direkt aus der Datenbank – kein fetch, kein useEffect
+  const arrivals = [...listFlights('arrival')].sort((a, b) =>
+    a.scheduledTime.localeCompare(b.scheduledTime),
+  );
+
+  return (
+    <div>
+      {/* Überschrift wird auf dem Server gerendert */}
+      <h1 className="board-page-title">
+        Ankünfte ({arrivals.length})
+      </h1>
+      {/* Server Component übergibt serialisierbare Daten an die Client Component */}
+      <SearchWrapper flights={arrivals} />
+    </div>
+  );
+}

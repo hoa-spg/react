@@ -76,44 +76,58 @@
     <section class="section section-lernziele">
       <h2>Lernziele</h2>
       <ul>
-        <li>E2E-Tests von Unit- und Integrationstests abgrenzen</li>
+        <li>E2E-Tests von Komponententests (Lektion 2.6) abgrenzen</li>
         <li>Playwright in einem Next.js-Projekt einrichten</li>
-        <li>Wichtige User-Flows als stabile E2E-Szenarien formulieren</li>
+        <li>Wichtige User-Flows als E2E-Tests formulieren</li>
         <li>Locators und Assertions robust verwenden</li>
-        <li>Headless/Headed-Modus und Debugging-Tools nutzen</li>
-        <li>Tests in CI-Umgebungen einbinden</li>
+        <li>Tests im Browser beobachten und Fehler finden</li>
       </ul>
     </section>
 
     <section class="section">
-      <h2>1. Was ist E2E-Testen?</h2>
+      <h2>1 &mdash; Was ist E2E-Testen?</h2>
       <p>
-        End-to-End-Tests validieren komplette Benutzerfl&uuml;sse im Browser. Anders als
-        Komponententests pr&uuml;fen sie nicht einzelne Bausteine, sondern die reale
-        Integration aus Routing, Formularen, Netzwerk, Rendering und Navigation.
+        In Lektion&nbsp;2.6 haben wir einzelne Komponenten mit Vitest und der React Testing Library
+        getestet &ndash; in einem simulierten Browser (jsdom) und ohne Server. <strong>End-to-End-Tests</strong>
+        (E2E) pr&uuml;fen dagegen die ganze Anwendung: Ein echter Browser &ouml;ffnet die laufende App, klickt
+        und tippt wie ein Mensch und kontrolliert, was auf dem Bildschirm erscheint. Dabei laufen Routing,
+        Server Components, Datenbank und Client Components zusammen.
       </p>
       <p>
-        Gute E2E-Tests sind wenige, aber zentral: Login, Hauptnavigation,
-        Kern-CRUD-Aktionen und kritische Fehlerpfade.
+        E2E-Tests sind langsamer als Komponententests. Gute E2E-Tests sind deshalb <strong>wenige</strong>,
+        decken aber die wichtigsten Abl&auml;ufe ab: Hauptnavigation, Suche, Formulare und zentrale Fehlerf&auml;lle.
       </p>
     </section>
 
     <section class="section">
-      <h2>2. Playwright Setup</h2>
+      <h2>2 &mdash; Playwright einrichten</h2>
+      <p>
+        <strong>Playwright</strong> (von Microsoft) steuert Chromium, Firefox und WebKit. Wir installieren das
+        Test-Paket und einen Browser:
+      </p>
       <div class="code-block">
         <div class="code-header">
           <span class="code-filename">Terminal</span>
           <span class="code-lang">Bash</span>
         </div>
-        <pre><code class="language-bash">npm init playwright@latest
-
-# empfohlen im Kurs:
-# - TypeScript
-# - tests/ als Ordner
-# - GitHub Actions optional
-# - Chromium als Startbrowser</code></pre>
+        <pre><code class="language-bash">npm install --save-dev @playwright/test
+npx playwright install chromium</code></pre>
       </div>
-
+      <p>In <code>package.json</code> kommt ein Skript zum Starten der Tests dazu:</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">package.json (Ausschnitt)</span>
+          <span class="code-lang">JSON</span>
+        </div>
+        <pre><code class="language-json">"scripts": {
+  "dev": "next dev",
+  "build": "next build",
+  "start": "next start",
+  "lint": "next lint",
+  "test:e2e": "playwright test"
+}</code></pre>
+      </div>
+      <p>Die Einstellungen stehen in <code>playwright.config.ts</code> im Projektordner:</p>
       <div class="code-block">
         <div class="code-header">
           <span class="code-filename">playwright.config.ts</span>
@@ -122,88 +136,152 @@
         <pre><code class="language-typescript">import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
+  // Hier liegen die E2E-Tests
   testDir: './tests',
-  retries: process.env.CI ? 2 : 0,
   use: {
-    baseURL: 'http://127.0.0.1:3000',
-    trace: 'on-first-retry',
+    // page.goto('/departures') öffnet http://localhost:3000/departures
+    baseURL: 'http://localhost:3000',
   },
+  // Startet vor den Tests den Next.js-Server (oder nutzt einen laufenden)
   webServer: {
     command: 'npm run dev',
-    url: 'http://127.0.0.1:3000',
-    reuseExistingServer: !process.env.CI,
+    url: 'http://localhost:3000',
+    reuseExistingServer: true,
   },
-  projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-  ],
+  // Vorerst nur in Chromium testen
+  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
 });</code></pre>
+      </div>
+      <ul>
+        <li><code>testDir</code>: In diesem Ordner sucht Playwright nach Dateien mit der Endung <code>.spec.ts</code>.</li>
+        <li><code>baseURL</code>: Damit reicht in den Tests ein relativer Pfad wie <code>'/departures'</code>.</li>
+        <li><code>webServer</code>: Playwright startet vor den Tests <code>npm run dev</code> und wartet, bis die URL antwortet. L&auml;uft der Server schon, wird er wiederverwendet.</li>
+        <li><code>projects</code>: In welchen Browsern getestet wird &mdash; vorerst nur Chromium.</li>
+      </ul>
+      <p>Playwright legt bei jedem Lauf Ergebnisse und einen Bericht ab. Die geh&ouml;ren nicht ins Repository:</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">.gitignore (Erg&auml;nzung)</span>
+          <span class="code-lang">Text</span>
+        </div>
+        <pre><code class="language-text"># Ergebnisse von Playwright
+test-results/
+playwright-report/</code></pre>
       </div>
     </section>
 
     <section class="section">
-      <h2>3. Erster E2E-Test f&uuml;r FlugBoard</h2>
-      <p>
-        Der erste Test sollte einen Kernfluss abdecken: Startseite laden,
-        Suchfeld benutzen, Ergebnisliste validieren.
-      </p>
+      <h2>3 &mdash; Der erste E2E-Test</h2>
+      <p>Ein Playwright-Test besteht aus wenigen Bausteinen, die du zum Teil aus Lektion&nbsp;2.6 kennst:</p>
+      <ul>
+        <li><code>test('Name', async ({ page }) =&gt; { … })</code> definiert einen Test. <code>page</code> ist ein Browser-Tab, den Playwright f&uuml;r jeden Test neu &ouml;ffnet.</li>
+        <li><code>page.goto('/departures')</code> &ouml;ffnet eine Seite.</li>
+        <li><strong>Locators</strong> finden Elemente wie die Testing Library: <code>page.getByRole('link', { name: 'LH456' })</code>, <code>page.getByText(…)</code> oder <code>page.getByPlaceholder(…)</code> f&uuml;r ein Eingabefeld &uuml;ber seinen Platzhaltertext.</li>
+        <li><code>fill('…')</code> tippt Text in ein Feld, <code>click()</code> klickt.</li>
+        <li><code>expect(locator).toBeVisible()</code> pr&uuml;ft, ob ein Element sichtbar ist, <code>toHaveCount(0)</code>, dass es keines gibt.</li>
+      </ul>
+      <p>Der erste Test pr&uuml;ft die Suche auf der Abflugseite aus Lektion&nbsp;3.3:</p>
       <div class="code-block">
         <div class="code-header">
-          <span class="code-filename">tests/flight-search.spec.ts</span>
+          <span class="code-filename">tests/flugboard.spec.ts</span>
           <span class="code-lang">TypeScript</span>
         </div>
         <pre><code class="language-typescript">import { test, expect } from '@playwright/test';
 
-test('filtert die Flugliste auf der Startseite', async ({ page }) =&gt; {
-  await page.goto('/');
+test('Suche filtert die Abflugliste', async ({ page }) =&gt; {
+  await page.goto('/departures');
+  await expect(page.getByRole('heading', { name: /Abflüge/ })).toBeVisible();
 
-  await expect(page.getByRole('heading', { name: /flugboard/i })).toBeVisible();
+  await page.getByPlaceholder('Flug, Airline oder Ziel suchen...').fill('lufthansa');
 
-  await page.getByRole('searchbox', { name: /suche/i }).fill('LH');
-
-  await expect(page.getByText('LH123')).toBeVisible();
-  await expect(page.getByText('OS404')).toHaveCount(0);
+  await expect(page.getByRole('link', { name: 'LH456' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'OS123' })).toHaveCount(0);
 });</code></pre>
       </div>
-
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">Terminal</span>
+          <span class="code-lang">Bash</span>
+        </div>
+        <pre><code class="language-bash">npm run test:e2e</code></pre>
+      </div>
       <div class="callout callout-tip">
         <div class="callout-icon">&#128161;</div>
         <div class="callout-body">
-          <div class="callout-title">Locators statt CSS-Selektoren</div>
+          <div class="callout-title">Automatisches Warten</div>
           <p>
-            Nutze bevorzugt <code>getByRole</code>, <code>getByLabel</code> und
-            <code>getByText</code>. Das macht Tests robuster gegen Layout-&Auml;nderungen.
+            Playwright wartet bei jedem <code>expect</code> und jeder Aktion automatisch, bis das Element da ist
+            (standardm&auml;&szlig;ig bis zu 5&nbsp;Sekunden). Nach dem Tippen in die Suche m&uuml;ssen wir also nicht
+            selbst warten, bis React die Liste neu gerendert hat.
           </p>
         </div>
       </div>
     </section>
 
     <section class="section">
-      <h2>4. Debugging und Stabilit&auml;t</h2>
+      <h2>4 &mdash; Navigation und Fehlerfall testen</h2>
+      <p>
+        Zwei weitere Tests decken die Detailseite (Lektion&nbsp;3.2) und die 404-Seite ab.
+        <code>expect(page).toHaveURL('/flight/1')</code> pr&uuml;ft die Adresse im Browser &mdash; relativ zur
+        <code>baseURL</code>.
+      </p>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-filename">tests/flugboard.spec.ts (Fortsetzung)</span>
+          <span class="code-lang">TypeScript</span>
+        </div>
+        <pre><code class="language-typescript">// ... (Import und erster Test wie oben)
+
+test('Klick auf einen Flug öffnet die Detailseite', async ({ page }) =&gt; {
+  await page.goto('/departures');
+
+  await page.getByRole('link', { name: 'OS123' }).click();
+  await expect(page).toHaveURL('/flight/1');
+  await expect(page.getByText('Austrian Airlines')).toBeVisible();
+
+  await page.getByRole('link', { name: '← Zurück' }).click();
+  await expect(page).toHaveURL('/departures');
+});
+
+test('Unbekannter Flug zeigt die 404-Seite', async ({ page }) =&gt; {
+  await page.goto('/flight/999');
+  await expect(page.getByRole('heading', { name: 'Seite nicht gefunden' })).toBeVisible();
+});</code></pre>
+      </div>
+      <p>
+        Die Tests verwenden die Startdaten aus <code>flights-db.ts</code>: Flug&nbsp;1 ist OS123 von Austrian
+        Airlines. Wer diesen Flug &uuml;ber die API l&ouml;scht, bringt die Tests zum Scheitern &mdash; dann
+        <code>flugboard.sqlite</code> l&ouml;schen, beim n&auml;chsten Start wird sie neu bef&uuml;llt.
+      </p>
+    </section>
+
+    <section class="section">
+      <h2>5 &mdash; Debugging</h2>
       <div class="code-block">
         <div class="code-header">
           <span class="code-filename">N&uuml;tzliche Befehle</span>
           <span class="code-lang">Bash</span>
         </div>
-        <pre><code class="language-bash"># Headed-Modus (Browser sichtbar)
+        <pre><code class="language-bash"># Browser sichtbar machen
 npx playwright test --headed
 
-# Nur ein Testfile
-npx playwright test tests/flight-search.spec.ts
+# Nur eine Testdatei
+npx playwright test tests/flugboard.spec.ts
 
-# UI Modus zum iterativen Debugging
+# UI-Modus: Tests einzeln starten und Schritt für Schritt ansehen
 npx playwright test --ui
 
-# HTML Report anzeigen
+# HTML-Bericht des letzten Laufs anzeigen
 npx playwright show-report</code></pre>
       </div>
-
       <div class="callout callout-warning">
         <div class="callout-icon">&#9888;</div>
         <div class="callout-body">
           <div class="callout-title">Flaky Tests vermeiden</div>
           <p>
-            Keine festen Sleeps mit <code>waitForTimeout</code> einbauen. Nutze stattdessen
-            Assertions, die auf sichtbare Zust&auml;nde warten.
+            Ein Test ist <em>flaky</em>, wenn er mal gr&uuml;n und mal rot ist. H&auml;ufigste Ursache sind feste
+            Wartezeiten wie <code>page.waitForTimeout(1000)</code>. Besser: auf einen sichtbaren Zustand warten,
+            also <code>expect(…).toBeVisible()</code>.
           </p>
         </div>
       </div>
@@ -214,13 +292,14 @@ npx playwright show-report</code></pre>
       <div class="projekt-box">
         <div class="projekt-box-header">
           <span class="projekt-step">Projektschritt 3.5</span>
-          <h3>E2E-Teststrecke f&uuml;r Next.js-FlugBoard aufbauen</h3>
+          <h3>E2E-Tests f&uuml;r das FlugBoard</h3>
         </div>
+        <p>Die App aus Lektion&nbsp;3.4 bleibt unver&auml;ndert &mdash; dazu kommen nur Playwright und drei Tests.</p>
         <ol>
-          <li>Playwright initialisieren und Config mit <code>webServer</code> setzen.</li>
-          <li>Mindestens zwei Flows automatisieren: Suche und Detailnavigation.</li>
-          <li>Fehlerfall erg&auml;nzen (z.B. 404-Seite bei ung&uuml;ltiger Route).</li>
-          <li>Report lokal auswerten und mindestens einen flaky Schritt stabilisieren.</li>
+          <li><strong>Installieren:</strong> <code>@playwright/test</code> und Chromium installieren, Skript <code>test:e2e</code> in <code>package.json</code> erg&auml;nzen.</li>
+          <li><strong>Konfigurieren:</strong> <code>playwright.config.ts</code> mit <code>baseURL</code> und <code>webServer</code> anlegen, <code>.gitignore</code> erg&auml;nzen.</li>
+          <li><strong>Testen:</strong> <code>tests/flugboard.spec.ts</code> mit den Tests f&uuml;r Suche, Detailnavigation und 404-Seite schreiben.</li>
+          <li><strong>Pr&uuml;fen:</strong> <code>npm run test:e2e</code> meldet drei bestandene Tests. Einen Test absichtlich kaputt machen (z.&nbsp;B. falsche Flugnummer) und den Fehler im HTML-Bericht ansehen.</li>
         </ol>
       </div>
     </section>
@@ -259,48 +338,50 @@ npx playwright show-report</code></pre>
 
     <section class="section section-aufgaben">
       <h2>Aufgaben</h2>
+      <div class="aufgaben-list">
       <div class="aufgabe">
         <div class="aufgabe-header">
           <span class="aufgabe-num">Aufgabe 1</span>
-          <span class="aufgabe-title">Playwright installieren und starten</span>
+          <span class="aufgabe-title">Ankunftsseite testen</span>
         </div>
         <ul>
-          <li>Initialisiere Playwright mit TypeScript.</li>
-          <li>Pr&uuml;fe, dass der Browser-Download erfolgreich ist.</li>
-          <li>F&uuml;hre den generierten Beispieltest einmal aus.</li>
+          <li>Schreibe einen Test f&uuml;r <code>/arrivals</code>: Die Suche nach &bdquo;dubai&ldquo; zeigt nur EK789.</li>
+          <li>Pr&uuml;fe zus&auml;tzlich, dass die &Uuml;berschrift &bdquo;Ank&uuml;nfte&ldquo; enth&auml;lt.</li>
+          <li>Starte den Test einmal mit <code>--headed</code> und beobachte den Browser.</li>
         </ul>
       </div>
       <div class="aufgabe">
         <div class="aufgabe-header">
           <span class="aufgabe-num">Aufgabe 2</span>
-          <span class="aufgabe-title">Kernflow: Suche + Navigation</span>
+          <span class="aufgabe-title">Formular &bdquo;Flug hinzuf&uuml;gen&ldquo;</span>
         </div>
         <ul>
-          <li>Teste Suchfunktion auf der Startseite.</li>
-          <li>Navigiere von einem Eintrag zur Detailansicht.</li>
-          <li>Pr&uuml;fe den Zur&uuml;ck-Flow zur Liste.</li>
+          <li>Teste das Formular aus Lektion&nbsp;3.4: Felder mit <code>page.getByLabel('Airline *')</code> usw. ausf&uuml;llen und absenden.</li>
+          <li>Danach muss der neue Flug als Link in der Abflugliste stehen.</li>
+          <li>Damit der Test bei jedem Lauf funktioniert, braucht jeder Flug eine neue Nummer, z.&nbsp;B. <code>'TT' + Math.floor(1000 + Math.random() * 9000)</code>.</li>
         </ul>
       </div>
       <div class="aufgabe">
         <div class="aufgabe-header">
           <span class="aufgabe-num">Aufgabe 3</span>
-          <span class="aufgabe-title">CI-Vorbereitung</span>
+          <span class="aufgabe-title">Vorbereitung f&uuml;r CI</span>
         </div>
         <ul>
-          <li>Setze <code>retries</code> f&uuml;r CI auf einen sinnvollen Wert.</li>
-          <li>Aktiviere Trace bei Retry.</li>
-          <li>Dokumentiere den Testbefehl f&uuml;r Teamkollegen.</li>
+          <li>Erg&auml;nze in der Config <code>retries: process.env.CI ? 2 : 0</code> &ndash; auf einem Build-Server wird ein fehlgeschlagener Test bis zu zweimal wiederholt.</li>
+          <li>Setze <code>trace: 'on-first-retry'</code> unter <code>use</code> und sieh dir einen Trace mit <code>npx playwright show-trace</code> an.</li>
+          <li>Setze <code>reuseExistingServer</code> auf <code>!process.env.CI</code>. Warum ist das auf einem Build-Server sinnvoll?</li>
         </ul>
       </div>
       <div class="aufgabe aufgabe-bonus">
         <div class="aufgabe-header">
           <span class="aufgabe-num">Bonus</span>
-          <span class="aufgabe-title">Mobile Viewport</span>
+          <span class="aufgabe-title">Mobiler Viewport</span>
         </div>
         <ul>
-          <li>Erg&auml;nze ein zweites Projekt mit mobilem Viewport.</li>
-          <li>Teste denselben Such-Flow auf kleiner Breite.</li>
+          <li>Erg&auml;nze unter <code>projects</code> ein zweites Projekt mit <code>devices['Pixel 7']</code>.</li>
+          <li>Laufen alle Tests auch auf der kleinen Breite? Was f&auml;llt dir am Layout auf?</li>
         </ul>
+      </div>
       </div>
     </section>
   </div>

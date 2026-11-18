@@ -79,978 +79,513 @@
   <section class="section-lernziele">
     <h2>Lernziele</h2>
     <ul>
-      <li><code>FlatList</code> f&uuml;r performante, virtualisierte Listen verwenden</li>
-      <li>Den Unterschied zwischen <code>ScrollView</code> und <code>FlatList</code> verstehen</li>
-      <li><code>TextInput</code> f&uuml;r eine Suchleiste einsetzen</li>
-      <li><code>ActivityIndicator</code> als Ladeanimation nutzen</li>
-      <li>Flexbox in React Native vollst&auml;ndig verstehen (inkl. der Unterschiede zum Web)</li>
-      <li><code>SafeAreaView</code> korrekt f&uuml;r Notch und Dynamic Island einsetzen</li>
-      <li><code>useEffect</code> + <code>fetch</code> f&uuml;r API-Aufrufe in React Native verwenden</li>
+      <li>Flexbox in React Native anwenden und die Unterschiede zum Web kennen</li>
+      <li>Wiederverwendbare Komponenten wie <code>FlightCard</code> und <code>StatusBadge</code> bauen</li>
+      <li><code>FlatList</code> f&uuml;r performante Listen verwenden und von <code>ScrollView</code> abgrenzen</li>
+      <li><code>TextInput</code> als gesteuertes Eingabefeld f&uuml;r eine Suche einsetzen</li>
+      <li>Ladezustand mit <code>ActivityIndicator</code> und Pull-to-Refresh umsetzen</li>
     </ul>
   </section>
 
-  <!-- Section 1: FlatList -->
+  <!-- Section 1: Flexbox -->
   <section>
-    <h2>1 &mdash; FlatList &ndash; Performante Listen</h2>
+    <h2>1 &mdash; Flexbox in React Native</h2>
     <p>
-      Eine der h&auml;ufigsten Aufgaben in mobilen Apps ist das Anzeigen langer Listen
-      &ndash; Fl&uuml;ge, Nachrichten, Produkte. In Lektion 1.4 haben wir <code>.map()</code>
-      verwendet. Das funktioniert bei wenigen Eintr&auml;gen, ist aber bei einer echten
-      Flugliste (100+ Eintr&auml;ge) problematisch: Alle Elemente werden gleichzeitig
-      gerendert, auch wenn sie au&szlig;erhalb des sichtbaren Bereichs liegen.
+      In React Native ist Flexbox das einzige Layout-System &ndash; jede <code>View</code> ist ein
+      Flex-Container. Wer Flexbox aus dem Web kennt, hat die Grundlage schon. Einige Standardwerte sind aber
+      anders:
     </p>
-
-    <h3>ScrollView vs. FlatList</h3>
     <div class="table-wrap">
       <table>
         <thead>
-          <tr>
-            <th>Kriterium</th>
-            <th>ScrollView + .map()</th>
-            <th>FlatList</th>
-          </tr>
+          <tr><th>Eigenschaft</th><th>Web (CSS)</th><th>React Native</th></tr>
         </thead>
         <tbody>
-          <tr>
-            <td>Alle Elemente rendern</td>
-            <td>Ja (immer)</td>
-            <td>Nein (nur sichtbare)</td>
-          </tr>
-          <tr>
-            <td>Speicherverbrauch bei 1000+ Items</td>
-            <td>Sehr hoch</td>
-            <td>Niedrig (virtualisiert)</td>
-          </tr>
-          <tr>
-            <td>Pull-to-Refresh</td>
-            <td>Manuell implementieren</td>
-            <td>Eingebaut (<code>onRefresh</code>)</td>
-          </tr>
-          <tr>
-            <td>Leerer Zustand (keine Daten)</td>
-            <td>Manuell implementieren</td>
-            <td>Eingebaut (<code>ListEmptyComponent</code>)</td>
-          </tr>
-          <tr>
-            <td>Header / Footer</td>
-            <td>Manuell</td>
-            <td>Eingebaut (<code>ListHeaderComponent</code>)</td>
-          </tr>
-          <tr>
-            <td>Empfohlen f&uuml;r</td>
-            <td>Kurze, feste Inhalte (&lt; 20 Items)</td>
-            <td>Dynamische Listen jeder L&auml;nge</td>
-          </tr>
+          <tr><td><code>flexDirection</code></td><td><code>row</code></td><td><code>column</code></td></tr>
+          <tr><td><code>flexShrink</code></td><td><code>1</code></td><td><code>0</code></td></tr>
+          <tr><td><code>alignContent</code></td><td><code>stretch</code></td><td><code>flex-start</code></td></tr>
+          <tr><td><code>flex</code></td><td>Kurzform f&uuml;r grow/shrink/basis</td><td>eine Zahl: Anteil am freien Platz</td></tr>
         </tbody>
       </table>
     </div>
-
-    <h3>FlatList in der Praxis</h3>
+    <p>
+      Mit <code>flex: N</code> verteilt man den Platz anteilig. Drei Spalten mit <code>flex: 2</code>,
+      <code>3</code> und <code>2</code> bekommen 2/7, 3/7 und 2/7 der Breite:
+    </p>
     <div class="code-block">
       <div class="code-header">
-        <span class="code-filename">components/FlightList.tsx</span>
+        <span class="code-filename">Spalten mit flex</span>
         <span class="code-lang">TypeScript</span>
       </div>
-      <pre><code class="language-typescript">import { FlatList, View, Text, StyleSheet } from 'react-native';
-import { Flight } from '../types/flight';
-import { FlightCard } from './FlightCard';
-
-interface FlightListProps {
-  flights: Flight[];
-  onFlightPress: (flight: Flight) =&gt; void;
-  isLoading?: boolean;
-  onRefresh?: () =&gt; void;
-  refreshing?: boolean;
-}
-
-export function FlightList({
-  flights,
-  onFlightPress,
-  isLoading = false,
-  onRefresh,
-  refreshing = false,
-}: FlightListProps) {
-  return (
-    &lt;FlatList
-      data={flights}
-
-      // keyExtractor: MUSS eine eindeutige String-ID zurückgeben.
-      // Nicht key={...} wie bei .map() – das ist ein häufiger Fehler!
-      keyExtractor={(item) =&gt; item.id.toString()}
-
-      // renderItem: Rendert jedes einzelne List-Element
-      renderItem={({ item, index }) =&gt; (
-        &lt;FlightCard
-          flight={item}
-          onPress={() =&gt; onFlightPress(item)}
-          index={index}
-        /&gt;
-      )}
-
-      // Trennlinie zwischen den Elementen
-      ItemSeparatorComponent={() =&gt; (
-        &lt;View style={styles.separator} /&gt;
-      )}
-
-      // Wird angezeigt, wenn data leer ist
-      ListEmptyComponent={() =&gt; (
-        &lt;View style={styles.emptyContainer}&gt;
-          &lt;Text style={styles.emptyIcon}&gt;&#9992;&lt;/Text&gt;
-          &lt;Text style={styles.emptyTitle}&gt;Keine Fl&uuml;ge gefunden&lt;/Text&gt;
-          &lt;Text style={styles.emptySubtitle}&gt;
-            Versuche eine andere Suche oder aktualisiere die Daten.
-          &lt;/Text&gt;
-        &lt;/View&gt;
-      )}
-
-      // Wird als Header über der Liste angezeigt (scrollt mit!)
-      ListHeaderComponent={() =&gt; (
-        &lt;View style={styles.headerContainer}&gt;
-          &lt;Text style={styles.headerText}&gt;
-            Abfl&uuml;ge ({flights.length})
-          &lt;/Text&gt;
-        &lt;/View&gt;
-      )}
-
-      // Pull-to-Refresh: refreshing steuert den Spinner
-      onRefresh={onRefresh}
-      refreshing={refreshing}
-
-      // Performance-Optimierungen
-      removeClippedSubviews={true}    // Entfernt Off-Screen-Elemente aus dem DOM
-      initialNumToRender={15}         // Wie viele Items initial rendern
-      maxToRenderPerBatch={10}        // Items pro Render-Batch
-      windowSize={10}                 // Render-Fenster in Vielfachen der Bildschirmhöhe
-
-      // Abstand am Ende der Liste (verhindert Tab-Bar-Überlappung)
-      contentContainerStyle={[
-        styles.listContent,
-        flights.length === 0 &amp;&amp; styles.listContentEmpty,
-      ]}
-    /&gt;
-  );
-}
-
-const styles = StyleSheet.create({
-  separator: {
-    height: 1,
-    backgroundColor: '#21262d',
-    marginHorizontal: 16,
-  },
-  emptyContainer: {
-    alignItems: 'center',
-    paddingTop: 64,
-    paddingHorizontal: 32,
-  },
-  emptyIcon: {
-    fontSize: 48,
-    marginBottom: 16,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#e6edf3',
-    marginBottom: 8,
-  },
-  emptySubtitle: {
-    fontSize: 14,
-    color: '#8b949e',
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-  headerContainer: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#21262d',
-  },
-  headerText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#8b949e',
-    letterSpacing: 1,
-    textTransform: 'uppercase',
-  },
-  listContent: {
-    paddingBottom: 100,     // Platz für Tab-Bar
-  },
-  listContentEmpty: {
-    flexGrow: 1,            // Damit Empty-State vertikal zentriert werden kann
-  },
-});</code></pre>
+      <pre><code class="language-typescript">// Drei Spalten im Verhältnis 2 : 3 : 2 – wie in der FlightCard
+&lt;View style={{ flexDirection: 'row', alignItems: 'center' }}&gt;
+  &lt;View style={{ flex: 2 }}&gt;&lt;Text&gt;Flugnummer&lt;/Text&gt;&lt;/View&gt;
+  &lt;View style={{ flex: 3 }}&gt;&lt;Text&gt;Ziel und Zeit&lt;/Text&gt;&lt;/View&gt;
+  &lt;View style={{ flex: 2 }}&gt;&lt;Text&gt;Status&lt;/Text&gt;&lt;/View&gt;
+&lt;/View&gt;</code></pre>
     </div>
   </section>
 
-  <!-- Section 2: FlightCard -->
+  <!-- Section 2: StatusBadge und FlightCard -->
   <section>
-    <h2>2 &mdash; FlightCard &ndash; Die native Fluganzeige</h2>
+    <h2>2 &mdash; StatusBadge und FlightCard</h2>
     <p>
-      Die <code>FlightCard</code> ist das Herzst&uuml;ck der App. Sie zeigt alle
-      relevanten Informationen zu einem Flug an: Flugnummer, Ziel, Gate, Abflugzeit
-      und den farbcodierten Status. Das Status-System verwendet das gleiche
-      <code>STATUS_CONFIG</code>-Pattern wie die Web-Version aus Lektion 4.
+      In Lektion&nbsp;4.1 stand die Karte direkt in <code>App.tsx</code>. Jetzt lagern wir sie wie im
+      Web-Kurs in Komponenten aus. Zuerst das Status-Abzeichen: Ein Objekt ordnet jedem Status Text und
+      Farben zu, die Farben kommen per Style-Array (Lektion&nbsp;4.1) dazu.
     </p>
-
     <div class="code-block">
       <div class="code-header">
-        <span class="code-filename">components/FlightCard.tsx</span>
+        <span class="code-filename">src/components/StatusBadge.tsx</span>
         <span class="code-lang">TypeScript</span>
       </div>
-      <pre><code class="language-typescript">import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
-import { Flight, FlightStatus } from '../types/flight';
+      <pre><code class="language-typescript">import { View, Text, StyleSheet } from 'react-native';
+import { FlightStatus } from '../types/flight';
 
-// STATUS_CONFIG: Identisches Muster wie in der Web-Version (Lektion 1.5),
-// aber mit React-Native-kompatiblen Style-Werten statt CSS-Klassen.
-const STATUS_CONFIG: Record&lt;FlightStatus, {
-  label: string;
-  color: string;
-  backgroundColor: string;
-}&gt; = {
-  'on-time':   { label: 'P&uuml;nktlich',   color: '#3fb950', backgroundColor: '#0d2818' },
-  'delayed':   { label: 'Versp&auml;tet',   color: '#d29922', backgroundColor: '#2d1f03' },
-  'boarding':  { label: 'Boarding',     color: '#61dafb', backgroundColor: '#0b2634' },
-  'departed':  { label: 'Abgeflogen',   color: '#8b949e', backgroundColor: '#161b22' },
-  'landed':    { label: 'Gelandet',     color: '#3fb950', backgroundColor: '#0d2818' },
-  'cancelled': { label: 'Storniert',    color: '#f85149', backgroundColor: '#2d0f0f' },
+const STATUS_CONFIG: Record&lt;FlightStatus, { label: string; color: string; bg: string }&gt; = {
+  'on-time':   { label: 'Pünktlich',  color: '#3fb950', bg: '#1a3a1a' },
+  'delayed':   { label: 'Verspätet', color: '#d29922', bg: '#3a2a0a' },
+  'boarding':  { label: 'Boarding',   color: '#61dafb', bg: '#0a2a3a' },
+  'departed':  { label: 'Gestartet',  color: '#8b949e', bg: '#21262d' },
+  'landed':    { label: 'Gelandet',   color: '#8b949e', bg: '#21262d' },
+  'cancelled': { label: 'Gestrichen', color: '#f85149', bg: '#3a0a0a' },
 };
+
+interface StatusBadgeProps { status: FlightStatus; }
+
+const StatusBadge = ({ status }: StatusBadgeProps) =&gt; {
+  const cfg = STATUS_CONFIG[status];
+  return (
+    &lt;View style={[styles.badge, { backgroundColor: cfg.bg }]}&gt;
+      &lt;Text style={[styles.text, { color: cfg.color }]}&gt;{cfg.label}&lt;/Text&gt;
+    &lt;/View&gt;
+  );
+};
+
+const styles = StyleSheet.create({
+  badge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 4 },
+  text: { fontSize: 11, fontWeight: '600' },
+});
+
+export default StatusBadge;</code></pre>
+    </div>
+    <p>
+      Die <code>FlightCard</code> zeigt einen Flug in drei Spalten (Abschnitt&nbsp;1) und ist als Ganzes
+      antippbar. Neu sind:
+    </p>
+    <ul>
+      <li><code>numberOfLines={1}</code>: Zu langer Text wird nach einer Zeile mit &bdquo;&hellip;&ldquo; abgeschnitten.</li>
+      <li><code>textDecorationLine: 'line-through'</code>: durchgestrichener Text f&uuml;r gestrichene Fl&uuml;ge.</li>
+      <li><code>isSelected</code>: Die ausgew&auml;hlte Karte bekommt einen hellen Rand links.</li>
+    </ul>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">src/components/FlightCard.tsx</span>
+        <span class="code-lang">TypeScript</span>
+      </div>
+      <pre><code class="language-typescript">import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Flight } from '../types/flight';
+import StatusBadge from './StatusBadge';
 
 interface FlightCardProps {
   flight: Flight;
   onPress: () =&gt; void;
   isSelected?: boolean;
-  index?: number;
 }
 
-export function FlightCard({
-  flight,
-  onPress,
-  isSelected = false,
-  index = 0,
-}: FlightCardProps) {
-  const statusConfig = STATUS_CONFIG[flight.status];
-
-  return (
-    &lt;TouchableOpacity
-      style={[
-        styles.card,
-        isSelected &amp;&amp; styles.cardSelected,
-      ]}
-      onPress={onPress}
-      activeOpacity={0.75}
-      accessibilityRole="button"
-      accessibilityLabel={`Flug ${flight.flightNumber} nach ${flight.destination}`}
-    &gt;
-      {/* Linker farbiger Akzentstreifen bei ausgewähltem Element */}
-      {isSelected &amp;&amp; &lt;View style={styles.selectedIndicator} /&gt;}
-
-      {/* Dreispaltiges Layout: links (Flugnummer), mitte (Ziel+Gate), rechts (Zeit+Status) */}
-      &lt;View style={styles.leftColumn}&gt;
-        &lt;Text style={styles.flightNumber}&gt;{flight.flightNumber}&lt;/Text&gt;
+const FlightCard = ({ flight, onPress, isSelected = false }: FlightCardProps) =&gt; (
+  &lt;TouchableOpacity
+    style={[styles.card, isSelected &amp;&amp; styles.cardSelected]}
+    onPress={onPress}
+    activeOpacity={0.8}
+  &gt;
+    &lt;View style={styles.row}&gt;
+      {/* Left column */}
+      &lt;View style={styles.leftCol}&gt;
+        &lt;Text style={[styles.flightNumber, flight.status === 'cancelled' &amp;&amp; styles.strikethrough]}&gt;
+          {flight.flightNumber}
+        &lt;/Text&gt;
         &lt;Text style={styles.airline}&gt;{flight.airline}&lt;/Text&gt;
       &lt;/View&gt;
-
-      &lt;View style={styles.centerColumn}&gt;
-        &lt;Text style={styles.destination} numberOfLines={1}&gt;
-          {flight.destination}
-        &lt;/Text&gt;
-        &lt;Text style={styles.gate}&gt;
-          {flight.gate ? `Gate ${flight.gate}` : 'Gate TBD'}
-        &lt;/Text&gt;
-      &lt;/View&gt;
-
-      &lt;View style={styles.rightColumn}&gt;
-        &lt;Text style={styles.departureTime}&gt;{flight.departureTime}&lt;/Text&gt;
-
-        {/* Status-Badge mit dynamischer Hintergrundfarbe */}
-        &lt;View
-          style={[
-            styles.statusBadge,
-            { backgroundColor: statusConfig.backgroundColor },
-          ]}
-        &gt;
-          &lt;Text style={[styles.statusText, { color: statusConfig.color }]}&gt;
-            {statusConfig.label}
+      {/* Center column */}
+      &lt;View style={styles.centerCol}&gt;
+        &lt;Text style={styles.airport} numberOfLines={1}&gt;{flight.airport}&lt;/Text&gt;
+        &lt;View style={styles.timeRow}&gt;
+          &lt;Text style={[styles.time, flight.status === 'cancelled' &amp;&amp; styles.strikethrough]}&gt;
+            {flight.scheduledTime}
           &lt;/Text&gt;
+          {flight.expectedTime &amp;&amp; (
+            &lt;Text style={styles.expectedTime}&gt;→ {flight.expectedTime}&lt;/Text&gt;
+          )}
         &lt;/View&gt;
       &lt;/View&gt;
-    &lt;/TouchableOpacity&gt;
-  );
-}
+      {/* Right column */}
+      &lt;View style={styles.rightCol}&gt;
+        &lt;StatusBadge status={flight.status} /&gt;
+      &lt;/View&gt;
+    &lt;/View&gt;
+    {(flight.gate || flight.terminal) &amp;&amp; (
+      &lt;View style={styles.footer}&gt;
+        &lt;Text style={styles.footerText}&gt;
+          {flight.terminal}{flight.gate ? ` · Gate ${flight.gate}` : ''}
+        &lt;/Text&gt;
+      &lt;/View&gt;
+    )}
+  &lt;/TouchableOpacity&gt;
+);
 
 const styles = StyleSheet.create({
   card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#0d1117',
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    position: 'relative',
+    backgroundColor: '#1c2128',
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#30363d',
   },
   cardSelected: {
-    backgroundColor: '#161b22',
+    backgroundColor: '#1f3a4a',
     borderLeftWidth: 3,
     borderLeftColor: '#61dafb',
-    paddingLeft: 13,              // 16 - 3 = 13 (Ausgleich für Border)
   },
-  selectedIndicator: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    bottom: 0,
-    width: 3,
-    backgroundColor: '#61dafb',
-  },
-  leftColumn: {
-    flex: 2,
-    marginRight: 8,
-  },
-  centerColumn: {
-    flex: 3,
-    marginRight: 8,
-  },
-  rightColumn: {
-    flex: 2,
-    alignItems: 'flex-end',
-  },
-  flightNumber: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#61dafb',
-    marginBottom: 2,
-  },
-  airline: {
-    fontSize: 12,
-    color: '#8b949e',
-  },
-  destination: {
-    fontSize: 15,
-    fontWeight: '500',
-    color: '#e6edf3',
-    marginBottom: 2,
-  },
-  gate: {
-    fontSize: 12,
-    color: '#8b949e',
-  },
-  departureTime: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#e6edf3',
-    marginBottom: 4,
-    fontVariant: ['tabular-nums'],  // Monospace-Zahlen für Zeit-Anzeige
-  },
-  statusBadge: {
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  statusText: {
-    fontSize: 11,
-    fontWeight: '600',
-    letterSpacing: 0.3,
-  },
-});</code></pre>
+  row: { flexDirection: 'row', alignItems: 'center' },
+  timeRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  leftCol:   { flex: 2 },
+  centerCol: { flex: 3 },
+  rightCol:  { flex: 2, alignItems: 'flex-end' },
+  flightNumber: { fontSize: 15, fontWeight: 'bold', color: '#e6edf3' },
+  airline:      { fontSize: 11, color: '#8b949e', marginTop: 2 },
+  airport:      { fontSize: 13, color: '#e6edf3' },
+  time:         { fontSize: 14, fontWeight: '600', color: '#61dafb', marginTop: 2 },
+  expectedTime: { fontSize: 12, color: '#d29922' },
+  strikethrough:{ textDecorationLine: 'line-through', color: '#8b949e' },
+  footer: { marginTop: 8, paddingTop: 8, borderTopWidth: 1, borderTopColor: '#30363d' },
+  footerText: { fontSize: 11, color: '#8b949e' },
+});
+
+export default FlightCard;</code></pre>
     </div>
   </section>
 
-  <!-- Section 3: TextInput -->
+  <!-- Section 3: FlatList -->
   <section>
-    <h2>3 &mdash; TextInput &ndash; Die Suchleiste</h2>
+    <h2>3 &mdash; FlatList &ndash; performante Listen</h2>
     <p>
-      <code>TextInput</code> ist das React-Native-&Auml;quivalent zu <code>&lt;input&gt;</code>
-      im Web. Es gibt einige wichtige Unterschiede und zus&auml;tzliche Props, die auf
-      mobilen Ger&auml;ten wichtig sind.
+      In Lektion&nbsp;4.1 haben wir die Fl&uuml;ge mit <code>map()</code> in einer <code>ScrollView</code>
+      angezeigt. Das rendert <em>alle</em> Elemente auf einmal &ndash; bei 8 Fl&uuml;gen kein Problem, bei 1000
+      schon. <code>FlatList</code> rendert nur die Elemente, die gerade sichtbar sind (plus ein paar
+      dar&uuml;ber und darunter), und bringt typische Listenfunktionen gleich mit.
     </p>
-
+    <ul>
+      <li><code>data</code>: das Array, <code>renderItem</code>: Funktion, die f&uuml;r ein Element (<code>item</code>) die Komponente liefert.</li>
+      <li><code>keyExtractor</code>: liefert den eindeutigen Schl&uuml;ssel als String &ndash; statt <code>key</code> wie bei <code>map()</code>.</li>
+      <li><code>ListHeaderComponent</code> und <code>ListEmptyComponent</code>: Inhalt &uuml;ber der Liste bzw. bei leerer Liste.</li>
+      <li><code>onRefresh</code> und <code>refreshing</code>: Pull-to-Refresh &ndash; die Liste nach unten ziehen ruft <code>onRefresh</code> auf, solange <code>refreshing</code> wahr ist, dreht sich ein Spinner.</li>
+      <li><code>ActivityIndicator</code>: der native Lade-Spinner.</li>
+    </ul>
     <div class="code-block">
       <div class="code-header">
-        <span class="code-filename">components/SearchBar.tsx</span>
+        <span class="code-filename">src/components/FlightList.tsx</span>
         <span class="code-lang">TypeScript</span>
       </div>
-      <pre><code class="language-typescript">import {
-  TextInput,
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-} from 'react-native';
+      <pre><code class="language-typescript">import { FlatList, View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { Flight } from '../types/flight';
+import FlightCard from './FlightCard';
+
+interface FlightListProps {
+  flights: Flight[];
+  title: string;
+  onFlightPress: (flight: Flight) =&gt; void;
+  selectedFlightId?: number;
+  isLoading?: boolean;
+  onRefresh?: () =&gt; void;
+  refreshing?: boolean;
+}
+
+const FlightList = ({
+  flights,
+  title,
+  onFlightPress,
+  selectedFlightId,
+  isLoading = false,
+  onRefresh,
+  refreshing = false,
+}: FlightListProps) =&gt; (
+  &lt;FlatList
+    // Während des Ladens eine leere Liste – dann zeigt ListEmptyComponent den Spinner
+    data={isLoading ? [] : flights}
+    keyExtractor={item =&gt; item.id.toString()}
+    renderItem={({ item }) =&gt; (
+      &lt;FlightCard
+        flight={item}
+        onPress={() =&gt; onFlightPress(item)}
+        isSelected={item.id === selectedFlightId}
+      /&gt;
+    )}
+    ListHeaderComponent={
+      &lt;View style={styles.listHeader}&gt;
+        &lt;Text style={styles.listTitle}&gt;{title} ({flights.length})&lt;/Text&gt;
+      &lt;/View&gt;
+    }
+    ListEmptyComponent={
+      &lt;View style={styles.empty}&gt;
+        {isLoading ? (
+          &lt;&gt;
+            &lt;ActivityIndicator size="large" color="#61dafb" /&gt;
+            &lt;Text style={styles.emptyText}&gt;Flugdaten werden geladen...&lt;/Text&gt;
+          &lt;/&gt;
+        ) : (
+          &lt;&gt;
+            &lt;Text style={styles.emptyIcon}&gt;✈&lt;/Text&gt;
+            &lt;Text style={styles.emptyText}&gt;Keine Flüge gefunden&lt;/Text&gt;
+          &lt;/&gt;
+        )}
+      &lt;/View&gt;
+    }
+    onRefresh={onRefresh}
+    refreshing={refreshing}
+    style={styles.list}
+  /&gt;
+);
+
+const styles = StyleSheet.create({
+  list: { flex: 1 },
+  listHeader: {
+    backgroundColor: '#161b22',
+    padding: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#30363d',
+  },
+  listTitle: { fontSize: 16, fontWeight: '600', color: '#61dafb' },
+  empty: { padding: 48, alignItems: 'center' },
+  emptyIcon: { fontSize: 32, marginBottom: 12 },
+  emptyText: { color: '#8b949e', fontSize: 15, marginTop: 12 },
+});
+
+export default FlightList;</code></pre>
+    </div>
+  </section>
+
+  <!-- Section 4: TextInput -->
+  <section>
+    <h2>4 &mdash; TextInput &ndash; die Suchleiste</h2>
+    <p>
+      <code>TextInput</code> ist das Gegenst&uuml;ck zu <code>input</code>. Statt <code>onChange</code> mit
+      <code>event.target.value</code> gibt es <code>onChangeText</code>, das direkt den neuen Text liefert.
+      Wie im Web steuern wir das Feld &uuml;ber <code>value</code> und State (gesteuertes Eingabefeld).
+    </p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-filename">src/components/SearchBar.tsx</span>
+        <span class="code-lang">TypeScript</span>
+      </div>
+      <pre><code class="language-typescript">import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
 
 interface SearchBarProps {
   value: string;
   onChangeText: (text: string) =&gt; void;
   placeholder?: string;
-  resultCount?: number;
 }
 
-export function SearchBar({
+const SearchBar = ({
   value,
   onChangeText,
-  placeholder = 'Flugnummer oder Ziel...',
-  resultCount,
-}: SearchBarProps) {
-  return (
-    &lt;View style={styles.container}&gt;
-      {/* Suchfeld-Row: Icon + Input + Clear-Button */}
-      &lt;View style={styles.inputRow}&gt;
-        &lt;Text style={styles.searchIcon}&gt;&#128269;&lt;/Text&gt;
-
-        &lt;TextInput
-          style={styles.input}
-          value={value}
-          onChangeText={onChangeText}
-          placeholder={placeholder}
-
-          // placeholderTextColor MUSS explizit gesetzt werden –
-          // der Standardwert ist auf Dark-Theme oft zu hell oder zu dunkel.
-          placeholderTextColor="#484f58"
-
-          // Tastatur-Optionen
-          autoCorrect={false}           // Keine Autokorrektur (stört bei Flugnummern)
-          autoCapitalize="none"         // Keine automatische Großschreibung
-          keyboardType="default"
-          returnKeyType="search"
-          keyboardAppearance="dark"     // Dunkle Tastatur auf iOS
-
-          // iOS: Zeigt ein "×"-Symbol zum Löschen im Input-Feld
-          clearButtonMode="while-editing"
-
-          // Barrierefreiheit
-          accessibilityLabel="Flug suchen"
-          accessibilityHint="Flugnummer oder Zielflughafen eingeben"
-        /&gt;
-
-        {/* Eigener Clear-Button für Android (clearButtonMode nur iOS) */}
-        {value.length &gt; 0 &amp;&amp; (
-          &lt;TouchableOpacity
-            style={styles.clearButton}
-            onPress={() =&gt; onChangeText('')}
-            activeOpacity={0.7}
-            accessibilityLabel="Suche l&ouml;schen"
-          &gt;
-            &lt;Text style={styles.clearIcon}&gt;&#10006;&lt;/Text&gt;
-          &lt;/TouchableOpacity&gt;
-        )}
-      &lt;/View&gt;
-
-      {/* Ergebnis-Zähler */}
-      {value.length &gt; 0 &amp;&amp; resultCount !== undefined &amp;&amp; (
-        &lt;Text style={styles.resultCount}&gt;
-          {resultCount} {resultCount === 1 ? 'Ergebnis' : 'Ergebnisse'}
-        &lt;/Text&gt;
-      )}
-    &lt;/View&gt;
-  );
-}
+  placeholder = 'Flug oder Ziel suchen...',
+}: SearchBarProps) =&gt; (
+  &lt;View style={styles.container}&gt;
+    &lt;TextInput
+      style={styles.input}
+      value={value}
+      onChangeText={onChangeText}
+      placeholder={placeholder}
+      placeholderTextColor="#8b949e"
+      clearButtonMode="while-editing"
+      autoCorrect={false}
+      autoCapitalize="none"
+      returnKeyType="search"
+    /&gt;
+    {value.length &gt; 0 &amp;&amp; (
+      &lt;TouchableOpacity onPress={() =&gt; onChangeText('')} style={styles.clearButton}&gt;
+        &lt;Text style={styles.clearText}&gt;✕&lt;/Text&gt;
+      &lt;/TouchableOpacity&gt;
+    )}
+  &lt;/View&gt;
+);
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    backgroundColor: '#0d1117',
-    borderBottomWidth: 1,
-    borderBottomColor: '#21262d',
-  },
-  inputRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#161b22',
+    margin: 12,
+    backgroundColor: '#21262d',
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: '#30363d',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    height: 44,
-  },
-  searchIcon: {
-    fontSize: 16,
-    marginRight: 8,
-    color: '#8b949e',
   },
   input: {
     flex: 1,
-    fontSize: 15,
     color: '#e6edf3',
-    // Kein padding nötig – der Container übernimmt das
-    paddingVertical: 0,   // Wichtig auf Android: verhindert Extra-Padding
+    fontSize: 15,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
   },
-  clearButton: {
-    padding: 4,
-    marginLeft: 8,
-  },
-  clearIcon: {
-    fontSize: 14,
-    color: '#8b949e',
-  },
-  resultCount: {
-    fontSize: 12,
-    color: '#8b949e',
-    marginTop: 6,
-    marginLeft: 4,
-  },
-});</code></pre>
-    </div>
+  clearButton: { paddingRight: 12 },
+  clearText: { color: '#8b949e', fontSize: 16 },
+});
 
-    <h3>Gesteuerter Input &ndash; useState + TextInput</h3>
+export default SearchBar;</code></pre>
+    </div>
+    <ul>
+      <li><code>placeholderTextColor</code>: Farbe des Platzhalters &ndash; auf dunklem Hintergrund n&ouml;tig.</li>
+      <li><code>autoCorrect</code> und <code>autoCapitalize</code>: Autokorrektur und Gro&szlig;schreibung der Tastatur ausschalten.</li>
+      <li><code>returnKeyType="search"</code>: Die Eingabetaste der Bildschirmtastatur zeigt &bdquo;Suchen&ldquo;.</li>
+      <li>Das &#10005; erscheint nur bei Text und leert das Feld &uuml;ber <code>onChangeText('')</code>.</li>
+    </ul>
+  </section>
+
+  <!-- Section 5: App.tsx -->
+  <section>
+    <h2>5 &mdash; Alles zusammen: Suche, Filter und Laden</h2>
+    <p>
+      <code>App.tsx</code> h&auml;lt den State und setzt die Komponenten zusammen &mdash; das Prinzip kennst
+      du aus Teil&nbsp;1 und 2:
+    </p>
+    <ul>
+      <li><code>searchQuery</code> und <code>typeFilter</code> steuern Suche und Reiter (&bdquo;Alle&ldquo;, &bdquo;Abfl&uuml;ge&ldquo;, &bdquo;Ank&uuml;nfte&ldquo;). <code>useMemo</code> berechnet die gefilterte Liste nur neu, wenn sich einer der beiden Werte &auml;ndert.</li>
+      <li><code>isLoading</code> simuliert mit <code>useEffect</code> und <code>setTimeout</code> eine Ladezeit von einer Sekunde &ndash; so sieht man den Spinner aus Abschnitt&nbsp;3.</li>
+      <li><code>refreshing</code> und <code>handleRefresh</code> simulieren das Aktualisieren per Pull-to-Refresh.</li>
+    </ul>
     <div class="code-block">
       <div class="code-header">
-        <span class="code-filename">screens/DepartureListScreen.tsx (Auszug)</span>
+        <span class="code-filename">App.tsx</span>
         <span class="code-lang">TypeScript</span>
       </div>
-      <pre><code class="language-typescript">import { useState, useMemo } from 'react';
-import { FLIGHTS } from '../data/flights';
+      <pre><code class="language-typescript">import { useState, useMemo, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { StatusBar } from 'expo-status-bar';
+import { sampleFlights } from './src/data/flights';
+import { Flight } from './src/types/flight';
+import FlightList from './src/components/FlightList';
+import SearchBar from './src/components/SearchBar';
 
-export function DepartureListScreen() {
+type TypeFilter = 'all' | 'departure' | 'arrival';
+
+export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [typeFilter, setTypeFilter]   = useState&lt;TypeFilter&gt;('all');
+  const [selectedFlight, setSelectedFlight] = useState&lt;Flight | null&gt;(null);
+  const [refreshing, setRefreshing]   = useState(false);
+  const [isLoading, setIsLoading]     = useState(true);
 
-  // useMemo: Filterliste nur neu berechnen, wenn sich searchQuery oder Daten ändern
+  // Ladezeit simulieren: erst nach 1 Sekunde gelten die Daten als geladen
+  useEffect(() =&gt; {
+    const timeoutId = setTimeout(() =&gt; {
+      setIsLoading(false);
+    }, 1000);
+    return () =&gt; clearTimeout(timeoutId);
+  }, []);
+
   const filteredFlights = useMemo(() =&gt; {
-    const query = searchQuery.toLowerCase().trim();
-    if (!query) return FLIGHTS;
-    return FLIGHTS.filter(
-      (f) =&gt;
-        f.flightNumber.toLowerCase().includes(query) ||
-        f.destination.toLowerCase().includes(query) ||
-        f.airline.toLowerCase().includes(query)
-    );
-  }, [searchQuery]);
+    const q = searchQuery.toLowerCase();
+    return sampleFlights
+      .filter(f =&gt; {
+        if (typeFilter !== 'all' &amp;&amp; f.type !== typeFilter) return false;
+        if (
+          q &amp;&amp;
+          !f.flightNumber.toLowerCase().includes(q) &amp;&amp;
+          !f.airport.toLowerCase().includes(q) &amp;&amp;
+          !f.airline.toLowerCase().includes(q)
+        ) return false;
+        return true;
+      })
+      .sort((a, b) =&gt; a.scheduledTime.localeCompare(b.scheduledTime));
+  }, [searchQuery, typeFilter]);
 
-  return (
-    &lt;&gt;
-      &lt;SearchBar
-        value={searchQuery}
-        onChangeText={setSearchQuery}
-        resultCount={filteredFlights.length}
-      /&gt;
-      &lt;FlightList
-        flights={filteredFlights}
-        onFlightPress={(flight) =&gt; console.log(flight)}
-      /&gt;
-    &lt;/&gt;
-  );
-}</code></pre>
-    </div>
-  </section>
-
-  <!-- Section 4: Flexbox -->
-  <section>
-    <h2>4 &mdash; Flexbox in React Native</h2>
-    <p>
-      React Native verwendet Flexbox als einziges Layout-System &ndash; es gibt kein
-      CSS Grid, keine Float-Layouts, keine absoluten Pixel-Positionen (au&szlig;er
-      mit <code>position: 'absolute'</code>). Das Gute: Wer Flexbox vom Web kennt,
-      hat die Grundlage bereits. Es gibt aber einige wichtige Unterschiede.
-    </p>
-
-    <h3>Die wichtigsten Unterschiede zum Web</h3>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Eigenschaft</th>
-            <th>Web (CSS)</th>
-            <th>React Native</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>flexDirection</code></td>
-            <td><code>row</code> (Standard)</td>
-            <td><code>column</code> (Standard!)</td>
-          </tr>
-          <tr>
-            <td><code>alignContent</code></td>
-            <td><code>stretch</code></td>
-            <td><code>flex-start</code></td>
-          </tr>
-          <tr>
-            <td><code>flexShrink</code></td>
-            <td><code>1</code></td>
-            <td><code>0</code></td>
-          </tr>
-          <tr>
-            <td><code>gap</code></td>
-            <td>Vollst&auml;ndig unterst&uuml;tzt</td>
-            <td>Ab RN 0.71+ unterst&uuml;tzt</td>
-          </tr>
-          <tr>
-            <td>Elterngr&ouml;&szlig;e</td>
-            <td>Implizit vom Browser</td>
-            <td>Muss explizit mit <code>flex: 1</code> oder fixen Werten gesetzt werden</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <h3>Flex-Verteilung &ndash; Dreispalten-Layout</h3>
-    <p>
-      Mit <code>flex: N</code> verteilt man den verf&uuml;gbaren Platz anteilig. Das
-      ist das Kernprinzip hinter der FlightCard: drei Spalten, die sich den Platz
-      in einem 2:3:2-Verh&auml;ltnis teilen.
-    </p>
-    <div class="code-block">
-      <div class="code-header">
-        <span class="code-filename">flexbox-layout.tsx</span>
-        <span class="code-lang">TypeScript</span>
-      </div>
-      <pre><code class="language-typescript">// Dreispalten-Layout: links 2/7, mitte 3/7, rechts 2/7
-&lt;View style={{ flexDirection: 'row' }}&gt;
-  &lt;View style={{ flex: 2, backgroundColor: '#1a1a2e' }}&gt;
-    &lt;Text&gt;Links (2/7)&lt;/Text&gt;
-  &lt;/View&gt;
-  &lt;View style={{ flex: 3, backgroundColor: '#16213e' }}&gt;
-    &lt;Text&gt;Mitte (3/7)&lt;/Text&gt;
-  &lt;/View&gt;
-  &lt;View style={{ flex: 2, backgroundColor: '#0f3460' }}&gt;
-    &lt;Text&gt;Rechts (2/7)&lt;/Text&gt;
-  &lt;/View&gt;
-&lt;/View&gt;
-
-// Vollständiges FlightCard-Layout-Schema:
-// flexDirection: 'row' (horizontale Anordnung)
-// └── leftColumn   (flex: 2) – Flugnummer + Airline
-// └── centerColumn (flex: 3) – Ziel + Gate
-// └── rightColumn  (flex: 2) – Zeit + Status
-
-// Wichtig: Ohne flex: 1 auf dem übergeordneten Container
-// hat die Row keine definierte Breite!
-const layoutStyles = StyleSheet.create({
-  screen: {
-    flex: 1,                      // Gesamten Bildschirm einnehmen
-    backgroundColor: '#0d1117',
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',         // Vertikal zentrieren
-    gap: 8,                       // Abstand zwischen Spalten (RN 0.71+)
-  },
-  col: {
-    flex: 1,                      // Gleich verteilt
-  },
-  colWide: {
-    flex: 2,                      // Doppelt so breit
-  },
-});</code></pre>
-    </div>
-
-    <h3>Absolute Positionierung</h3>
-    <div class="code-block">
-      <div class="code-header">
-        <span class="code-filename">absolute-positioning.tsx</span>
-        <span class="code-lang">TypeScript</span>
-      </div>
-      <pre><code class="language-typescript">// Absolute Positionierung: herausnehmen aus dem Flow
-// Nützlich für Badges, Overlays, Floating Buttons
-const styles = StyleSheet.create({
-  container: {
-    position: 'relative',       // Elternelement (Standard in RN)
-  },
-  badge: {
-    position: 'absolute',
-    top: -4,
-    right: -4,
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: '#f85149',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  badgeText: {
-    color: '#ffffff',
-    fontSize: 10,
-    fontWeight: 'bold',
-  },
-  // Floating Action Button (FAB) - gängiges Mobile-Pattern
-  fab: {
-    position: 'absolute',
-    bottom: 24,
-    right: 24,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#61dafb',
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 6,               // Android-Schatten
-  },
-});</code></pre>
-    </div>
-  </section>
-
-  <!-- Section 5: ActivityIndicator und SafeAreaView -->
-  <section>
-    <h2>5 &mdash; ActivityIndicator und SafeAreaView</h2>
-
-    <h3>SafeAreaView &ndash; Notch und Dynamic Island</h3>
-    <p>
-      Moderne Smartphones haben Aussparungen im Display: den klassischen Notch (iPhone X),
-      die Dynamic Island (iPhone 14 Pro+) oder runde Ecken. <code>SafeAreaView</code>
-      stellt sicher, dass der Inhalt der App in den sicheren Bereich verschoben wird
-      und nichts hinter diesen Hardware-Elementen verschwindet.
-    </p>
-
-    <div class="code-block">
-      <div class="code-header">
-        <span class="code-filename">screens/DepartureListScreen.tsx</span>
-        <span class="code-lang">TypeScript</span>
-      </div>
-      <pre><code class="language-typescript">import {
-  SafeAreaView,
-  View,
-  Text,
-  ActivityIndicator,
-  StyleSheet,
-} from 'react-native';
-import { useState } from 'react';
-
-export function DepartureListScreen() {
-  const [isLoading, setIsLoading] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
-
-  const handleRefresh = async () => {
+  // Pull-to-Refresh: Spinner für 1 Sekunde anzeigen
+  const handleRefresh = () =&gt; {
     setRefreshing(true);
-    await new Promise((resolve) =&gt; setTimeout(resolve, 1500)); // Simuliert API-Call
-    setRefreshing(false);
+    setTimeout(() =&gt; setRefreshing(false), 1000);
   };
 
+  const TAB_FILTERS: { key: TypeFilter; label: string }[] = [
+    { key: 'all',       label: 'Alle' },
+    { key: 'departure', label: '↑ Abflüge' },
+    { key: 'arrival',   label: '↓ Ankünfte' },
+  ];
+
+  const listTitle =
+    typeFilter === 'all'
+      ? 'Alle Flüge'
+      : typeFilter === 'departure'
+      ? 'Abflüge'
+      : 'Ankünfte';
+
   return (
-    // SafeAreaView statt View als Root-Container!
-    // Respektiert iOS Notch, Dynamic Island, Home-Indicator
-    &lt;SafeAreaView style={styles.safeArea}&gt;
+    &lt;SafeAreaProvider&gt;
+      &lt;SafeAreaView style={styles.safeArea}&gt;
+        &lt;StatusBar style="light" /&gt;
 
-      {/* Header-Bereich */}
-      &lt;View style={styles.header}&gt;
-        &lt;Text style={styles.headerTitle}&gt;&#9992; Abfl&uuml;ge&lt;/Text&gt;
-        &lt;Text style={styles.headerSubtitle}&gt;Wien-Schwechat (VIE)&lt;/Text&gt;
-      &lt;/View&gt;
-
-      {/* Suchleiste */}
-      &lt;SearchBar
-        value={searchQuery}
-        onChangeText={setSearchQuery}
-        resultCount={filteredFlights.length}
-      /&gt;
-
-      {/* Ladeanimation: Zeige ActivityIndicator statt Liste während dem Laden */}
-      {isLoading ? (
-        &lt;View style={styles.loadingContainer}&gt;
-          &lt;ActivityIndicator
-            size="large"          // 'small' oder 'large'
-            color="#61dafb"       // Spinner-Farbe
-          /&gt;
-          &lt;Text style={styles.loadingText}&gt;Fl&uuml;ge werden geladen...&lt;/Text&gt;
+        {/* Header */}
+        &lt;View style={styles.header}&gt;
+          &lt;Text style={styles.headerTitle}&gt;✈ FlugBoard 4.2&lt;/Text&gt;
+          &lt;Text style={styles.headerSubtitle}&gt;Flughafen Wien-Schwechat&lt;/Text&gt;
         &lt;/View&gt;
-      ) : (
+
+        {/* Search */}
+        &lt;SearchBar value={searchQuery} onChangeText={setSearchQuery} /&gt;
+
+        {/* Type filter tabs */}
+        &lt;View style={styles.tabs}&gt;
+          {TAB_FILTERS.map(tab =&gt; (
+            &lt;TouchableOpacity
+              key={tab.key}
+              style={[styles.tab, typeFilter === tab.key &amp;&amp; styles.tabActive]}
+              onPress={() =&gt; setTypeFilter(tab.key)}
+            &gt;
+              &lt;Text style={[styles.tabText, typeFilter === tab.key &amp;&amp; styles.tabTextActive]}&gt;
+                {tab.label}
+              &lt;/Text&gt;
+            &lt;/TouchableOpacity&gt;
+          ))}
+        &lt;/View&gt;
+
+        {/* Flight list */}
         &lt;FlightList
           flights={filteredFlights}
-          onFlightPress={handleFlightPress}
+          title={listTitle}
+          onFlightPress={setSelectedFlight}
+          selectedFlightId={selectedFlight?.id}
+          isLoading={isLoading}
           onRefresh={handleRefresh}
           refreshing={refreshing}
         /&gt;
-      )}
-    &lt;/SafeAreaView&gt;
+      &lt;/SafeAreaView&gt;
+    &lt;/SafeAreaProvider&gt;
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#0d1117',
-  },
+  safeArea: { flex: 1, backgroundColor: '#0d1117' },
   header: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 12,
+    backgroundColor: '#161b22',
+    paddingHorizontal: 20,
+    paddingVertical: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#21262d',
+    borderBottomColor: '#30363d',
   },
-  headerTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#e6edf3',
+  headerTitle: { fontSize: 22, fontWeight: 'bold', color: '#61dafb' },
+  headerSubtitle: { fontSize: 12, color: '#8b949e', marginTop: 2 },
+  tabs: {
+    flexDirection: 'row',
+    backgroundColor: '#161b22',
+    borderBottomWidth: 1,
+    borderBottomColor: '#30363d',
   },
-  headerSubtitle: {
-    fontSize: 13,
-    color: '#8b949e',
-    marginTop: 2,
-  },
-  loadingContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 16,
-  },
-  loadingText: {
-    fontSize: 15,
-    color: '#8b949e',
-  },
+  tab: { flex: 1, paddingVertical: 10, alignItems: 'center' },
+  tabActive: { borderBottomWidth: 2, borderBottomColor: '#61dafb' },
+  tabText: { color: '#8b949e', fontSize: 13, fontWeight: '500' },
+  tabTextActive: { color: '#61dafb', fontWeight: '700' },
 });</code></pre>
-    </div>
-
-    <div class="callout callout-info">
-      <div class="callout-icon">&#8505;</div>
-      <div class="callout-body">
-        <div class="callout-title">SafeAreaView nur f&uuml;r den &auml;u&szlig;ersten Container</div>
-        <p>
-          Verwende <code>SafeAreaView</code> nur als <strong>Root-Container</strong> jedes
-          Screens &ndash; nicht f&uuml;r jeden einzelnen View innerhalb der App. Mehrfach
-          verschachtelte <code>SafeAreaView</code>s k&ouml;nnen doppelte Padding-Werte
-          erzeugen. Bei Screens mit React Navigation wird <code>SafeAreaView</code>
-          oft durch die <code>react-native-safe-area-context</code>-Bibliothek ersetzt,
-          die mehr Kontrolle bietet.
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Section 6: useEffect + fetch -->
-  <section>
-    <h2>6 &mdash; useEffect &amp; fetch in React Native</h2>
-    <p>
-      Eine der gro&szlig;en St&auml;rken von React Native: <code>fetch</code>,
-      <code>useEffect</code>, <code>useState</code> und alle Custom Hooks aus
-      Lektion 2.2 und 2.5 funktionieren <strong>exakt identisch</strong> wie im Web.
-      Kein neues API zu lernen &ndash; das gesamte Wissen &uuml;bertr&auml;gt sich.
-    </p>
-
-    <div class="callout callout-info" style="border-left-color: #d29922;">
-      <div class="callout-icon">&#9888;</div>
-      <div class="callout-body">
-        <div class="callout-title">Achtung: localhost funktioniert nicht!</div>
-        <p>
-          In Expo bezieht sich <code>localhost</code> auf das Telefon selbst, nicht
-          auf den Entwicklungsrechner. Verwende stattdessen die lokale IP-Adresse
-          deines Computers (z.B. <code>192.168.1.42</code>). Die IP wird beim Start
-          von <code>npx expo start</code> im Terminal angezeigt. Alternativ:
-          <code>Constants.expoConfig?.hostUri</code> aus dem
-          <code>expo-constants</code>-Paket gibt die IP automatisch zur&uuml;ck.
-        </p>
-      </div>
-    </div>
-
-    <div class="code-block">
-      <div class="code-header">
-        <span class="code-filename">hooks/useFetchFlights.ts</span>
-        <span class="code-lang">TypeScript</span>
-      </div>
-      <pre><code class="language-typescript">import { useState, useEffect, useCallback } from 'react';
-import { Flight } from '../types/flight';
-
-// Dieser Custom Hook ist IDENTISCH zur Web-Version aus Lektion 9!
-// React Native unterstützt alle React-Hooks ohne Änderungen.
-
-// ⚠️ Lokale IP statt localhost:
-// Expo zeigt beim Start die IP im Terminal an.
-// Alternativ: Constants.expoConfig?.hostUri aus expo-constants
-const API_BASE_URL = 'http://192.168.1.42:3000';
-
-interface FetchFlightsResult {
-  flights: Flight[];
-  isLoading: boolean;
-  error: string | null;
-  refetch: () =&gt; void;
-}
-
-export function useFetchFlights(type: 'departures' | 'arrivals'): FetchFlightsResult {
-  const [flights, setFlights] = useState&lt;Flight[]&gt;([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState&lt;string | null&gt;(null);
-  const [fetchKey, setFetchKey] = useState(0);
-
-  const refetch = useCallback(() =&gt; setFetchKey((k) =&gt; k + 1), []);
-
-  useEffect(() =&gt; {
-    // AbortController: identisch zum Web (L06/L09)
-    const controller = new AbortController();
-    setIsLoading(true);
-    setError(null);
-
-    const fetchData = async () =&gt; {
-      try {
-        const response = await fetch(
-          `${API_BASE_URL}/api/flights?type=${type}`,
-          { signal: controller.signal }
-        );
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-
-        const data: Flight[] = await response.json();
-        setFlights(data);
-      } catch (err) {
-        if (err instanceof Error &amp;&amp; err.name === 'AbortError') return;
-        setError(err instanceof Error ? err.message : 'Unbekannter Fehler');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-
-    // Cleanup: fetch abbrechen wenn die Komponente unmountet
-    return () =&gt; controller.abort();
-  }, [type, fetchKey]);
-
-  return { flights, isLoading, error, refetch };
-}</code></pre>
-    </div>
-
-    <h3>Verwendung in einem Screen</h3>
-    <div class="code-block">
-      <div class="code-header">
-        <span class="code-filename">screens/DepartureListScreen.tsx (mit API)</span>
-        <span class="code-lang">TypeScript</span>
-      </div>
-      <pre><code class="language-typescript">export function DepartureListScreen() {
-  const { flights, isLoading, error, refetch } = useFetchFlights('departures');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [refreshing, setRefreshing] = useState(false);
-
-  const handleRefresh = useCallback(async () =&gt; {
-    setRefreshing(true);
-    refetch();
-    // Warte kurz, damit der Spinner sichtbar ist
-    await new Promise((r) =&gt; setTimeout(r, 500));
-    setRefreshing(false);
-  }, [refetch]);
-
-  const filteredFlights = useMemo(
-    () =&gt; flights.filter(
-      (f) =&gt;
-        f.flightNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        f.destination.toLowerCase().includes(searchQuery.toLowerCase())
-    ),
-    [flights, searchQuery]
-  );
-
-  if (error) {
-    return (
-      &lt;SafeAreaView style={styles.safeArea}&gt;
-        &lt;View style={styles.errorContainer}&gt;
-          &lt;Text style={styles.errorIcon}&gt;&#9888;&lt;/Text&gt;
-          &lt;Text style={styles.errorTitle}&gt;Fehler beim Laden&lt;/Text&gt;
-          &lt;Text style={styles.errorMessage}&gt;{error}&lt;/Text&gt;
-          &lt;TouchableOpacity style={styles.retryButton} onPress={refetch}&gt;
-            &lt;Text style={styles.retryText}&gt;Erneut versuchen&lt;/Text&gt;
-          &lt;/TouchableOpacity&gt;
-        &lt;/View&gt;
-      &lt;/SafeAreaView&gt;
-    );
-  }
-
-  return (
-    &lt;SafeAreaView style={styles.safeArea}&gt;
-      &lt;SearchBar value={searchQuery} onChangeText={setSearchQuery} /&gt;
-      &lt;FlightList
-        flights={filteredFlights}
-        isLoading={isLoading}
-        onFlightPress={(f) =&gt; console.log(f)}
-        onRefresh={handleRefresh}
-        refreshing={refreshing}
-      /&gt;
-    &lt;/SafeAreaView&gt;
-  );
-}</code></pre>
     </div>
   </section>
 
@@ -1060,38 +595,18 @@ export function useFetchFlights(type: 'departures' | 'arrivals'): FetchFlightsRe
     <div class="projekt-box">
       <div class="projekt-box-header">
         <span class="projekt-step">Projektschritt 4.2</span>
-        <h3>FlugBoard Mobile &ndash; Vollst&auml;ndige Listenansicht</h3>
+        <h3>FlugBoard Mobile &ndash; Listenansicht mit Suche</h3>
       </div>
       <p>
-        In diesem Schritt bauen wir die vollst&auml;ndige, interaktive Listenansicht der
-        FlugBoard Mobile App. Am Ende gibt es eine performante Flugliste mit Suchfunktion
-        und Pull-to-Refresh.
+        Ausgangspunkt ist das Projekt aus Lektion&nbsp;4.1. Die Liste aus <code>App.tsx</code> wandert in
+        Komponenten, dazu kommen Suche, Reiter und Laden.
       </p>
       <ol>
-        <li>
-          <strong>FlightCard.tsx erstellen:</strong> Native Version mit
-          <code>STATUS_CONFIG</code>, <code>TouchableOpacity</code>, Dreispalten-Layout
-          und Status-Badge (wie in Abschnitt 2 gezeigt).
-        </li>
-        <li>
-          <strong>FlightList.tsx erstellen:</strong> <code>FlatList</code> mit
-          <code>keyExtractor</code>, <code>renderItem</code>, <code>ListEmptyComponent</code>,
-          <code>ListHeaderComponent</code>, <code>onRefresh</code> + <code>refreshing</code>.
-        </li>
-        <li>
-          <strong>SearchBar.tsx erstellen:</strong> <code>TextInput</code> mit
-          <code>value</code>, <code>onChangeText</code>, <code>placeholderTextColor</code>,
-          <code>autoCorrect={false}</code>, Clear-Button.
-        </li>
-        <li>
-          <strong>App.tsx aktualisieren:</strong> <code>SafeAreaView</code> als Root,
-          <code>SearchBar</code> + gefiltertes <code>FlatList</code> +
-          <code>ActivityIndicator</code> f&uuml;r Ladezustand.
-        </li>
-        <li>
-          <strong>Testen:</strong> Suchfunktion pr&uuml;fen (Flugnummer + Ziel),
-          leerer Zustand wenn keine Ergebnisse, Pull-to-Refresh testen.
-        </li>
+        <li><strong>StatusBadge</strong> und <strong>FlightCard</strong> in <code>src/components/</code> anlegen (Abschnitt&nbsp;2).</li>
+        <li><strong>FlightList</strong> mit <code>FlatList</code>, Kopfzeile, Leer- und Ladezustand anlegen (Abschnitt&nbsp;3).</li>
+        <li><strong>SearchBar</strong> mit <code>TextInput</code> anlegen (Abschnitt&nbsp;4).</li>
+        <li><strong>App.tsx</strong> umbauen: <code>ScrollView</code> und Aktualisieren-Button aus 4.1 entfallen, stattdessen Suche, Reiter und <code>FlightList</code> (Abschnitt&nbsp;5).</li>
+        <li><strong>Testen:</strong> Suche, Reiter, Antippen einer Karte und Pull-to-Refresh in Expo Go ausprobieren.</li>
       </ol>
     </div>
   </section>
@@ -1119,7 +634,7 @@ export function useFetchFlights(type: 'departures' | 'arrivals'): FetchFlightsRe
     </div>
 
     <div class="fehler-item">
-      <div class="fehler-title">Fehler: localhost im fetch-URL</div>
+      <div class="fehler-title">Fehler: localhost im fetch-URL (Bonusaufgabe)</div>
       <p>
         <code>fetch('http://localhost:3000/api/flights')</code> schl&auml;gt in Expo
         mit einem Netzwerkfehler fehl, weil <code>localhost</code> auf dem Telefon
@@ -1174,80 +689,47 @@ export function useFetchFlights(type: 'departures' | 'arrivals'): FetchFlightsRe
   <section class="section-aufgaben">
     <h2>Aufgaben</h2>
     <div class="aufgaben-list">
-
       <div class="aufgabe">
         <div class="aufgabe-header">
           <span class="aufgabe-num">Aufgabe 1</span>
-          <span class="aufgabe-title">FlightCard + FlatList mit Beispieldaten</span>
+          <span class="aufgabe-title">Trefferzahl in der Suchleiste</span>
         </div>
-        <p>
-          Erstelle die vollst&auml;ndige <code>FlightCard</code>-Komponente und
-          binde sie in eine <code>FlatList</code> ein.
-        </p>
         <ul>
-          <li>Dreispalten-Layout (links: Flugnummer+Airline, mitte: Ziel+Gate, rechts: Zeit+Status)</li>
-          <li><code>STATUS_CONFIG</code> mit allen 6 Status-Varianten (<code>on-time</code>, <code>delayed</code>, <code>boarding</code>, <code>departed</code>, <code>landed</code>, <code>cancelled</code>)</li>
-          <li>Status-Badge mit dynamischer Hintergrundfarbe aus <code>STATUS_CONFIG</code></li>
-          <li><code>FlatList</code> mit <code>keyExtractor</code>, <code>ItemSeparatorComponent</code> und <code>ListEmptyComponent</code></li>
-          <li>Mindestens 8 Testdatens&auml;tze mit unterschiedlichen Status-Werten</li>
+          <li>Gib <code>SearchBar</code> eine zus&auml;tzliche Prop <code>resultCount: number</code>.</li>
+          <li>Zeige darunter &bdquo;3 Treffer&ldquo; an &ndash; aber nur, solange ein Suchbegriff eingegeben ist.</li>
         </ul>
       </div>
-
       <div class="aufgabe">
         <div class="aufgabe-header">
           <span class="aufgabe-num">Aufgabe 2</span>
-          <span class="aufgabe-title">SearchBar + Live-Filter</span>
+          <span class="aufgabe-title">Details zum ausgew&auml;hlten Flug</span>
         </div>
-        <p>
-          F&uuml;ge eine Suchleiste oberhalb der <code>FlatList</code> ein und
-          filtere die Flugliste in Echtzeit.
-        </p>
         <ul>
-          <li><code>TextInput</code> mit <code>value</code>, <code>onChangeText</code>, <code>placeholderTextColor="#484f58"</code></li>
-          <li><code>autoCorrect={false}</code> und <code>autoCapitalize="none"</code></li>
-          <li>Filterlogik: Suche in Flugnummer <strong>und</strong> Ziel (case-insensitive)</li>
-          <li>Ergebnis-Z&auml;hler unter dem Suchfeld (&bdquo;X Ergebnisse&ldquo;)</li>
-          <li>Clear-Button erscheint, sobald Text eingegeben wurde</li>
+          <li>Zeige unter den Reitern einen Kasten mit Terminal, Gate und erwarteter Zeit des ausgew&auml;hlten Flugs (<code>selectedFlight</code>).</li>
+          <li>Ein zweites Antippen derselben Karte hebt die Auswahl wieder auf.</li>
         </ul>
       </div>
-
       <div class="aufgabe">
         <div class="aufgabe-header">
           <span class="aufgabe-num">Aufgabe 3</span>
-          <span class="aufgabe-title">Filter-Tabs (Alle / Abfl&uuml;ge / Ank&uuml;nfte)</span>
+          <span class="aufgabe-title">Sortierung umschalten</span>
         </div>
-        <p>
-          Erstelle eine Tab-Leiste mit drei Buttons, die die Liste nach Typ filtert.
-        </p>
         <ul>
-          <li>Drei <code>TouchableOpacity</code>-Buttons: &bdquo;Alle&ldquo;, &bdquo;Abfl&uuml;ge&ldquo;, &bdquo;Ank&uuml;nfte&ldquo;</li>
-          <li>Aktiver Tab: Hintergrund <code>#21262d</code>, Text <code>#61dafb</code>, Border-Bottom in <code>#61dafb</code></li>
-          <li>Inaktiver Tab: kein Hintergrund, Text <code>#8b949e</code></li>
-          <li>Filter-Logik kombiniert mit Suchfilter aus Aufgabe 2 (<code>useMemo</code>)</li>
-          <li>Horizontale Tab-Leiste mit <code>flexDirection: 'row'</code>, gleichm&auml;&szlig;ig verteilt</li>
+          <li>Ein Button rechts in der Kopfzeile schaltet zwischen &bdquo;Zeit &uarr;&ldquo; und &bdquo;Zeit &darr;&ldquo; um.</li>
+          <li>Die Sortierung flie&szlig;t in das <code>useMemo</code> f&uuml;r <code>filteredFlights</code> ein &ndash; welche Abh&auml;ngigkeit kommt dazu?</li>
         </ul>
       </div>
-
       <div class="aufgabe aufgabe-bonus">
         <div class="aufgabe-header">
           <span class="aufgabe-num">Aufgabe 4 &mdash; Bonus</span>
-          <span class="aufgabe-title">Pull-to-Refresh</span>
+          <span class="aufgabe-title">Daten von der FlugBoard-API laden</span>
         </div>
-        <p>
-          Implementiere das Pull-to-Refresh-Pattern f&uuml;r die Flugliste.
-        </p>
         <ul>
-          <li><code>refreshing</code> State (<code>useState&lt;boolean&gt;</code>)</li>
-          <li><code>onRefresh</code>-Handler: setzt <code>refreshing</code> auf <code>true</code>,
-              wartet 2 Sekunden (oder echten API-Call), dann <code>false</code></li>
-          <li><code>refreshing</code> und <code>onRefresh</code> Props an <code>FlatList</code> &uuml;bergeben</li>
-          <li>Spinner-Farbe: <code>#61dafb</code> (via <code>tintColor</code> in <code>refreshControl</code>
-              oder Standard-Farbe &uuml;berschreiben)</li>
-          <li>Nach dem Refresh: neuen Zeitstempel in einer <code>Text</code>-Komponente anzeigen
-              (&bdquo;Aktualisiert: HH:MM:SS&ldquo;)</li>
+          <li>Starte das Next.js-Projekt aus Teil&nbsp;3 und lade die Fl&uuml;ge mit <code>useEffect</code> und <code>fetch</code> von <code>/api/flights</code> statt aus <code>sampleFlights</code>.</li>
+          <li>Verwende die IP-Adresse deines Computers statt <code>localhost</code> (siehe H&auml;ufige Fehler).</li>
+          <li><code>isLoading</code> wird erst <code>false</code>, wenn die Antwort da ist; <code>handleRefresh</code> l&auml;dt die Daten neu.</li>
         </ul>
       </div>
-
     </div>
   </section>
 

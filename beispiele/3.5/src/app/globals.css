@@ -341,3 +341,45 @@ button {
   color: #e6edf3;
   font-weight: 500;
 }
+
+/* Formular „Flug hinzufügen“ (Lektion 3.4) */
+.add-flight-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 1.25rem;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  background: #161b22;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.form-group label {
+  color: #8b949e;
+  font-size: 0.8rem;
+}
+
+.form-group input {
+  padding: 8px 12px;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  background: #21262d;
+  color: #e6edf3;
+}
+
+.btn-primary {
+  align-self: end;
+  padding: 8px 20px;
+  border: none;
+  border-radius: 6px;
+  background: #3fb950;
+  color: #0d1117;
+  font-weight: 600;
+  cursor: pointer;
+}
