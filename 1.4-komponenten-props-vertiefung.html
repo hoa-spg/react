@@ -86,8 +86,8 @@
           <li>Komponenten zusammensetzen (Komposition)</li>
           <li>Default Props und optionale Props mit <code>?</code> nutzen</li>
           <li>Komponenten in eigene Dateien auslagern</li>
-          <li>Listen mit <code>.map()</code> rendern und den <code>key</code>-Prop richtig einsetzen</li>
           <li>Elemente bedingt rendern mit <code>&amp;&amp;</code>, Ternary und fr&uuml;hem Return</li>
+          <li>Listen mit <code>.map()</code> rendern und den <code>key</code>-Prop richtig einsetzen</li>
           <li>Listen sortieren, ohne das Original-Array zu ver&auml;ndern</li>
           <li>Leere Listen mit einem Empty State abfangen</li>
           <li>Children Props verstehen</li>
@@ -160,7 +160,7 @@ function App() {
         <p>
           Props (kurz f&uuml;r <em>Properties</em>) sind die Eingabeparameter einer Komponente &ndash; &auml;hnlich wie
           Funktionsargumente. Sie flie&szlig;en immer <strong>von oben nach unten</strong> (vom Eltern- zum
-          Kindkind-Element). Props sind <strong>read-only</strong>: Eine Komponente darf ihre eigenen Props
+          Kind-Element). Props sind <strong>read-only</strong>: Eine Komponente darf ihre eigenen Props
           niemals ver&auml;ndern.
         </p>
         <p>
@@ -209,6 +209,30 @@ const FlightStatusBadge = ({ status }: FlightStatusBadgeProps) => {
 
 export default FlightStatusBadge;</code></pre>
         </div>
+        <p>In dieser Komponente stecken vier Sprachmittel, die wir ab jetzt laufend verwenden:</p>
+        <ul>
+          <li>
+            <strong>Union Type:</strong> <code>type FlightStatus = 'on-time' | 'delayed' | ...</code> erlaubt
+            genau diese sechs Strings und sonst nichts. Ein Tippfehler wie
+            <code>&lt;FlightStatusBadge status="ontime" /&gt;</code> wird von TypeScript sofort als Fehler markiert.
+          </li>
+          <li>
+            <strong>Destructuring im Funktionskopf:</strong> <code>({ status }: FlightStatusBadgeProps)</code>
+            holt das Prop <code>status</code> direkt aus dem Props-Objekt. Das ist gleichbedeutend mit
+            <code>(props: FlightStatusBadgeProps)</code> und anschlie&szlig;endem <code>props.status</code>
+            &ndash; so wie in Lektion 1.3, nur k&uuml;rzer.
+          </li>
+          <li>
+            <strong><code>Record&lt;Schl&uuml;ssel, Wert&gt;</code>:</strong> beschreibt ein Objekt, das f&uuml;r
+            <em>jeden</em> Wert von <code>FlightStatus</code> einen Eintrag der Form
+            <code>{ label, className }</code> haben muss. Fehlt ein Status, meldet TypeScript einen Fehler.
+          </li>
+          <li>
+            <strong>Destructuring eines Objekts:</strong> <code>const { label, className } = config[status];</code>
+            liest beide Eigenschaften des passenden Eintrags in zwei Variablen. Das Template-Literal
+            <code>{`status-pill ${className}`}</code> setzt daraus die CSS-Klassen zusammen.
+          </li>
+        </ul>
       </section>
 
       <section class="section">
@@ -225,36 +249,31 @@ export default FlightStatusBadge;</code></pre>
           </div>
           <pre><code class="language-typescript">interface AirportHeaderProps {
   airportName: string;           // Pflichtfeld
-  iataCode: string;              // Pflichtfeld
-  subtitle?: string;             // Optional (mit ?)
-  showTime?: boolean;            // Optional, Default: false
+  iataCode?: string;             // Optional (mit ?), Default: 'VIE'
+  subtitle?: string;             // Optional, Default: 'Flugplan aktuell'
 }
 
 const AirportHeader = ({
   airportName,
-  iataCode,
-  subtitle = 'Flugplan aktuell',  // Default-Wert direkt hier
-  showTime = false,               // Default-Wert
+  iataCode = 'VIE',               // Default-Wert direkt hier
+  subtitle = 'Flugplan aktuell',  // Default-Wert
 }: AirportHeaderProps) => {
   return (
     &lt;header&gt;
       &lt;h1&gt;&#9992; {airportName} ({iataCode})&lt;/h1&gt;
       &lt;p&gt;{subtitle}&lt;/p&gt;
-      {/* Optionaler Zeitstempel */}
-      {showTime &amp;&amp; &lt;p&gt;{new Date().toLocaleTimeString('de-AT')}&lt;/p&gt;}
     &lt;/header&gt;
   );
 };
 
-// Verwendung &ndash; nur Pflichtfelder:
-&lt;AirportHeader airportName="Wien-Schwechat" iataCode="VIE" /&gt;
+// Verwendung &ndash; nur Pflichtfeld (iataCode = 'VIE', subtitle = 'Flugplan aktuell'):
+&lt;AirportHeader airportName="Wien-Schwechat" /&gt;
 
 // Verwendung &ndash; mit optionalen Feldern:
 &lt;AirportHeader
-  airportName="Wien-Schwechat"
-  iataCode="VIE"
+  airportName="Graz"
+  iataCode="GRZ"
   subtitle="Live-Flugplan"
-  showTime={true}
 /&gt;</code></pre>
         </div>
       </section>
@@ -366,11 +385,105 @@ export const sampleFlights: Flight[] = [
       </section>
 
       <section class="section">
+        <h2>Conditional Rendering &ndash; Drei Patterns</h2>
+        <p>
+          Bevor wir die Tabellenzeile als Komponente bauen, brauchen wir ein Werkzeug: Oft soll ein Teil der
+          Oberfl&auml;che nur unter einer Bedingung erscheinen &ndash; etwa die erwartete Zeit nur bei
+          versp&auml;teten Fl&uuml;gen. React hat daf&uuml;r keine eigene Template-Syntax; man verwendet
+          ganz normale JavaScript-Ausdr&uuml;cke direkt in JSX. Es gibt drei g&auml;ngige Patterns &ndash; jedes hat
+          seine Berechtigung. Die Beispiele verwenden das <code>Flight</code>-Interface von oben:
+        </p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">Pattern 1: &amp;&amp; Operator</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">// Wenn die Bedingung wahr ist, wird der rechte Teil gerendert.
+// Wenn falsch, wird nichts gerendert (undefined/false wird von React ignoriert).
+
+{flight.status === 'delayed' &amp;&amp; (
+  &lt;span className="time-delayed"&gt;
+    Versp&auml;tet: {flight.expectedTime} Uhr
+  &lt;/span&gt;
+)}
+
+{flight.gate &amp;&amp; (
+  &lt;span&gt;Gate: {flight.gate}&lt;/span&gt;
+)}
+
+// Typisch f&uuml;r optionale boolesche Props, z.B. showTime?: boolean im Header:
+{showTime &amp;&amp; &lt;p&gt;{new Date().toLocaleTimeString('de-AT')}&lt;/p&gt;}
+
+// ACHTUNG: Zahlen! 0 wird als "0" gerendert, nicht als nichts!
+// FALSCH:
+{flights.length &amp;&amp; &lt;span&gt;{flights.length} Fl&uuml;ge&lt;/span&gt;}
+// Wenn flights.length === 0, wird "0" im DOM angezeigt!
+
+// RICHTIG:
+{flights.length &gt; 0 &amp;&amp; &lt;span&gt;{flights.length} Fl&uuml;ge&lt;/span&gt;}</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">Pattern 2: Ternary Operator</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">// Bedingung ? WennWahr : WennFalsch
+// Gut, wenn es zwei alternative Darstellungen gibt.
+
+// Auch au&szlig;erhalb von JSX, um einen Wert zu berechnen:
+const timeDisplay = flight.expectedTime ? flight.expectedTime : flight.scheduledTime;
+
+{flight.gate ? (
+  &lt;span&gt;Gate: {flight.gate}&lt;/span&gt;
+) : (
+  &lt;span&gt;Kein Gate zugewiesen&lt;/span&gt;
+)}
+
+// Auch f&uuml;r CSS-Klassen (statt Inline-Styles):
+&lt;span className={flight.status === 'cancelled' ? 'flight-num is-cancelled' : 'flight-num'}&gt;
+  {flight.flightNumber}
+&lt;/span&gt;</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">Pattern 3: Fr&uuml;her Return</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">// F&uuml;r komplexere Logik: vor dem Haupt-JSX zur&uuml;ckkehren.
+// Gut lesbar und vermeidet tief verschachtelte Bedingungen.
+
+const FlightRow = ({ flight }: { flight: Flight }) => {
+  // Annullierte Fl&uuml;ge bekommen eine spezielle Darstellung
+  if (flight.status === 'cancelled') {
+    return (
+      &lt;tr className="flight-row is-cancelled"&gt;
+        &lt;td colSpan={7} className="flight-cell"&gt;
+          {flight.flightNumber} &ndash; {flight.airline} &ndash; Gestrichen
+        &lt;/td&gt;
+      &lt;/tr&gt;
+    );
+  }
+
+  // Normaler Fall: vollst&auml;ndige Zeile
+  return (
+    &lt;tr&gt;
+      {/* ... alle Spalten ... */}
+    &lt;/tr&gt;
+  );
+};</code></pre>
+        </div>
+      </section>
+
+      <section class="section">
         <h2>FlightCard &ndash; Eine Komponente pro Tabellenzeile</h2>
         <p>
           Anstatt die Tabelle mit hartkodierten <code>&lt;tr&gt;</code>-Elementen zu f&uuml;llen, extrahieren wir
           jede Zeile in eine eigene <code>FlightCard</code>-Komponente. Die Komponente bekommt ein vollst&auml;ndiges
-          <code>Flight</code>-Objekt als Prop.
+          <code>Flight</code>-Objekt als Prop. F&uuml;r die Zeitanzeige verwendet sie den Ternary-Operator aus
+          dem vorigen Abschnitt; beim Gate sorgt der <em>Nullish-Coalescing-Operator</em> <code>??</code>
+          daf&uuml;r, dass ein Strich erscheint, wenn <code>gate</code> <code>undefined</code> ist
+          (<code>a ?? b</code> liefert <code>b</code>, wenn <code>a</code> <code>null</code> oder
+          <code>undefined</code> ist, sonst <code>a</code>).
         </p>
         <div class="code-block">
           <div class="code-header">
@@ -417,97 +530,11 @@ export default FlightCard;</code></pre>
       </section>
 
       <section class="section">
-        <h2>FlightBoard &ndash; Komponenten zusammensetzen</h2>
-        <p>
-          <code>FlightBoard</code> ist eine Container-Komponente: Sie erh&auml;lt ein Array von Fl&uuml;gen und
-          einen Titel als Props und rendert f&uuml;r jeden Flug eine <code>FlightCard</code>. Wie <code>.map()</code>
-          und der <code>key</code>-Prop genau funktionieren, sehen wir weiter unten in dieser Lektion.
-        </p>
-        <div class="code-block">
-          <div class="code-header">
-            <span class="code-filename">src/components/FlightBoard.tsx</span>
-            <span class="code-lang">TypeScript</span>
-          </div>
-          <pre><code class="language-typescript">import FlightCard from './FlightCard';
-import { Flight } from '../types/flight';
-import './FlightBoard.css';
-
-interface FlightBoardProps {
-  flights: Flight[];   // Array von Fl&uuml;gen
-  title: string;       // &Uuml;berschrift der Tabelle
-}
-
-/**
- * Tabellenansicht f&uuml;r eine Liste von Fl&uuml;gen.
- */
-const FlightBoard = ({ flights, title }: FlightBoardProps) => {
-  return (
-    &lt;section className="board-section"&gt;
-      &lt;h2 className="board-title"&gt;{title}&lt;/h2&gt;
-      &lt;table className="flight-table"&gt;
-        &lt;thead&gt;
-          &lt;tr&gt;
-            &lt;th&gt;Flug&lt;/th&gt;
-            &lt;th&gt;Airline&lt;/th&gt;
-            &lt;th&gt;Ziel&lt;/th&gt;
-            &lt;th&gt;Geplant&lt;/th&gt;
-            &lt;th&gt;Status&lt;/th&gt;
-            &lt;th&gt;Terminal&lt;/th&gt;
-            &lt;th&gt;Gate&lt;/th&gt;
-          &lt;/tr&gt;
-        &lt;/thead&gt;
-        &lt;tbody&gt;
-          {flights.map((flight) => (
-            // key ist Pflicht beim Rendern von Listen &ndash; mehr dazu weiter unten
-            &lt;FlightCard key={flight.id} flight={flight} /&gt;
-          ))}
-        &lt;/tbody&gt;
-      &lt;/table&gt;
-    &lt;/section&gt;
-  );
-};
-
-export default FlightBoard;</code></pre>
-        </div>
-        <p>In <code>App.tsx</code> werden die Fl&uuml;ge nach Typ aufgeteilt und an zwei
-          <code>FlightBoard</code>-Instanzen &uuml;bergeben. Der <code>AirportHeader</code> bleibt als
-          Seitenkopf erhalten (seine &uuml;berarbeitete Fassung sehen wir im Abschnitt
-          <a href="#children-props">Children Props</a>):</p>
-        <div class="code-block">
-          <div class="code-header">
-            <span class="code-filename">src/App.tsx</span>
-            <span class="code-lang">TypeScript</span>
-          </div>
-          <pre><code class="language-typescript">import { sampleFlights } from './data/flights';
-import AirportHeader from './components/AirportHeader';
-import FlightBoard from './components/FlightBoard';
-import './App.css';
-
-function App() {
-  // Fl&uuml;ge nach Typ aufteilen
-  const departures = sampleFlights.filter(f => f.type === 'departure');
-  const arrivals   = sampleFlights.filter(f => f.type === 'arrival');
-
-  return (
-    &lt;div className="app-page"&gt;
-      &lt;AirportHeader airportName="Flughafen Wien-Schwechat" /&gt;
-
-      {/* Gleiche Komponente, unterschiedliche Props */}
-      &lt;FlightBoard flights={departures} title="Abfl&uuml;ge" /&gt;
-      &lt;FlightBoard flights={arrivals}   title="Ank&uuml;nfte" /&gt;
-    &lt;/div&gt;
-  );
-}
-
-export default App;</code></pre>
-        </div>
-      </section>
-
-      <section class="section">
         <h2>Listen mit .map() rendern</h2>
         <p>
-          Im <code>FlightBoard</code> haben wir es schon verwendet: In React rendert man Listen, indem man
-          ein Array mit der <code>.map()</code>-Methode in ein Array von JSX-Elementen umwandelt. React kann
+          Eine <code>FlightCard</code> pro Flug von Hand hinzuschreiben, w&auml;re bei acht Fl&uuml;gen m&uuml;hsam
+          und bei wechselnden Daten unm&ouml;glich. In React rendert man Listen, indem man ein Array mit der
+          <code>.map()</code>-Methode in ein Array von JSX-Elementen umwandelt. React kann
           solche Arrays direkt rendern. Das <code>key</code>-Prop ist dabei <strong>Pflicht</strong> &ndash;
           es hilft React, die Elemente bei &Auml;nderungen eindeutig zu identifizieren.
         </p>
@@ -581,93 +608,100 @@ const Stadtliste = () => (
       </section>
 
       <section class="section">
-        <h2>Conditional Rendering &ndash; Drei Patterns</h2>
+        <h2>FlightBoard &ndash; Komponenten zusammensetzen</h2>
         <p>
-          Einzelne Muster kennen wir schon: <code>{showTime &amp;&amp; ...}</code> im <code>AirportHeader</code>
-          und den Ternary-Operator f&uuml;r die Zeitanzeige in <code>FlightCard</code>. React rendert bedingt,
-          indem JavaScript-Ausdr&uuml;cke direkt in JSX verwendet werden. Es gibt drei g&auml;ngige Patterns &ndash;
-          jedes hat seine Berechtigung:
+          <code>FlightBoard</code> ist eine Container-Komponente: Sie erh&auml;lt ein Array von Fl&uuml;gen und
+          einen Titel als Props und rendert mit <code>.map()</code> f&uuml;r jeden Flug eine <code>FlightCard</code>
+          &ndash; mit der ID als <code>key</code>, wie im vorigen Abschnitt beschrieben.
         </p>
         <div class="code-block">
           <div class="code-header">
-            <span class="code-filename">Pattern 1: &amp;&amp; Operator</span>
+            <span class="code-filename">src/components/FlightBoard.tsx</span>
             <span class="code-lang">TypeScript</span>
           </div>
-          <pre><code class="language-typescript">// Wenn die Bedingung wahr ist, wird der rechte Teil gerendert.
-// Wenn falsch, wird nichts gerendert (undefined/false wird von React ignoriert).
+          <pre><code class="language-typescript">import FlightCard from './FlightCard';
+import { Flight } from '../types/flight';
+import './FlightBoard.css';
 
-{flight.status === 'delayed' &amp;&amp; (
-  &lt;span className="time-delayed"&gt;
-    Versp&auml;tet: {flight.expectedTime} Uhr
-  &lt;/span&gt;
-)}
+interface FlightBoardProps {
+  flights: Flight[];   // Array von Fl&uuml;gen
+  title: string;       // &Uuml;berschrift der Tabelle
+}
 
-{flight.gate &amp;&amp; (
-  &lt;span&gt;Gate: {flight.gate}&lt;/span&gt;
-)}
-
-// ACHTUNG: Zahlen! 0 wird als "0" gerendert, nicht als nichts!
-// FALSCH:
-{flights.length &amp;&amp; &lt;span&gt;{flights.length} Fl&uuml;ge&lt;/span&gt;}
-// Wenn flights.length === 0, wird "0" im DOM angezeigt!
-
-// RICHTIG:
-{flights.length &gt; 0 &amp;&amp; &lt;span&gt;{flights.length} Fl&uuml;ge&lt;/span&gt;}</code></pre>
-        </div>
-        <div class="code-block">
-          <div class="code-header">
-            <span class="code-filename">Pattern 2: Ternary Operator</span>
-            <span class="code-lang">TypeScript</span>
-          </div>
-          <pre><code class="language-typescript">// Bedingung ? WennWahr : WennFalsch
-// Gut, wenn es zwei alternative Darstellungen gibt.
-
-{flight.gate ? (
-  &lt;span&gt;Gate: {flight.gate}&lt;/span&gt;
-) : (
-  &lt;span&gt;Kein Gate zugewiesen&lt;/span&gt;
-)}
-
-// Auch f&uuml;r CSS-Klassen (statt Inline-Styles):
-&lt;span className={flight.status === 'cancelled' ? 'flight-num is-cancelled' : 'flight-num'}&gt;
-  {flight.flightNumber}
-&lt;/span&gt;</code></pre>
-        </div>
-        <div class="code-block">
-          <div class="code-header">
-            <span class="code-filename">Pattern 3: Fr&uuml;her Return</span>
-            <span class="code-lang">TypeScript</span>
-          </div>
-          <pre><code class="language-typescript">// F&uuml;r komplexere Logik: vor dem Haupt-JSX zur&uuml;ckkehren.
-// Gut lesbar und vermeidet tief verschachtelte Bedingungen.
-
-const FlightRow = ({ flight }: { flight: Flight }) => {
-  // Annullierte Fl&uuml;ge bekommen eine spezielle Darstellung
-  if (flight.status === 'cancelled') {
-    return (
-      &lt;tr className="flight-row is-cancelled"&gt;
-        &lt;td colSpan={7} className="flight-cell"&gt;
-          {flight.flightNumber} &ndash; {flight.airline} &ndash; Gestrichen
-        &lt;/td&gt;
-      &lt;/tr&gt;
-    );
-  }
-
-  // Normaler Fall: vollst&auml;ndige Zeile
+/**
+ * Tabellenansicht f&uuml;r eine Liste von Fl&uuml;gen.
+ */
+const FlightBoard = ({ flights, title }: FlightBoardProps) => {
   return (
-    &lt;tr&gt;
-      {/* ... alle Spalten ... */}
-    &lt;/tr&gt;
+    &lt;section className="board-section"&gt;
+      &lt;h2 className="board-title"&gt;{title}&lt;/h2&gt;
+      &lt;table className="flight-table"&gt;
+        &lt;thead&gt;
+          &lt;tr&gt;
+            &lt;th&gt;Flug&lt;/th&gt;
+            &lt;th&gt;Airline&lt;/th&gt;
+            &lt;th&gt;Ziel&lt;/th&gt;
+            &lt;th&gt;Geplant&lt;/th&gt;
+            &lt;th&gt;Status&lt;/th&gt;
+            &lt;th&gt;Terminal&lt;/th&gt;
+            &lt;th&gt;Gate&lt;/th&gt;
+          &lt;/tr&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+          {flights.map((flight) => (
+            // Stabile ID als key (nicht den Index)
+            &lt;FlightCard key={flight.id} flight={flight} /&gt;
+          ))}
+        &lt;/tbody&gt;
+      &lt;/table&gt;
+    &lt;/section&gt;
   );
-};</code></pre>
+};
+
+export default FlightBoard;</code></pre>
+        </div>
+        <p>In <code>App.tsx</code> werden die Fl&uuml;ge nach Typ aufgeteilt und an zwei
+          <code>FlightBoard</code>-Instanzen &uuml;bergeben. Daf&uuml;r verwenden wir <code>.filter()</code>: Es
+          liefert ein <strong>neues</strong> Array mit allen Elementen, f&uuml;r die die Funktion
+          <code>true</code> zur&uuml;ckgibt &ndash; hier alle Fl&uuml;ge mit <code>type === 'departure'</code>
+          bzw. <code>'arrival'</code>. Der <code>AirportHeader</code> bleibt als
+          Seitenkopf erhalten (seine &uuml;berarbeitete Fassung sehen wir im Abschnitt
+          <a href="#children-props">Children Props</a>):</p>
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">src/App.tsx</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+          <pre><code class="language-typescript">import { sampleFlights } from './data/flights';
+import AirportHeader from './components/AirportHeader';
+import FlightBoard from './components/FlightBoard';
+import './App.css';
+
+function App() {
+  // Fl&uuml;ge nach Typ aufteilen
+  const departures = sampleFlights.filter(f => f.type === 'departure');
+  const arrivals   = sampleFlights.filter(f => f.type === 'arrival');
+
+  return (
+    &lt;div className="app-page"&gt;
+      &lt;AirportHeader airportName="Flughafen Wien-Schwechat" /&gt;
+
+      {/* Gleiche Komponente, unterschiedliche Props */}
+      &lt;FlightBoard flights={departures} title="Abfl&uuml;ge" /&gt;
+      &lt;FlightBoard flights={arrivals}   title="Ank&uuml;nfte" /&gt;
+    &lt;/div&gt;
+  );
+}
+
+export default App;</code></pre>
         </div>
       </section>
 
       <section class="section">
         <h2>Listen sortieren ohne Mutation</h2>
         <p>
-          JavaScript-Array-Methoden wie <code>.filter()</code> und <code>.sort()</code> eignen sich gut,
-          um Flugdaten vor dem Rendern aufzubereiten. Aber Vorsicht: <code>.filter()</code> und
+          Neben <code>.filter()</code> eignet sich <code>.sort()</code> gut, um Flugdaten vor dem Rendern
+          aufzubereiten. Aber Vorsicht: <code>.filter()</code> und
           <code>.map()</code> liefern ein <strong>neues</strong> Array, <code>.sort()</code> dagegen
           <strong>ver&auml;ndert das Original-Array</strong>. Deshalb zuerst mit dem Spread-Operator eine
           Kopie erstellen und erst die Kopie sortieren.
