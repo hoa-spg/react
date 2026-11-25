@@ -1110,12 +1110,12 @@ html.theme-transitions *::after {
 }
 
 /* ============================================================
-   QUIZ (Multiple Choice, standardmäßig zugeklappt)
+   ZUGEKLAPPTE ABSCHNITTE: Quiz, Häufige Fehler, Aufgaben
    Generierte Kurse: Makro <quiz> in _build; React/Angular: assets/quiz.js
    ============================================================ */
 :root { --quiz-accent: var(--react); }
 
-details.quiz-box > summary {
+details:is(.quiz-box, .fold-box) > summary {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
@@ -1123,10 +1123,10 @@ details.quiz-box > summary {
   cursor: pointer;
   list-style: none;
   padding-bottom: 0.55rem;
-  border-bottom: 2px solid var(--quiz-accent);
+  border-bottom: 2px solid var(--fold-accent, var(--quiz-accent));
 }
-details.quiz-box > summary::-webkit-details-marker { display: none; }
-details.quiz-box > summary h2 {
+details:is(.quiz-box, .fold-box) > summary::-webkit-details-marker { display: none; }
+details:is(.quiz-box, .fold-box) > summary h2 {
   font-size: 1.2rem;
   font-weight: 600;
   color: var(--text-primary);
@@ -1135,17 +1135,22 @@ details.quiz-box > summary h2 {
   padding: 0;
   border: 0;
 }
-details.quiz-box > summary h2::before {
+details:is(.quiz-box, .fold-box) > summary h2::before {
   content: '\25B8';
   display: inline-block;
   width: 1.1em;
-  color: var(--quiz-accent);
+  color: var(--fold-accent, var(--quiz-accent));
 }
-details.quiz-box[open] > summary h2::before { content: '\25BE'; }
-details.quiz-box > summary:hover h2 { color: var(--quiz-accent); }
+details:is(.quiz-box, .fold-box)[open] > summary h2::before { content: '\25BE'; }
+details:is(.quiz-box, .fold-box) > summary:hover h2 { color: var(--fold-accent, var(--quiz-accent)); }
 .quiz-box-hint { color: var(--text-muted); font-size: 0.85rem; }
-details.quiz-box[open] .quiz-box-hint { visibility: hidden; }
-details.quiz-box > .quiz { margin-top: 1.25rem; }
+details:is(.quiz-box, .fold-box)[open] .quiz-box-hint { visibility: hidden; }
+details.quiz-box > .quiz,
+details.fold-box > .fold-body { margin-top: 1.25rem; }
+
+/* Häufige Fehler und Aufgaben: gleiche Darstellung, eigene Linienfarbe */
+.section-fehler   { --fold-accent: var(--red); }
+.section-aufgaben { --fold-accent: var(--rn); }
 
 .quiz { display: flex; flex-direction: column; gap: 1rem; }
 
@@ -1235,3 +1240,22 @@ details.quiz-box > .quiz { margin-top: 1.25rem; }
   color: var(--text-muted);
 }
 .quiz-score { font-weight: 600; }
+
+/* Link zurück zur Landing Page (ganz unten in der Seitenleiste) */
+.sidebar-footer {
+  border-top: 1px solid var(--border);
+  padding: 0.6rem 0;
+}
+.sidebar-home {
+  display: block;
+  padding: 0.45rem 1.25rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.12s, background 0.12s;
+}
+.sidebar-home:hover {
+  background: rgba(255,255,255,0.04);
+  color: var(--text-primary);
+}

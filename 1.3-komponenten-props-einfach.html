@@ -68,6 +68,9 @@
         <a class="nav-link" href="4.3-rn-navigation.html"><span class="ln">4.3</span>Navigation &amp; State</a>
       </div>
     </nav>
+    <div class="sidebar-footer">
+      <a class="sidebar-home" href="https://hoa-spg.github.io/">&larr; Kursseite</a>
+    </div>
   </aside>
 
   <main class="main-content">
@@ -90,6 +93,7 @@
           <li>Einfache Props zwischen Eltern- und Kindkomponenten weitergeben</li>
           <li>Ohne komplizierte Typ-Tricks eine kleine Struktur aufbauen</li>
           <li>Erste Aufteilung von <code>App.tsx</code> in mehrere Dateien umsetzen</li>
+          <li>Erklären, warum Komponenten-CSS global wirkt und was CSS Modules daran ändern</li>
         </ul>
       </section>
 
@@ -179,6 +183,118 @@ export default FlightRow;</code></pre>
             <p>
               Diese Lektion ist als sanfter Einstieg gedacht. Die erweiterten TypeScript-Muster
               (Union-Typen, Record, Destructuring, Spread) kommen erst in der Lektion 1.4.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>3 &mdash; Exkurs: Ist Komponenten-CSS gekapselt?</h2>
+        <p>
+          Jede Komponente bekommt bei uns eine eigene CSS-Datei, die sie mit
+          <code>import './FlightRow.css';</code> einbindet. Das sieht so aus, als w&uuml;rden die Regeln nur
+          f&uuml;r diese Komponente gelten. Das stimmt aber <strong>nicht</strong>: Vite sammelt alle importierten
+          CSS-Dateien in einem gemeinsamen Stylesheet. Jede Regel gilt also f&uuml;r die <strong>ganze Seite</strong>.
+        </p>
+        <p>
+          Solange jede Klasse einen eindeutigen Namen hat, ist das kein Problem. Gibt es aber in
+          <code>FlightRow.css</code> und in <code>AirportHeader.css</code> je eine Klasse <code>.title</code>,
+          dann wirken beide Regeln auf beide Komponenten &ndash; und bei Widerspr&uuml;chen gewinnt wie immer die
+          sp&auml;ter geladene Regel (Cascade aus dem HTML-&amp;-CSS-Kurs).
+        </p>
+
+        <h3>Die Alternative: CSS Modules</h3>
+        <p>
+          Endet der Dateiname auf <code>.module.css</code>, behandelt Vite die Datei als <strong>CSS Module</strong>:
+          Jede Klasse bekommt beim Bauen einen eindeutigen Namen, z.&nbsp;B. wird aus <code>.cell</code> die
+          Klasse <code>._cell_1mp39_1</code>. Eine gleichnamige Klasse in einer anderen Komponente st&ouml;rt dann
+          nicht mehr.
+        </p>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">src/components/FlightRow.module.css</span>
+            <span class="code-lang">CSS</span>
+          </div>
+<pre><code class="language-css">.cell {
+  border-bottom: 1px solid #30363d;
+  padding: 0.7rem 1rem;
+}</code></pre>
+        </div>
+
+        <p>
+          Weil der echte Klassenname erst beim Bauen entsteht, kann man ihn nicht als Text in
+          <code>className</code> schreiben. Stattdessen liefert der Import ein <strong>Objekt</strong>
+          (hier <code>styles</code> genannt), das jeden Klassennamen aus der Datei auf den erzeugten Namen
+          abbildet: <code>styles.cell</code> enth&auml;lt <code>"_cell_1mp39_1"</code>.
+        </p>
+
+        <div class="code-block">
+          <div class="code-header">
+            <span class="code-filename">src/components/FlightRow.tsx (als CSS Module)</span>
+            <span class="code-lang">TypeScript</span>
+          </div>
+<pre><code class="language-typescript">import styles from './FlightRow.module.css';
+
+// ... FlightRowProps wie oben
+
+const FlightRow = (props: FlightRowProps) =&gt; {
+  return (
+    &lt;tr&gt;
+      &lt;td className={styles.cell}&gt;{props.flightNumber}&lt;/td&gt;
+      &lt;td className={styles.cell}&gt;{props.airline}&lt;/td&gt;
+      &lt;td className={styles.cell}&gt;{props.destination}&lt;/td&gt;
+      &lt;td className={styles.cell}&gt;{props.time}&lt;/td&gt;
+    &lt;/tr&gt;
+  );
+};</code></pre>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th></th>
+                <th>Normales CSS (<code>FlightRow.css</code>)</th>
+                <th>CSS Module (<code>FlightRow.module.css</code>)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Import</td>
+                <td><code>import './FlightRow.css';</code></td>
+                <td><code>import styles from './FlightRow.module.css';</code></td>
+              </tr>
+              <tr>
+                <td>Klasse verwenden</td>
+                <td><code>className="flight-row-cell"</code></td>
+                <td><code>className={styles.cell}</code></td>
+              </tr>
+              <tr>
+                <td>G&uuml;ltigkeit</td>
+                <td>ganze Seite &ndash; Namen m&uuml;ssen eindeutig sein</td>
+                <td>nur die Komponente, die das Modul importiert</td>
+              </tr>
+              <tr>
+                <td>In den DevTools</td>
+                <td>lesbar: <code>flight-row-cell</code></td>
+                <td>erzeugt: <code>_cell_1mp39_1</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout-info">
+          <div class="callout-icon">&#8505;</div>
+          <div class="callout-body">
+            <div class="callout-title">Warum der Kurs bei normalem CSS bleibt</div>
+            <p>
+              Im FlugBoard beginnt jede Klasse mit dem Namen ihrer Komponente (<code>flight-row-cell</code>,
+              sp&auml;ter z.&nbsp;B. <code>status-pill</code>). So entstehen keine Kollisionen, die Klassennamen
+              bleiben in den Entwicklertools lesbar, und du kannst alles anwenden, was du im HTML-&amp;-CSS-Kurs
+              gelernt hast. In gr&ouml;&szlig;eren Projekten mit vielen Komponenten sind CSS Modules eine gute
+              Wahl &ndash; Vite und Next.js unterst&uuml;tzen sie ohne zus&auml;tzliche Einrichtung. Probiere es in
+              der Bonus-Aufgabe aus.
             </p>
           </div>
         </div>
@@ -369,7 +485,9 @@ export default Welcome;</code></pre>
       </section>
 
       <section class="section section-fehler">
-        <h2>H&auml;ufige Fehler</h2>
+<details class="fold-box">
+<summary><h2>H&auml;ufige Fehler</h2><span class="quiz-box-hint">3 Fehler &middot; zum Aufklappen klicken</span></summary>
+<div class="fold-body">
 
         <div class="fehler-item">
           <div class="fehler-title">Fehler: Komponentenname klein geschrieben</div>
@@ -394,10 +512,14 @@ export default Welcome;</code></pre>
           </p>
           <p class="fehler-fix">Jede Komponenten-Datei mit <code>export default ...;</code> abschlie&szlig;en.</p>
         </div>
+</div>
+</details>
       </section>
 
       <section class="section section-aufgaben">
-        <h2>Aufgaben</h2>
+<details class="fold-box">
+<summary><h2>Aufgaben</h2><span class="quiz-box-hint">3 Aufgaben + Bonus &middot; zum Aufklappen klicken</span></summary>
+<div class="fold-body">
         <div class="aufgaben-list">
           <div class="aufgabe">
             <div class="aufgabe-header">
@@ -438,7 +560,27 @@ export default Welcome;</code></pre>
               Flugnummer in der Konsole aus.
             </p>
           </div>
+
+          <div class="aufgabe aufgabe-bonus">
+            <div class="aufgabe-header">
+              <span class="aufgabe-num">Bonus</span>
+              <span class="aufgabe-title">FlightRow als CSS Module</span>
+            </div>
+            <p>
+              Schreibe zuerst testweise in <code>AirportHeader.css</code> die Regel
+              <code>.flight-row-cell { color: red; }</code>. Obwohl sie in der Datei einer anderen Komponente
+              steht, werden die Tabellenzellen rot &ndash; ein Beweis, dass normales Komponenten-CSS global wirkt.
+            </p>
+            <p>
+              Stelle dann <code>FlightRow</code> wie im Exkurs auf <code>FlightRow.module.css</code> mit der
+              Klasse <code>.cell</code> und <code>className={styles.cell}</code> um. Sieh dir im Tab
+              <em>Elements</em> der Entwicklertools den Klassennamen der Zellen an. Sind sie noch rot? Warum
+              nicht? Entferne zum Schluss die Test-Regel wieder.
+            </p>
+          </div>
         </div>
+</div>
+</details>
       </section>
 
       <section class="section">
@@ -459,7 +601,7 @@ export default Welcome;</code></pre>
 
       <section class="section section-quiz">
         <details class="quiz-box">
-<summary><h2>Quiz</h2><span class="quiz-box-hint">5 Fragen &middot; zum Aufklappen klicken</span></summary>
+<summary><h2>Quiz</h2><span class="quiz-box-hint">6 Fragen &middot; zum Aufklappen klicken</span></summary>
 <div class="quiz" id="quiz-1">
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 1</span> Was ist eine React-Komponente technisch?</p>
@@ -520,6 +662,18 @@ export default Welcome;</code></pre>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
     <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Jede Komponenten-Datei endet mit einem Export, z. B. <code>export default FlightRow;</code>.</div>
+  </div>
+  <div class="quiz-frage" data-multi="0">
+    <p class="quiz-q"><span class="quiz-num">Frage 6</span> Gelten die Regeln aus <code>import './FlightRow.css';</code> nur für die Komponente <code>FlightRow</code>?</p>
+    <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-6"> <span>Ja, jede importierte CSS-Datei gilt nur für die Komponente, die sie importiert</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-6"> <span>Nein, die Regeln gelten für die ganze Seite – gekapselt wären sie erst als CSS Module (<code>FlightRow.module.css</code>)</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-6"> <span>Ja, aber nur im Entwicklungsmodus</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-6"> <span>Nein, die Regeln gelten gar nicht, weil CSS in React nicht importiert werden darf</span></label></li>
+    </ul>
+    <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
+    <p class="quiz-feedback" hidden></p>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Vite fasst alle importierten CSS-Dateien zu einem Stylesheet zusammen. Erst bei <code>.module.css</code> bekommt jede Klasse einen eindeutigen Namen, und man verwendet sie über das importierte Objekt, z. B. <code>className={styles.cell}</code>.</div>
   </div>
   <div class="quiz-summary"><span class="quiz-score"></span><button type="button" class="quiz-reset">Zur&uuml;cksetzen</button></div>
 </div>

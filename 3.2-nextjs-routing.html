@@ -60,6 +60,9 @@
       <a class="nav-link" href="4.3-rn-navigation.html"><span class="ln">4.3</span>Navigation &amp; State</a>
     </div>
   </nav>
+  <div class="sidebar-footer">
+    <a class="sidebar-home" href="https://hoa-spg.github.io/">&larr; Kursseite</a>
+  </div>
 </aside>
 
 <main class="main-content">
@@ -675,7 +678,9 @@ export default function DeparturePage() {
 
   <!-- FEHLER -->
   <section class="section section-fehler">
-    <h2>H&auml;ufige Fehler</h2>
+<details class="fold-box">
+<summary><h2>H&auml;ufige Fehler</h2><span class="quiz-box-hint">4 Fehler &middot; zum Aufklappen klicken</span></summary>
+<div class="fold-body">
 
     <div class="fehler-item">
       <div class="fehler-title">Fehler: <code>params</code> nicht awaited</div>
@@ -732,11 +737,15 @@ export default function DeparturePage() {
         Benenne den Ordner um und starte den Dev-Server neu.
       </p>
     </div>
+</div>
+</details>
   </section>
 
   <!-- AUFGABEN -->
   <section class="section section-aufgaben">
-    <h2>Aufgaben</h2>
+<details class="fold-box">
+<summary><h2>Aufgaben</h2><span class="quiz-box-hint">3 Aufgaben + Bonus &middot; zum Aufklappen klicken</span></summary>
+<div class="fold-body">
     <div class="aufgaben-list">
 
       <div class="aufgabe">
@@ -806,6 +815,8 @@ export default function DeparturePage() {
       </div>
 
     </div>
+</div>
+</details>
   </section>
 
       <section class="section section-quiz">

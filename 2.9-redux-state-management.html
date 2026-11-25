@@ -60,6 +60,9 @@
       <a class="nav-link" href="4.3-rn-navigation.html"><span class="ln">4.3</span>Navigation &amp; State</a>
     </div>
   </nav>
+  <div class="sidebar-footer">
+    <a class="sidebar-home" href="https://hoa-spg.github.io/">&larr; Kursseite</a>
+  </div>
 </aside>
 
 <main class="main-content">
@@ -463,7 +466,9 @@ const handleStatusChange = (id: number, status: FlightStatus) =&gt; {
     </section>
 
     <section class="section section-fehler">
-      <h2>H&auml;ufige Architekturfehler</h2>
+<details class="fold-box">
+<summary><h2>H&auml;ufige Architekturfehler</h2><span class="quiz-box-hint">3 Fehler &middot; zum Aufklappen klicken</span></summary>
+<div class="fold-body">
       <div class="fehler-item">
         <h3>Zu fr&uuml;h Redux einf&uuml;hren</h3>
         <p class="fehler-fix">
@@ -485,10 +490,14 @@ const handleStatusChange = (id: number, status: FlightStatus) =&gt; {
           bleiben weiterhin entscheidend.
         </p>
       </div>
+</div>
+</details>
     </section>
 
     <section class="section section-aufgaben">
-      <h2>Aufgaben (ohne eigenes Projekt)</h2>
+<details class="fold-box">
+<summary><h2>Aufgaben (ohne eigenes Projekt)</h2><span class="quiz-box-hint">2 Aufgaben + Bonus &middot; zum Aufklappen klicken</span></summary>
+<div class="fold-body">
       <div class="aufgabe">
         <div class="aufgabe-header">
           <span class="aufgabe-num">1</span>
@@ -515,6 +524,8 @@ const handleStatusChange = (id: number, status: FlightStatus) =&gt; {
         </div>
         <p>Definiert Kriterien, ab wann ihr von Context auf Redux Toolkit wechseln w&uuml;rdet, und skizziert daf&uuml;r 3 konkrete Migrationsschritte.</p>
       </div>
+</div>
+</details>
     </section>
 
       <section class="section section-quiz">

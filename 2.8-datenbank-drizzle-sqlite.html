@@ -60,6 +60,9 @@
       <a class="nav-link" href="4.3-rn-navigation.html"><span class="ln">4.3</span>Navigation &amp; State</a>
     </div>
   </nav>
+  <div class="sidebar-footer">
+    <a class="sidebar-home" href="https://hoa-spg.github.io/">&larr; Kursseite</a>
+  </div>
 </aside>
 
 <main class="main-content">
@@ -469,7 +472,9 @@ console.log('FlugBoard API (Drizzle + SQLite) läuft auf http://localhost:8000')
     </section>
 
     <section class="section section-fehler">
-      <h2>H&auml;ufige Fehler</h2>
+<details class="fold-box">
+<summary><h2>H&auml;ufige Fehler</h2><span class="quiz-box-hint">3 Fehler &middot; zum Aufklappen klicken</span></summary>
+<div class="fold-body">
       <div class="fehler-item">
         <h3>Fehlende Deno-Rechte (<code>NotCapable</code>)</h3>
         <p>
@@ -505,10 +510,14 @@ console.log('FlugBoard API (Drizzle + SQLite) läuft auf http://localhost:8000')
           <code>updateFlightStatus</code> in <code>db.ts</code> anlegen und im PATCH-Handler verwenden.
         </p>
       </div>
+</div>
+</details>
     </section>
 
     <section class="section section-aufgaben">
-      <h2>Aufgaben</h2>
+<details class="fold-box">
+<summary><h2>Aufgaben</h2><span class="quiz-box-hint">2 Aufgaben + Bonus &middot; zum Aufklappen klicken</span></summary>
+<div class="fold-body">
       <div class="aufgabe">
         <div class="aufgabe-header">
           <span class="aufgabe-num">1</span>
@@ -537,6 +546,8 @@ console.log('FlugBoard API (Drizzle + SQLite) läuft auf http://localhost:8000')
           <code>curl http://localhost:8000/api/flights</code>, dass die Liste nach Zeit sortiert ankommt.
         </p>
       </div>
+</div>
+</details>
     </section>
 
       <section class="section section-quiz">

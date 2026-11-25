@@ -68,6 +68,9 @@
         <a class="nav-link" href="4.3-rn-navigation.html"><span class="ln">4.3</span>Navigation &amp; State</a>
       </div>
     </nav>
+    <div class="sidebar-footer">
+      <a class="sidebar-home" href="https://hoa-spg.github.io/">&larr; Kursseite</a>
+    </div>
   </aside>
 
   <main class="main-content">
@@ -738,7 +741,9 @@ const App = () =&gt; {
 
       <!-- H&Auml;UFIGE FEHLER -->
       <section class="section section-fehler">
-        <h2>H&auml;ufige Fehler</h2>
+<details class="fold-box">
+<summary><h2>H&auml;ufige Fehler</h2><span class="quiz-box-hint">4 Fehler &middot; zum Aufklappen klicken</span></summary>
+<div class="fold-body">
 
         <div class="fehler-item">
           <div class="fehler-title">Fehler: Context au&szlig;erhalb des Providers verwenden</div>
@@ -803,11 +808,15 @@ const App = () =&gt; {
             <code>createContext&lt;ThemeContextType | null&gt;(null)</code> und im Custom Hook pr&uuml;fen.
           </p>
         </div>
+</div>
+</details>
       </section>
 
       <!-- AUFGABEN -->
       <section class="section section-aufgaben">
-        <h2>Aufgaben</h2>
+<details class="fold-box">
+<summary><h2>Aufgaben</h2><span class="quiz-box-hint">3 Aufgaben + Bonus &middot; zum Aufklappen klicken</span></summary>
+<div class="fold-body">
 
         <div class="aufgabe">
           <div class="aufgabe-header">
@@ -900,6 +909,8 @@ const App = () =&gt; {
             </li>
           </ul>
         </div>
+</div>
+</details>
       </section>
 
       <section class="section section-quiz">

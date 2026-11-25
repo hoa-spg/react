@@ -60,6 +60,9 @@
       <a class="nav-link" href="4.3-rn-navigation.html"><span class="ln">4.3</span>Navigation &amp; State</a>
     </div>
   </nav>
+  <div class="sidebar-footer">
+    <a class="sidebar-home" href="https://hoa-spg.github.io/">&larr; Kursseite</a>
+  </div>
 </aside>
 
 <main class="main-content">
@@ -452,7 +455,9 @@ sudo systemctl restart flugboard</code></pre>
 
   <!-- FEHLER -->
   <section class="section section-fehler">
-    <h2>H&auml;ufige Fehler</h2>
+<details class="fold-box">
+<summary><h2>H&auml;ufige Fehler</h2><span class="quiz-box-hint">4 Fehler &middot; zum Aufklappen klicken</span></summary>
+<div class="fold-body">
     <div class="fehler-item">
       <div class="fehler-title">Fehler: <code>Could not find a production build</code></div>
       <p><code>npm start</code> bricht sofort ab, weil im Ordner <code>.next/</code> noch kein Build liegt.</p>
@@ -473,11 +478,15 @@ sudo systemctl restart flugboard</code></pre>
       <p>Eine Client Component liest <code>process.env.APP_NAME</code> und bekommt <code>undefined</code>.</p>
       <p class="fehler-fix"><strong>Fix:</strong> Werte f&uuml;r den Browser hei&szlig;en <code>NEXT_PUBLIC_APP_NAME</code> &mdash; aber nur, wenn sie nicht geheim sind. Nach einer &Auml;nderung neu bauen, weil sie beim Build eingesetzt werden.</p>
     </div>
+</div>
+</details>
   </section>
 
   <!-- AUFGABEN -->
   <section class="section section-aufgaben">
-    <h2>Aufgaben</h2>
+<details class="fold-box">
+<summary><h2>Aufgaben</h2><span class="quiz-box-hint">3 Aufgaben + Bonus &middot; zum Aufklappen klicken</span></summary>
+<div class="fold-body">
     <div class="aufgaben-list">
 
       <div class="aufgabe">
@@ -529,6 +538,8 @@ sudo systemctl restart flugboard</code></pre>
       </div>
 
     </div>
+</div>
+</details>
   </section>
 
   <!-- ABSCHLUSS TEIL 3 -->
