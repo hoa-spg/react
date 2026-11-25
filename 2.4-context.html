@@ -133,7 +133,7 @@
             </tr>
             <tr style="border-bottom: 1px solid #21262d;">
               <td style="padding: 0.75rem; font-weight: 600; color: #3fb950;">2. Wert bereitstellen</td>
-              <td style="padding: 0.75rem;"><code>&lt;Context.Provider value={...}&gt;</code></td>
+              <td style="padding: 0.75rem;"><code>&lt;Context value={...}&gt;</code></td>
               <td style="padding: 0.75rem; color: #8b949e;">In der Eltern- oder Root-Komponente</td>
             </tr>
             <tr>
@@ -143,6 +143,20 @@
             </tr>
           </tbody>
         </table>
+
+        <div class="callout callout-info">
+          <div class="callout-icon">&#8505;</div>
+          <div class="callout-body">
+            <div class="callout-title">&lt;Context&gt; statt &lt;Context.Provider&gt;</div>
+            <p>
+              Seit React&nbsp;19 ist das Context-Objekt selbst die Komponente, die den Wert bereitstellt:
+              <code>&lt;ThemeContext value={...}&gt;</code>. Eine solche Komponente nennt man
+              <strong>Provider</strong>. In &auml;lterem Code und vielen Tutorials steht stattdessen
+              <code>&lt;ThemeContext value={...}&gt;</code> &ndash; das funktioniert weiterhin
+              und bedeutet genau dasselbe, soll aber k&uuml;nftig wegfallen.
+            </p>
+          </div>
+        </div>
 
         <div class="callout callout-info">
           <div class="callout-icon">&#8505;</div>
@@ -199,9 +213,9 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) =&gt; {
   const toggleTheme = () =&gt; setTheme(t =&gt; (t === 'dark' ? 'light' : 'dark'));
 
   return (
-    &lt;ThemeContext.Provider value={{ theme, toggleTheme }}&gt;
+    &lt;ThemeContext value={{ theme, toggleTheme }}&gt;
       {children}
-    &lt;/ThemeContext.Provider&gt;
+    &lt;/ThemeContext&gt;
   );
 };
 
@@ -343,9 +357,9 @@ export const FlugBoardProvider = ({ children }: { children: ReactNode }) =&gt; {
   }), [flights, isLoading, error, searchQuery, selectedFlight]);
 
   return (
-    &lt;FlugBoardContext.Provider value={value}&gt;
+    &lt;FlugBoardContext value={value}&gt;
       {children}
-    &lt;/FlugBoardContext.Provider&gt;
+    &lt;/FlugBoardContext&gt;
   );
 };
 
@@ -511,9 +525,9 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) =&gt; {
   const colors = theme === 'dark' ? DARK : LIGHT;
 
   return (
-    &lt;ThemeContext.Provider value={{ theme, toggleTheme, colors }}&gt;
+    &lt;ThemeContext value={{ theme, toggleTheme, colors }}&gt;
       {children}
-    &lt;/ThemeContext.Provider&gt;
+    &lt;/ThemeContext&gt;
   );
 };
 
@@ -767,7 +781,7 @@ const App = () =&gt; {
         <div class="fehler-item">
           <div class="fehler-title">Fehler: Neues Objekt als value bei jedem Render</div>
           <p>
-            <code>&lt;Context.Provider value={{ theme, toggleTheme }}&gt;</code> erstellt bei jedem
+            <code>&lt;Context value={{ theme, toggleTheme }}&gt;</code> erstellt bei jedem
             Render des Providers ein <em>neues</em> Objekt, auch wenn sich <code>theme</code> und
             <code>toggleTheme</code> nicht ge&auml;ndert haben. React f&uuml;hrt einen Referenzvergleich
             durch &ndash; neues Objekt bedeutet neue Referenz, bedeutet alle Consumer re-rendern.
@@ -923,9 +937,9 @@ const App = () =&gt; {
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 1</span> Welche drei Schritte gehören zur Verwendung eines Context?</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>import, export, render</span></label></li>
       <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-1"> <span>Context mit <code>createContext</code> erstellen, mit einem Provider Werte bereitstellen, mit <code>useContext</code> lesen</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span><code>useState</code>, <code>useEffect</code>, <code>useMemo</code></span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>import, export, render</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Store, Action, Reducer</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
@@ -935,10 +949,10 @@ const App = () =&gt; {
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 2</span> Warum exportiert man einen Custom Hook wie <code>useTheme()</code> statt den <code>ThemeContext</code> direkt?</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Weil <code>useContext</code> veraltet ist</span></label></li>
       <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-2"> <span>Weil man so einen zentralen Ort für zusätzliche Logik hat, z. B. eine Fehlermeldung, wenn kein Provider vorhanden ist</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Weil Contexts sonst nicht typisiert werden können</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Weil der Context sonst bei jedem Render neu erstellt wird</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Weil <code>useContext</code> veraltet ist</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Weil Contexts sonst nicht typisiert werden können</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
@@ -947,33 +961,34 @@ const App = () =&gt; {
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 3</span> Wozu dient <code>useMemo</code> beim <code>value</code>-Objekt eines Providers?</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Es speichert den Wert im localStorage</span></label></li>
       <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-3"> <span>Das Objekt wird nur neu erstellt, wenn sich einer seiner Werte ändert – sonst würden alle Konsumenten bei jedem Render des Providers neu rendern</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Es macht den Context schreibgeschützt</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Es ist für Context vorgeschrieben</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Es macht den Context schreibgeschützt</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Es speichert den Wert im localStorage</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
     <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Ein neues Objekt hat eine neue Referenz – und React behandelt das als geänderten Wert.</div>
   </div>
-  <div class="quiz-frage" data-multi="0">
+  <div class="quiz-frage" data-multi="1">
     <p class="quiz-q"><span class="quiz-num">Frage 4</span> Wann sind Props die bessere Wahl als Context?</p>
+    <p class="quiz-hint">Mehrere Antworten sind richtig.</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Nie, Context ist immer besser</span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-4"> <span>Wenn Daten nur eine oder zwei Ebenen überbrücken – Props machen den Datenfluss explizit und nachvollziehbar</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Nur bei Zahlen</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Wenn die App TypeScript verwendet</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-4"> <span>Wenn Daten nur eine oder zwei Ebenen überbrücken – Props machen den Datenfluss explizit und nachvollziehbar</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-4"> <span>Wenn nur eine einzelne Kind-Komponente die Daten braucht</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-4"> <span>Wenn die App TypeScript verwendet</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-4"> <span>Nie, Context ist immer besser</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
-    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Context eignet sich für Daten, die viele Komponenten an verschiedenen Stellen brauchen, z. B. Theme oder angemeldete Person.</div>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Props machen den Datenfluss explizit und nachvollziehbar. Sie sind die richtige Wahl, wenn Daten nur eine oder zwei Ebenen überbrücken oder nur eine einzelne Kind-Komponente sie braucht. Context lohnt sich für Daten, die wirklich „global“ für einen Teilbaum sind. Datentyp und TypeScript spielen keine Rolle.</div>
   </div>
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 5</span> Wo wird der <code>ThemeProvider</code> im FlugBoard eingebunden?</p>
     <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>In <code>index.html</code></span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>In jeder Komponente, die das Theme braucht</span></label></li>
       <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-5"> <span>In <code>main.tsx</code> um die gesamte App</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>In <code>index.html</code></span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>In der CSS-Datei</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>

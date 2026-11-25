@@ -455,7 +455,7 @@ const FlightCard = ({
               Bei React-Eventhandlern immer den React-spezifischen Eventtyp verwenden:
               <code>React.ChangeEvent&lt;HTMLSelectElement&gt;</code>,
               <code>React.MouseEvent&lt;HTMLButtonElement&gt;</code>,
-              <code>React.FormEvent&lt;HTMLFormElement&gt;</code> usw.
+              <code>React.SubmitEvent&lt;HTMLFormElement&gt;</code> usw.
               Diese Typen kennen das <code>target</code>-Objekt korrekt und erm&ouml;glichen
               typsichere Zugriffe auf Werte wie <code>e.target.value</code>.
             </p>
@@ -840,46 +840,48 @@ app.patch('/api/flights/:id', async (c) =&gt; {
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 1</span> Zwei Geschwister-Komponenten brauchen denselben Wert. Wo platziert man den State?</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>In beiden Komponenten getrennt</span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-1"> <span>In der gemeinsamen Eltern-Komponente – so tief wie möglich, so hoch wie nötig</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Immer ganz oben in <code>main.tsx</code></span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>In einer globalen Variable außerhalb von React</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>In beiden Komponenten getrennt</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Immer ganz oben in <code>main.tsx</code></span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-1"> <span>In der gemeinsamen Eltern-Komponente – so tief wie möglich, so hoch wie nötig</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
     <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Das ist „Lifting State Up“: Die Eltern-Komponente hält den State und gibt Wert und Callback per Props weiter.</div>
   </div>
-  <div class="quiz-frage" data-multi="0">
-    <p class="quiz-q"><span class="quiz-num">Frage 2</span> Wie meldet eine Kind-Komponente ein Ereignis an die Eltern-Komponente?</p>
+  <div class="quiz-frage" data-multi="1">
+    <p class="quiz-q"><span class="quiz-num">Frage 2</span> Welche Aussagen zur Kommunikation von einer Kind- zur Eltern-Komponente sind richtig?</p>
+    <p class="quiz-hint">Mehrere Antworten sind richtig.</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Sie ändert direkt die Props</span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-2"> <span>Sie ruft eine Callback-Funktion auf, die sie als Prop bekommen hat (z. B. <code>onFlightSelect(flight.id)</code>)</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Sie schreibt in den State der Eltern-Komponente</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Sie löst ein DOM-Event aus</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-2"> <span>Sie löst ein DOM-Event aus</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-2"> <span>Die Eltern-Komponente übergibt eine Funktion als Prop, die ihren eigenen State ändert</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-2"> <span>Sie ruft eine Callback-Funktion auf, die sie als Prop bekommen hat (z. B. <code>onFlightSelect(flight.id)</code>)</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-2"> <span>Das Kind ändert direkt die Props, die es bekommen hat</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
-    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Daten fließen nach unten, Ereignisse über Callbacks nach oben.</div>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Das Kind ruft eine Callback-Funktion auf, die es als Prop bekommen hat. Diese Funktion gehört der Eltern-Komponente und ändert deren State. Props direkt ändern oder in den State der Eltern schreiben kann das Kind nicht; ein DOM-Event ist dafür nicht der Weg.</div>
   </div>
-  <div class="quiz-frage" data-multi="0">
-    <p class="quiz-q"><span class="quiz-num">Frage 3</span> Was bezeichnet man als <strong>Prop Drilling</strong>?</p>
+  <div class="quiz-frage" data-multi="1">
+    <p class="quiz-q"><span class="quiz-num">Frage 3</span> Was trifft auf <strong>Prop Drilling</strong> zu?</p>
+    <p class="quiz-hint">Mehrere Antworten sind richtig.</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Das Testen von Props</span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-3"> <span>Ein Prop wird durch mehrere Zwischenkomponenten gereicht, die ihn selbst gar nicht brauchen</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Das Umbenennen von Props</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Props mit sehr vielen Eigenschaften</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-3"> <span>Je mehr Zwischenebenen, desto mühsamer werden Änderungen – jede Ebene muss den Prop weiterreichen</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-3"> <span>Ein Prop wird durch mehrere Zwischenkomponenten gereicht, die ihn selbst gar nicht brauchen</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-3"> <span>Das Testen von Props</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-3"> <span>Das Umbenennen von Props</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
-    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Bei tiefen Hierarchien wird das unübersichtlich. Eine Lösung ist die Context API (Lektion 2.4).</div>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Beim Prop Drilling wird ein Prop durch mehrere Zwischenkomponenten gereicht, die ihn selbst gar nicht brauchen. Bei wenigen Ebenen ist das unproblematisch; wird die Kette lang, macht es Änderungen mühsam. Mit Testen oder Umbenennen von Props hat der Begriff nichts zu tun.</div>
   </div>
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 4</span> Wie typisiert man eine Callback-Prop, die eine Flug-ID bekommt und nichts zurückgibt?</p>
     <ul class="quiz-opts">
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span><code>onFlightSelect: Function</code></span></label></li>
       <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-4"> <span><code>onFlightSelect: (id: number) =&gt; void</code></span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span><code>onFlightSelect: void</code></span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span><code>onFlightSelect: number</code></span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span><code>onFlightSelect: void</code></span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
@@ -888,10 +890,10 @@ app.patch('/api/flights/:id', async (c) =&gt; {
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 5</span> Wie hebt <code>FlightBoard</code> die ausgewählte Zeile hervor, ohne dass <code>FlightCard</code> den State kennt?</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span><code>FlightCard</code> liest den State über <code>document.querySelector</code></span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-5"> <span><code>FlightBoard</code> bekommt <code>selectedFlightId</code> und gibt jeder Karte ein berechnetes <code>isSelected</code> als Prop</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Jede <code>FlightCard</code> hat einen eigenen <code>selected</code>-State</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Über eine globale CSS-Klasse</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-5"> <span><code>FlightBoard</code> bekommt <code>selectedFlightId</code> und gibt jeder Karte ein berechnetes <code>isSelected</code> als Prop</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span><code>FlightCard</code> liest den State über <code>document.querySelector</code></span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Jede <code>FlightCard</code> hat einen eigenen <code>selected</code>-State</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>

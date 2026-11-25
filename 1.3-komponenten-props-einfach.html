@@ -610,9 +610,9 @@ export default Welcome;</code></pre>
     <p class="quiz-q"><span class="quiz-num">Frage 1</span> Was ist eine React-Komponente technisch?</p>
     <ul class="quiz-opts">
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Eine HTML-Datei</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Ein Objekt mit einer <code>render</code>-Eigenschaft</span></label></li>
       <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-1"> <span>Eine Funktion, die JSX zurückgibt</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Eine CSS-Klasse</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Ein Objekt mit einer <code>render</code>-Eigenschaft</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
@@ -621,34 +621,35 @@ export default Welcome;</code></pre>
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 2</span> Was passiert bei <code>&lt;flightrow /&gt;</code> (klein geschrieben)?</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>React findet die Komponente trotzdem</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Die Komponente wird doppelt gerendert</span></label></li>
       <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-2"> <span>React interpretiert es als (unbekannten) HTML-Tag, nicht als Komponente</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Der Build bricht ab</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Die Komponente wird doppelt gerendert</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>React findet die Komponente trotzdem</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
     <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Komponentennamen immer in PascalCase schreiben: <code>&lt;FlightRow /&gt;</code>.</div>
   </div>
-  <div class="quiz-frage" data-multi="0">
-    <p class="quiz-q"><span class="quiz-num">Frage 3</span> Was sind <strong>Props</strong>?</p>
+  <div class="quiz-frage" data-multi="1">
+    <p class="quiz-q"><span class="quiz-num">Frage 3</span> Was trifft auf <strong>Props</strong> zu?</p>
+    <p class="quiz-hint">Mehrere Antworten sind richtig.</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Der interne Speicher einer Komponente</span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-3"> <span>Eingabewerte, die eine Eltern-Komponente an eine Kind-Komponente übergibt</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>CSS-Eigenschaften einer Komponente</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Globale Variablen der App</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-3"> <span>Man übergibt sie im JSX wie HTML-Attribute, z. B. <code>&lt;FlightRow destination="Wien" /&gt;</code></span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-3"> <span>Globale Variablen der App</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-3"> <span>Der interne Speicher einer Komponente</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-3"> <span>Eingabewerte, die eine Eltern-Komponente an eine Kind-Komponente übergibt</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
-    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Props funktionieren wie Funktionsargumente, z. B. <code>&lt;FlightRow destination="Wien" /&gt;</code>.</div>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Props sind Eingabewerte, die eine Eltern-Komponente an eine Kind-Komponente übergibt – im JSX wie HTML-Attribute. Der interne Speicher einer Komponente ist der State, nicht die Props; globale Variablen oder CSS-Eigenschaften sind Props auch nicht.</div>
   </div>
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 4</span> Du übergibst <code>destination="Wien"</code>, die Komponente liest aber <code>props.airport</code>. Was passiert?</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>React ordnet die Werte automatisch zu</span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-4"> <span><code>props.airport</code> ist <code>undefined</code> – die Namen müssen beim Aufruf und in der Komponente übereinstimmen</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Der Browser zeigt „Wien“ trotzdem an</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>React nimmt den ersten übergebenen Wert</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>React ordnet die Werte automatisch zu</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-4"> <span><code>props.airport</code> ist <code>undefined</code> – die Namen müssen beim Aufruf und in der Komponente übereinstimmen</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
@@ -657,10 +658,10 @@ export default Welcome;</code></pre>
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 5</span> Warum lässt sich eine Komponente aus einer anderen Datei nicht importieren?</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Weil Komponenten immer in <code>App.tsx</code> stehen müssen</span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-5"> <span>Weil in der Komponenten-Datei <code>export default …</code> fehlt</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Weil die Datei auf <code>.tsx</code> endet</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Weil die CSS-Datei fehlt</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Weil Komponenten immer in <code>App.tsx</code> stehen müssen</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Weil die Datei auf <code>.tsx</code> endet</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-5"> <span>Weil in der Komponenten-Datei <code>export default …</code> fehlt</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
@@ -669,10 +670,10 @@ export default Welcome;</code></pre>
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 6</span> Gelten die Regeln aus <code>import './FlightRow.css';</code> nur für die Komponente <code>FlightRow</code>?</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-6"> <span>Ja, jede importierte CSS-Datei gilt nur für die Komponente, die sie importiert</span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-6"> <span>Nein, die Regeln gelten für die ganze Seite – gekapselt wären sie erst als CSS Module (<code>FlightRow.module.css</code>)</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-6"> <span>Ja, aber nur im Entwicklungsmodus</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-6"> <span>Nein, die Regeln gelten gar nicht, weil CSS in React nicht importiert werden darf</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-6"> <span>Nein, die Regeln gelten für die ganze Seite – gekapselt wären sie erst als CSS Module (<code>FlightRow.module.css</code>)</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-6"> <span>Ja, jede importierte CSS-Datei gilt nur für die Komponente, die sie importiert</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>

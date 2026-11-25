@@ -700,25 +700,26 @@ export default App;</code></pre>
         <details class="quiz-box">
 <summary><h2>Quiz</h2><span class="quiz-box-hint">5 Fragen &middot; zum Aufklappen klicken</span></summary>
 <div class="quiz" id="quiz-1">
-  <div class="quiz-frage" data-multi="0">
+  <div class="quiz-frage" data-multi="1">
     <p class="quiz-q"><span class="quiz-num">Frage 1</span> Warum bezeichnet man React als <strong>Bibliothek</strong> und nicht als Framework?</p>
+    <p class="quiz-hint">Mehrere Antworten sind richtig.</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Weil React nur wenige Zeilen Code hat</span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-1"> <span>Weil React sich nur um die View-Schicht kümmert – Routing, Datenabruf usw. kombiniert man mit weiteren Bibliotheken</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Weil React nur in Node.js läuft</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Weil React keine Komponenten kennt</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-1"> <span>Weil React keine Komponenten kennt</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-1"> <span>Weil erst Frameworks wie Next.js, die auf React aufbauen, Routing, Datenabruf und Build-Setup mitbringen</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-1"> <span>Weil React nur wenige Zeilen Code hat</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-1"> <span>Weil React sich nur um die View-Schicht kümmert – Routing, Datenabruf usw. kombiniert man mit weiteren Bibliotheken</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
-    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Angular bringt Routing, Formulare und HTTP mit. Bei React wählt man diese Teile selbst aus (z. B. React Router).</div>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> React kümmert sich nur um die View-Schicht. Für Routing, Datenabruf usw. kombiniert man weitere Bibliotheken – Frameworks wie Next.js bündeln diese Teile. Wie viele Zeilen React hat, spielt keine Rolle, und Komponenten sind gerade das zentrale Konzept von React.</div>
   </div>
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 2</span> Welche Aufgabe hat <code>src/main.tsx</code> in einem Vite-React-Projekt?</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Sie enthält alle Styles</span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-2"> <span>Sie verbindet React mit dem HTML-Dokument und rendert die <code>App</code>-Komponente in das Element <code>#root</code></span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Sie startet den Entwicklungsserver</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Sie enthält die Testdaten</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-2"> <span>Sie verbindet React mit dem HTML-Dokument und rendert die <code>App</code>-Komponente in das Element <code>#root</code></span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Sie enthält alle Styles</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Sie startet den Entwicklungsserver</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
@@ -727,34 +728,35 @@ export default App;</code></pre>
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 3</span> Warum startet Vite deutlich schneller als Create React App?</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Weil Vite keine TypeScript-Prüfung kennt</span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-3"> <span>Weil Vite native ES-Module im Browser nutzt, statt beim Start das ganze Projekt zu bündeln</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Weil Vite die App auf einem Cloud-Server baut</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Weil Vite nur kleine Projekte unterstützt</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Weil Vite keine TypeScript-Prüfung kennt</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Weil Vite die App auf einem Cloud-Server baut</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-3"> <span>Weil Vite native ES-Module im Browser nutzt, statt beim Start das ganze Projekt zu bündeln</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
     <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Create React App bündelt beim Start alles – bei größeren Projekten kann das Minuten dauern. CRA gilt heute als veraltet.</div>
   </div>
-  <div class="quiz-frage" data-multi="0">
-    <p class="quiz-q"><span class="quiz-num">Frage 4</span> Welche Aussage über JSX ist richtig?</p>
+  <div class="quiz-frage" data-multi="1">
+    <p class="quiz-q"><span class="quiz-num">Frage 4</span> Welche Aussagen über JSX sind richtig?</p>
+    <p class="quiz-hint">Mehrere Antworten sind richtig.</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>JSX ist HTML, das der Browser direkt versteht</span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-4"> <span>JSX ist eine HTML-ähnliche Syntax in JavaScript/TypeScript, die in Funktionsaufrufe übersetzt wird; statt <code>class</code> schreibt man <code>className</code></span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>In JSX darf man keine JavaScript-Ausdrücke verwenden</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Eine Komponente darf mehrere Elemente nebeneinander ohne gemeinsames Eltern-Element zurückgeben</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-4"> <span>Eine Komponente darf mehrere Elemente nebeneinander ohne gemeinsames Eltern-Element zurückgeben</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-4"> <span>JSX ist HTML, das der Browser direkt versteht</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-4"> <span>JSX ist eine HTML-ähnliche Syntax in JavaScript/TypeScript, die in Funktionsaufrufe übersetzt wird; statt <code>class</code> schreibt man <code>className</code></span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-4"> <span>In geschweiften Klammern <code>{ }</code> lassen sich JavaScript-Ausdrücke einbetten, z. B. <code>{flight.number}</code></span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
-    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Ausdrücke stehen in <code>{ }</code>. Mehrere Elemente brauchen ein gemeinsames Eltern-Element oder ein Fragment <code>&lt;&gt;…&lt;/&gt;</code>.</div>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> JSX ist eine HTML-ähnliche Syntax, die vor dem Ausführen in Funktionsaufrufe übersetzt wird – der Browser versteht sie nicht direkt. Statt <code>class</code> schreibt man <code>className</code>, und in geschweiften Klammern lassen sich JavaScript-Ausdrücke einbetten. Mehrere Elemente nebeneinander brauchen ein gemeinsames Eltern-Element.</div>
   </div>
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 5</span> Wozu dient <code>&lt;StrictMode&gt;</code>?</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Es macht TypeScript strenger</span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-5"> <span>Es ist ein Entwicklungs-Hilfsmittel, das Komponenten im Entwicklungsmodus doppelt rendert, um Fehler früh aufzudecken</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Es verhindert, dass Benutzer:innen die Seite verlassen</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Es aktiviert den Produktionsmodus</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Es verhindert, dass Benutzer:innen die Seite verlassen</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-5"> <span>Es ist ein Entwicklungs-Hilfsmittel, das Komponenten im Entwicklungsmodus doppelt rendert, um Fehler früh aufzudecken</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Es macht TypeScript strenger</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>

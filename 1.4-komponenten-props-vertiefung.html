@@ -1254,24 +1254,25 @@ export default AirportHeader;</code></pre>
         <details class="quiz-box">
 <summary><h2>Quiz</h2><span class="quiz-box-hint">5 Fragen &middot; zum Aufklappen klicken</span></summary>
 <div class="quiz" id="quiz-1">
-  <div class="quiz-frage" data-multi="0">
-    <p class="quiz-q"><span class="quiz-num">Frage 1</span> In welche Richtung fließen Props?</p>
+  <div class="quiz-frage" data-multi="1">
+    <p class="quiz-q"><span class="quiz-num">Frage 1</span> Was trifft auf den <strong>Datenfluss mit Props</strong> zu?</p>
+    <p class="quiz-hint">Mehrere Antworten sind richtig.</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Vom Kind zum Eltern-Element</span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-1"> <span>Immer von oben nach unten – von der Eltern- zur Kind-Komponente</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>In beide Richtungen</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Zwischen Geschwister-Komponenten</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-1"> <span>Props fließen in beide Richtungen</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-1"> <span>Props fließen vom Kind zum Eltern-Element</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-1"> <span>Eine Kind-Komponente darf ihre Props nur lesen, aber nicht verändern</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-1"> <span>Immer von oben nach unten – von der Eltern- zur Kind-Komponente</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
-    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Props sind für die Kind-Komponente schreibgeschützt. Soll das Kind etwas melden, bekommt es eine Callback-Funktion als Prop.</div>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Props fließen immer von oben nach unten, von der Eltern- zur Kind-Komponente. Das Kind darf seine Props nicht verändern – es liest sie nur. Geschwister tauschen keine Props direkt aus, und ein Rückweg vom Kind zum Eltern-Element über Props gibt es nicht.</div>
   </div>
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 2</span> Wie definiert man eine optionale Prop mit Default-Wert?</p>
     <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span><code>Badge.defaultProps = 'md'</code> ist die einzige Möglichkeit</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span><code>interface Props { size: string = 'md' }</code></span></label></li>
       <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-2"> <span>Im Interface <code>size?: string</code> und im Funktionskopf <code>function Badge({ size = 'md' }: Props)</code></span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span><code>Badge.defaultProps = 'md'</code> ist die einzige Möglichkeit</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Optionale Props gibt es in TypeScript nicht</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
@@ -1281,9 +1282,9 @@ export default AirportHeader;</code></pre>
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 3</span> Was zeigt <code>{count &amp;&amp; &lt;span&gt;{count} Flüge&lt;/span&gt;}</code> an, wenn <code>count</code> den Wert <code>0</code> hat?</p>
     <ul class="quiz-opts">
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>„0 Flüge“</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Nichts</span></label></li>
       <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-3"> <span>Die Zahl <code>0</code></span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>„0 Flüge“</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Einen Fehler</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
@@ -1294,25 +1295,26 @@ export default AirportHeader;</code></pre>
     <p class="quiz-q"><span class="quiz-num">Frage 4</span> Warum lagert man das Interface <code>Flight</code> in eine eigene Datei (z. B. <code>types/flight.ts</code>) aus?</p>
     <ul class="quiz-opts">
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Weil Interfaces nicht in <code>.tsx</code>-Dateien stehen dürfen</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Weil React das verlangt</span></label></li>
       <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-4"> <span>Weil mehrere Komponenten dasselbe Datenmodell verwenden und es nur an einer Stelle definiert sein soll</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Weil der Build sonst langsamer ist</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Weil React das verlangt</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
     <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Eine zentrale Typdatei verhindert widersprüchliche Definitionen in verschiedenen Komponenten.</div>
   </div>
-  <div class="quiz-frage" data-multi="0">
-    <p class="quiz-q"><span class="quiz-num">Frage 5</span> Welche Schreibweise ist ein gültiges Conditional Rendering mit zwei Alternativen?</p>
+  <div class="quiz-frage" data-multi="1">
+    <p class="quiz-q"><span class="quiz-num">Frage 5</span> Welche Schreibweisen sind gültiges <strong>Conditional Rendering</strong> in JSX?</p>
+    <p class="quiz-hint">Mehrere Antworten sind richtig.</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span><code>{if (delayed) &lt;Badge /&gt; else &lt;Ok /&gt;}</code></span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-5"> <span><code>{delayed ? &lt;Badge /&gt; : &lt;Ok /&gt;}</code></span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span><code>{delayed : &lt;Badge /&gt; ? &lt;Ok /&gt;}</code></span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span><code>&lt;if test={delayed}&gt;&lt;Badge /&gt;&lt;/if&gt;</code></span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-5"> <span><code>{if (delayed) &lt;Badge /&gt; else &lt;Ok /&gt;}</code></span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-5"> <span><code>{delayed ? &lt;Badge /&gt; : &lt;Ok /&gt;}</code></span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-5"> <span><code>&lt;if test={delayed}&gt;&lt;Badge /&gt;&lt;/if&gt;</code></span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-5"> <span><code>{delayed &amp;&amp; &lt;Badge /&gt;}</code></span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
-    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> In JSX sind nur Ausdrücke erlaubt, keine <code>if</code>-Anweisungen. Für zwei Alternativen nimmt man den Ternary-Operator, für „anzeigen oder nicht“ <code>&amp;&amp;</code> oder ein frühes <code>return</code>.</div>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> In JSX sind nur Ausdrücke erlaubt: der ternäre Operator <code>bedingung ? a : b</code> für zwei Alternativen und <code>bedingung &amp;&amp; a</code>, wenn nur bei <code>true</code> etwas erscheinen soll. Eine <code>if</code>-Anweisung ist kein Ausdruck und kann nicht direkt in <code>{ }</code> stehen; ein <code>&lt;if&gt;</code>-Element gibt es nicht.</div>
   </div>
   <div class="quiz-summary"><span class="quiz-score"></span><button type="button" class="quiz-reset">Zur&uuml;cksetzen</button></div>
 </div>

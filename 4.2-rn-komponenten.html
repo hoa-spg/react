@@ -751,23 +751,24 @@ const styles = StyleSheet.create({
         <details class="quiz-box">
 <summary><h2>Quiz</h2><span class="quiz-box-hint">5 Fragen &middot; zum Aufklappen klicken</span></summary>
 <div class="quiz" id="quiz-1">
-  <div class="quiz-frage" data-multi="0">
-    <p class="quiz-q"><span class="quiz-num">Frage 1</span> Welche <code>flexDirection</code> hat eine <code>View</code> in React Native standardmäßig?</p>
+  <div class="quiz-frage" data-multi="1">
+    <p class="quiz-q"><span class="quiz-num">Frage 1</span> Welche Aussagen über Flexbox in React Native sind richtig?</p>
+    <p class="quiz-hint">Mehrere Antworten sind richtig.</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span><code>row</code> wie im Web</span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-1"> <span><code>column</code></span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span><code>row-reverse</code></span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Gar keine – Flexbox muss erst aktiviert werden</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-1"> <span>Die Standardrichtung ist <code>column</code> – Kinder stehen untereinander</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-1"> <span>Die Standardrichtung ist <code>row</code> wie im Web</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-1"> <span>Jede <code>View</code> ist automatisch ein Flex-Container</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-1"> <span>Gar keine – Flexbox muss erst aktiviert werden</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
-    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Jede <code>View</code> ist ein Flex-Container, aber die Hauptachse verläuft standardmäßig von oben nach unten. Auch <code>flexShrink</code> ist anders (0 statt 1).</div>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> In React Native ist jede <code>View</code> automatisch ein Flex-Container. Anders als im Web ist die Standardrichtung <code>column</code> – Kinder stehen untereinander. Aktivieren muss man Flexbox nicht.</div>
   </div>
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 2</span> Drei Spalten haben <code>flex: 2</code>, <code>flex: 3</code> und <code>flex: 2</code>. Welchen Anteil bekommt die mittlere?</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>1/3</span></label></li>
       <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-2"> <span>3/7</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>1/3</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>3/5</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Die Hälfte</span></label></li>
     </ul>
@@ -779,9 +780,9 @@ const styles = StyleSheet.create({
     <p class="quiz-q"><span class="quiz-num">Frage 3</span> Warum verwendet man für lange Listen <code>FlatList</code> statt <code>ScrollView</code> mit <code>map()</code>?</p>
     <ul class="quiz-opts">
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Weil <code>ScrollView</code> nicht scrollen kann</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Weil <code>FlatList</code> automatisch sortiert</span></label></li>
       <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-3"> <span>Weil <code>FlatList</code> nur die sichtbaren Einträge rendert – <code>ScrollView</code> rendert alle auf einmal</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Weil <code>map()</code> in React Native verboten ist</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Weil <code>FlatList</code> automatisch sortiert</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
@@ -790,26 +791,27 @@ const styles = StyleSheet.create({
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 4</span> Welche Aufgabe hat <code>keyExtractor</code> bei der <code>FlatList</code>?</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Er filtert die Liste</span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-4"> <span>Er liefert für jeden Eintrag einen eindeutigen Schlüssel als String – statt <code>key</code> wie bei <code>map()</code></span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Er verschlüsselt die Daten</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Er bestimmt die Reihenfolge</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-4"> <span>Er liefert für jeden Eintrag einen eindeutigen Schlüssel als String – statt <code>key</code> wie bei <code>map()</code></span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Er filtert die Liste</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Er verschlüsselt die Daten</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
     <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Z. B. <code>keyExtractor={(item) =&gt; item.id.toString()}</code>.</div>
   </div>
-  <div class="quiz-frage" data-multi="0">
-    <p class="quiz-q"><span class="quiz-num">Frage 5</span> Wie bekommt man bei einem <code>TextInput</code> den neuen Text?</p>
+  <div class="quiz-frage" data-multi="1">
+    <p class="quiz-q"><span class="quiz-num">Frage 5</span> Was trifft auf einen <code>TextInput</code> zu?</p>
+    <p class="quiz-hint">Mehrere Antworten sind richtig.</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Über <code>onChange</code> und <code>event.target.value</code> wie im Web</span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-5"> <span>Über <code>onChangeText</code>, das direkt den neuen Text liefert</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Über <code>onInput</code></span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Über <code>ref.current.value</code></span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-5"> <span>Wie im Web lässt sich das Feld über <code>value</code> an State binden (Controlled Component)</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-5"> <span>Den neuen Text liest man über <code>onChange</code> und <code>event.target.value</code> wie im Web</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-5"> <span><code>onChangeText</code> liefert direkt den neuen Text als String</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-5"> <span>Den neuen Text liest man über <code>onInput</code></span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
-    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Wie im Web steuert man das Feld als Controlled Component über <code>value</code> und State.</div>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> <code>onChangeText</code> liefert direkt den neuen Text als String – kein Event-Objekt wie im Web. Für ein kontrolliertes Feld bindet man zusätzlich <code>value</code> an State. <code>event.target.value</code>, <code>onInput</code> oder <code>ref.current.value</code> sind Web-Muster.</div>
   </div>
   <div class="quiz-summary"><span class="quiz-score"></span><button type="button" class="quiz-reset">Zur&uuml;cksetzen</button></div>
 </div>

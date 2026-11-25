@@ -60,7 +60,7 @@ export const FlightProvider = ({ children }: { children: ReactNode }) => {
   );
 
   return (
-    <FlightContext.Provider
+    <FlightContext
       value={{
         isLoading,
         isRefreshing,
@@ -72,7 +72,7 @@ export const FlightProvider = ({ children }: { children: ReactNode }) => {
       }}
     >
       {children}
-    </FlightContext.Provider>
+    </FlightContext>
   );
 };
 

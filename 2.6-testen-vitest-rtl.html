@@ -611,25 +611,26 @@ test('Suche filtert die Tabelle, ohne Treffer erscheint der Empty State', async 
         <details class="quiz-box">
 <summary><h2>Quiz</h2><span class="quiz-box-hint">5 Fragen &middot; zum Aufklappen klicken</span></summary>
 <div class="quiz" id="quiz-1">
-  <div class="quiz-frage" data-multi="0">
-    <p class="quiz-q"><span class="quiz-num">Frage 1</span> Wie fragt die React Testing Library Elemente bevorzugt ab?</p>
+  <div class="quiz-frage" data-multi="1">
+    <p class="quiz-q"><span class="quiz-num">Frage 1</span> Worüber fragt die React Testing Library Elemente bevorzugt ab?</p>
+    <p class="quiz-hint">Mehrere Antworten sind richtig.</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Über CSS-Klassen</span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-1"> <span>Über Rollen, Labels und sichtbaren Text – aus Sicht der Benutzer:innen</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Über die Komponentennamen</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Über den State der Komponente</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-1"> <span>Über CSS-Klassen</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-1"> <span>Über Rollen, z. B. <code>getByRole('button')</code></span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-1"> <span>Über Labels und sichtbaren Text, z. B. <code>getByLabelText</code> und <code>getByText</code></span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-1"> <span>Über den State der Komponente</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
-    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Z. B. <code>screen.getByRole('button', { name: 'Speichern' })</code> oder <code>getByLabelText('Flugnummer')</code>.</div>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Die Testing Library fragt aus Sicht der Benutzer:innen ab: über Rollen (<code>getByRole</code>), Labels (<code>getByLabelText</code>) und sichtbaren Text (<code>getByText</code>). CSS-Klassen, Komponentennamen und State sind Implementierungsdetails, die Benutzer:innen nicht sehen.</div>
   </div>
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 2</span> Warum findet <code>getByLabelText('Flugnummer')</code> das Eingabefeld nicht?</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Weil Vitest keine Formulare kennt</span></label></li>
       <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-2"> <span>Weil <code>&lt;label&gt;</code> und <code>&lt;input&gt;</code> nur nebeneinander stehen und nicht über <code>htmlFor</code>/<code>id</code> verknüpft sind</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Weil der Text kleingeschrieben sein muss</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Weil Vitest keine Formulare kennt</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Weil Labels in React verboten sind</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Weil der Text kleingeschrieben sein muss</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
@@ -639,33 +640,34 @@ test('Suche filtert die Tabelle, ohne Treffer erscheint der Empty State', async 
     <p class="quiz-q"><span class="quiz-num">Frage 3</span> Welcher Matcher stammt aus <code>@testing-library/jest-dom</code>?</p>
     <ul class="quiz-opts">
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span><code>toBe()</code></span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span><code>toHaveLength()</code></span></label></li>
       <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-3"> <span><code>toBeInTheDocument()</code></span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span><code>toEqual()</code></span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span><code>toHaveLength()</code></span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
     <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> jest-dom ergänzt DOM-spezifische Matcher wie <code>toBeInTheDocument</code>, <code>toBeDisabled</code> oder <code>toHaveValue</code>. Die Setup-Datei bindet sie vor jedem Test ein.</div>
   </div>
-  <div class="quiz-frage" data-multi="0">
-    <p class="quiz-q"><span class="quiz-num">Frage 4</span> Wann verwendet man <code>queryBy…</code> statt <code>getBy…</code>?</p>
+  <div class="quiz-frage" data-multi="1">
+    <p class="quiz-q"><span class="quiz-num">Frage 4</span> Welche Aussagen über <code>getBy…</code> und <code>queryBy…</code> sind richtig?</p>
+    <p class="quiz-hint">Mehrere Antworten sind richtig.</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Wenn das Element sicher vorhanden ist</span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-4"> <span>Wenn man prüfen will, dass ein Element <em>nicht</em> vorhanden ist – <code>queryBy</code> liefert dann <code>null</code> statt einen Fehler zu werfen</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Wenn das Element erst später erscheint</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Nur bei Buttons</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-4"> <span><code>getBy…</code> wirft einen Fehler, wenn das Element nicht gefunden wird</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-4"> <span><code>queryBy…</code> wartet automatisch, bis das Element erscheint</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-4"> <span><code>getBy…</code> und <code>queryBy…</code> funktionieren nur bei Buttons</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-4"> <span>Wenn man prüfen will, dass ein Element <em>nicht</em> vorhanden ist – <code>queryBy</code> liefert dann <code>null</code> statt einen Fehler zu werfen</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
-    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> <code>getBy</code> wirft, wenn nichts gefunden wird. Für Elemente, die asynchron erscheinen, nimmt man <code>findBy</code> (liefert ein Promise).</div>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> <code>getBy…</code> wirft einen Fehler, wenn das Element fehlt – praktisch, wenn es sicher da sein muss. <code>queryBy…</code> liefert dann <code>null</code>; damit prüft man, dass ein Element <em>nicht</em> vorhanden ist. Auf Elemente, die erst später erscheinen, wartet <code>queryBy…</code> nicht.</div>
   </div>
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 5</span> In welcher Umgebung laufen die Komponententests mit Vitest?</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>In einem echten Chrome-Browser</span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-5"> <span>In jsdom, einer DOM-Simulation in Node.js</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Auf dem Deno-Backend</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Auf einem Smartphone-Emulator</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-5"> <span>In jsdom, einer DOM-Simulation in Node.js</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>In einem echten Chrome-Browser</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>

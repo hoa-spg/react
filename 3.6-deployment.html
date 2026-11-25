@@ -580,25 +580,26 @@ sudo systemctl restart flugboard</code></pre>
         <details class="quiz-box">
 <summary><h2>Quiz</h2><span class="quiz-box-hint">5 Fragen &middot; zum Aufklappen klicken</span></summary>
 <div class="quiz" id="quiz-1">
-  <div class="quiz-frage" data-multi="0">
+  <div class="quiz-frage" data-multi="1">
     <p class="quiz-q"><span class="quiz-num">Frage 1</span> Warum betreiben wir das FlugBoard auf einem eigenen Node-Server und nicht auf GitHub Pages?</p>
+    <p class="quiz-hint">Mehrere Antworten sind richtig.</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Weil GitHub Pages zu langsam ist</span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-1"> <span>Weil die App Server-Code ausführt (Server Components, Route Handlers, Server Actions) – auf statischem Hosting läuft kein Server-Code</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Weil GitHub Pages kein HTTPS kann</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Weil Next.js nur auf Linux läuft</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-1"> <span>Weil die App Daten in eine SQLite-Datei auf dem Server schreibt</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-1"> <span>Weil Next.js nur auf Linux läuft</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-1"> <span>Weil die App Server-Code ausführt (Server Components, Route Handlers, Server Actions) – auf statischem Hosting läuft kein Server-Code</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-1"> <span>Weil GitHub Pages zu langsam ist</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
-    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Statisches Hosting liefert nur Dateien aus. Next.js mit Server-Funktionen braucht einen laufenden Node.js-Prozess.</div>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Das FlugBoard führt Server-Code aus – Server Components, Route Handlers, Server Actions – und schreibt in eine SQLite-Datei. GitHub Pages liefert nur statische Dateien aus, dort läuft kein Server-Code. Geschwindigkeit, HTTPS oder das Betriebssystem sind nicht der Grund.</div>
   </div>
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 2</span> Warum passt eine Serverless-Plattform wie Vercel nur eingeschränkt zum FlugBoard?</p>
     <ul class="quiz-opts">
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Weil Vercel kein Next.js unterstützt</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Weil Vercel kein TypeScript kann</span></label></li>
       <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-2"> <span>Weil das Dateisystem dort nicht dauerhaft ist – die SQLite-Datei würde verloren gehen</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Weil Vercel nur statische Seiten kann</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Weil Vercel kein TypeScript kann</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
@@ -607,34 +608,35 @@ sudo systemctl restart flugboard</code></pre>
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 3</span> <code>npm start</code> meldet „Could not find a production build“. Was fehlt?</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span><code>npm install</code></span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span><code>npm run dev</code></span></label></li>
       <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-3"> <span>Zuerst <code>npm run build</code> – auch nach jedem <code>git pull</code></span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Die Datei <code>.env</code></span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span><code>npm run dev</code></span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span><code>npm install</code></span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
     <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> <code>npm start</code> startet den fertigen Build aus <code>.next/</code>. Der Build prüft außerdem die TypeScript-Typen.</div>
   </div>
-  <div class="quiz-frage" data-multi="0">
-    <p class="quiz-q"><span class="quiz-num">Frage 4</span> Eine Client Component liest <code>process.env.APP_NAME</code> und bekommt <code>undefined</code>. Warum?</p>
+  <div class="quiz-frage" data-multi="1">
+    <p class="quiz-q"><span class="quiz-num">Frage 4</span> Eine Client Component liest <code>process.env.APP_NAME</code> und bekommt <code>undefined</code>. Was stimmt?</p>
+    <p class="quiz-hint">Mehrere Antworten sind richtig.</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Weil Umgebungsvariablen in Next.js verboten sind</span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-4"> <span>Weil nur Variablen mit dem Präfix <code>NEXT_PUBLIC_</code> in den Browser-Code eingebaut werden</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Weil die Variable kleingeschrieben sein muss</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Weil <code>process.env</code> nur in Tests funktioniert</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-4"> <span>Weil die Variable kleingeschrieben sein muss</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-4"> <span>Weil Umgebungsvariablen in Next.js verboten sind</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-4"> <span>Weil die Variable ohne dieses Präfix nur im Server-Code lesbar ist, z. B. in Server Components und Route Handlers</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-4"> <span>Weil nur Variablen mit dem Präfix <code>NEXT_PUBLIC_</code> in den Browser-Code eingebaut werden</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
-    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Werte für den Browser heißen z. B. <code>NEXT_PUBLIC_APP_NAME</code> – aber nur, wenn sie nicht geheim sind. Nach einer Änderung muss neu gebaut werden.</div>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Nur Variablen mit dem Präfix <code>NEXT_PUBLIC_</code> werden in den Browser-Code eingebaut. Alle anderen sind nur im Server-Code lesbar – deshalb liefert <code>process.env.APP_NAME</code> in einer Client Component <code>undefined</code>. Groß-/Kleinschreibung oder Tests haben damit nichts zu tun.</div>
   </div>
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 5</span> Warum legt man die Datenbank auf dem Server über <code>DATABASE_PATH</code> außerhalb des Projektordners ab?</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Weil SQLite das verlangt</span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-5"> <span>Damit die Datei bei einem Update oder neuen Klonen des Codes nicht gelöscht wird</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Damit die App schneller startet</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Weil SQLite das verlangt</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>Damit die Datenbank öffentlich erreichbar ist</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-5"> <span>Damit die Datei bei einem Update oder neuen Klonen des Codes nicht gelöscht wird</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>

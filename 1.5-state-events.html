@@ -145,7 +145,18 @@ const [flights, setFlights] = useState&lt;Flight[]&gt;([]);</code></pre>
       <p>
         React-Events sind synthetische Events (Wrapper um native Browser-Events). In TypeScript m&uuml;ssen
         Event-Handler-Funktionen den richtigen Typ f&uuml;r den Event-Parameter haben. Die wichtigsten Typen
-        sind <code>React.MouseEvent</code>, <code>React.ChangeEvent</code> und <code>React.FormEvent</code>.
+        sind <code>React.MouseEvent</code> (Klicks), <code>React.ChangeEvent</code> (Eingabefelder) und
+        <code>React.SubmitEvent</code> (Absenden eines Formulars).
+      </p>
+      <p>
+        In &auml;lterem Code und vielen Tutorials findest du f&uuml;r Formulare noch
+        <code>React.FormEvent</code>. Dieser Typ ist seit React&nbsp;19.3 als veraltet (<em>deprecated</em>)
+        markiert &ndash; der Editor streicht ihn durch. Verwende stattdessen <code>React.SubmitEvent</code>.
+      </p>
+      <p>
+        Alle Event-Typen und ihre Eigenschaften findest du in der offiziellen React-Referenz:
+        <a href="https://react.dev/reference/react-dom/components/common#react-event-object"
+           target="_blank" rel="noopener">react.dev &ndash; React event object</a>.
       </p>
       <div class="code-block">
         <div class="code-header">
@@ -642,24 +653,25 @@ const FlightCard = ({ flight, isSelected, onSelect }: FlightCardProps) => {
         <details class="quiz-box">
 <summary><h2>Quiz</h2><span class="quiz-box-hint">5 Fragen &middot; zum Aufklappen klicken</span></summary>
 <div class="quiz" id="quiz-1">
-  <div class="quiz-frage" data-multi="0">
-    <p class="quiz-q"><span class="quiz-num">Frage 1</span> Was ist der wichtigste Unterschied zwischen <strong>Props</strong> und <strong>State</strong>?</p>
+  <div class="quiz-frage" data-multi="1">
+    <p class="quiz-q"><span class="quiz-num">Frage 1</span> Welche Aussagen über <strong>Props und State</strong> sind richtig?</p>
+    <p class="quiz-hint">Mehrere Antworten sind richtig.</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Props sind veränderlich, State ist konstant</span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-1"> <span>Props kommen von den Eltern und bleiben in der Komponente unverändert; State ist der interne, veränderliche Speicher der Komponente</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>State wird immer von der Eltern-Komponente gesetzt</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-1"> <span>Es gibt keinen Unterschied</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-1"> <span>Ändert man State über die Setter-Funktion (z. B. <code>setCount</code>), rendert React die Komponente neu</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-1"> <span>Props kommen von den Eltern und bleiben in der Komponente unverändert; State ist der interne, veränderliche Speicher der Komponente</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-1"> <span>Props sind veränderlich, State ist konstant</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-1"> <span>State wird immer von der Eltern-Komponente gesetzt</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
-    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Eine Komponente kann ihren eigenen State ändern, aber niemals direkt die Props eines Kindes.</div>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Props kommen von der Eltern-Komponente und bleiben in der Komponente unverändert. State ist der interne, veränderliche Speicher; ändert er sich über die Setter-Funktion, rendert React die Komponente neu. State wird nicht von der Eltern-Komponente gesetzt.</div>
   </div>
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 2</span> Warum wird nach <code>flights.push(neu); setFlights(flights);</code> nichts neu gerendert?</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Weil <code>push</code> in React verboten ist</span></label></li>
       <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-2"> <span>Weil das Array mutiert wurde und die Referenz gleich bleibt – React erkennt keine Änderung</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Weil <code>setFlights</code> asynchron ist</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Weil <code>push</code> in React verboten ist</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-2"> <span>Weil Arrays nicht im State stehen dürfen</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
@@ -669,34 +681,35 @@ const FlightCard = ({ flight, isSelected, onSelect }: FlightCardProps) => {
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 3</span> Wann verwendet man die Callback-Form <code>setCount(prev =&gt; prev + 1)</code>?</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Immer, die andere Form ist veraltet</span></label></li>
       <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-3"> <span>Wenn der neue Wert vom vorherigen State abhängt</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Nur bei Strings</span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Nur in Klassenkomponenten</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Immer, die andere Form ist veraltet</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-3"> <span>Nur bei Strings</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
     <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Die Callback-Form garantiert, dass mit dem aktuellsten Wert gerechnet wird – auch wenn mehrere Updates kurz hintereinander kommen.</div>
   </div>
-  <div class="quiz-frage" data-multi="0">
-    <p class="quiz-q"><span class="quiz-num">Frage 4</span> Wo dürfen Hooks wie <code>useState</code> aufgerufen werden?</p>
+  <div class="quiz-frage" data-multi="1">
+    <p class="quiz-q"><span class="quiz-num">Frage 4</span> Wo dürfen Hooks wie <code>useState</code> aufgerufen werden, und warum?</p>
+    <p class="quiz-hint">Mehrere Antworten sind richtig.</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Überall, auch in normalen Hilfsfunktionen und Schleifen</span></label></li>
-      <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-4"> <span>Nur auf oberster Ebene von Funktionskomponenten und Custom Hooks – nicht in Bedingungen oder Schleifen</span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Nur in <code>main.tsx</code></span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-4"> <span>Nur in Klassenkomponenten</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-4"> <span>Überall, auch in normalen Hilfsfunktionen und Schleifen</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="checkbox" name="quiz-1-4"> <span>Nur in Klassenkomponenten</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-4"> <span>React erkennt die Hooks einer Komponente an der Reihenfolge ihrer Aufrufe – deshalb muss sie bei jedem Render gleich sein</span></label></li>
+      <li class="quiz-opt" data-correct="1"><label><input type="checkbox" name="quiz-1-4"> <span>Nur auf oberster Ebene von Funktionskomponenten und Custom Hooks – nicht in Bedingungen oder Schleifen</span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
-    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> React ordnet Hooks über ihre Aufrufreihenfolge zu; die muss bei jedem Render gleich sein.</div>
+    <div class="quiz-erklaerung" hidden><strong>Erkl&auml;rung:</strong> Hooks dürfen nur auf oberster Ebene von Funktionskomponenten und Custom Hooks aufgerufen werden – nicht in Bedingungen, Schleifen oder normalen Hilfsfunktionen. Nur so ruft React sie bei jedem Render in derselben Reihenfolge auf und kann den State richtig zuordnen.</div>
   </div>
   <div class="quiz-frage" data-multi="0">
     <p class="quiz-q"><span class="quiz-num">Frage 5</span> <code>FlightDetail</code> und <code>FlightBoard</code> brauchen beide den ausgewählten Flug. Wo lebt der State <code>selectedFlight</code>?</p>
     <ul class="quiz-opts">
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>In <code>FlightDetail</code></span></label></li>
-      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>In <code>FlightCard</code></span></label></li>
       <li class="quiz-opt" data-correct="1"><label><input type="radio" name="quiz-1-5"> <span>Im gemeinsamen Eltern-Element (<code>App</code>) – „Lifting State Up“</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>In <code>FlightCard</code></span></label></li>
       <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>In einer globalen Variable</span></label></li>
+      <li class="quiz-opt" data-correct="0"><label><input type="radio" name="quiz-1-5"> <span>In <code>FlightDetail</code></span></label></li>
     </ul>
     <div class="quiz-actions"><button type="button" class="quiz-check" disabled>Antwort pr&uuml;fen</button><button type="button" class="quiz-reveal">L&ouml;sung zeigen</button></div>
     <p class="quiz-feedback" hidden></p>
